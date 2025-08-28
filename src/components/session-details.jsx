@@ -18,22 +18,35 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { loadStudentsByCourse, loadAttendance, saveAttendance } from '@/lib/mock-data';
+import { Label } from '@/components/ui/label';
 
 
 export default function SessionDetails({ courseId, sessionId }) {
   const { toast } = useToast();
   
-  const getInitialStudentState = useCallback((loadedAttendance, studentList) => {
+  const getInitialStudentState = useCallback(() => {
+    // This function will now be defined within useEffect to avoid re-creation issues
+    // and ensure it captures the correct state.
+    if (typeof window === 'undefined') {
+        const studentList = loadStudentsByCourse(courseId);
+         return studentList.map(student => ({
+            ...student,
+            status: 'Absent',
+        }));
+    }
+    const loadedAttendance = loadAttendance();
+    const studentList = loadStudentsByCourse(courseId);
     const sessionStudents = studentList || [];
     const attendanceForSession = loadedAttendance[sessionId] || {};
     return sessionStudents.map(student => ({
       ...student,
       status: attendanceForSession[student.id] || 'Absent',
     }));
-  }, [sessionId]);
+  }, [courseId, sessionId]);
   
   const [students, setStudents] = useState([]);
   const [isQrDialogOpen, setQrDialogOpen] = useState(false);
+  const [checkinUrl, setCheckinUrl] = useState('');
   
   const previousStudentsRef = useRef(students);
 
@@ -41,18 +54,30 @@ export default function SessionDetails({ courseId, sessionId }) {
     const studentList = loadStudentsByCourse(courseId);
     // Load initial data from localStorage on client-side only
     const loadedAttendance = loadAttendance();
-    const initialStudents = getInitialStudentState(loadedAttendance, studentList);
+    
+    const getClientInitialStudentState = () => {
+        const attendanceForSession = loadedAttendance[sessionId] || {};
+        return studentList.map(student => ({
+        ...student,
+        status: attendanceForSession[student.id] || 'Absent',
+        }));
+    }
+
+    const initialStudents = getClientInitialStudentState();
     setStudents(initialStudents);
     previousStudentsRef.current = initialStudents;
+    
+    // Set initial check-in URL
+    const placeholderUrl = `https://your-public-url.com/checkin/${courseId}/${sessionId}`;
+    setCheckinUrl(placeholderUrl);
 
     const interval = setInterval(() => {
       const currentAttendance = loadAttendance();
-      const studentList = loadStudentsByCourse(courseId);
-      const newStudents = getInitialStudentState(currentAttendance, studentList);
+      const newStudents = getClientInitialStudentState();
       
       const previousStudents = previousStudentsRef.current;
       if (JSON.stringify(previousStudents) !== JSON.stringify(newStudents)) {
-        newStudents.forEach((newStudent, index) => {
+        newStudents.forEach((newStudent) => {
           const oldStudent = previousStudents.find(s => s.id === newStudent.id);
           if (oldStudent && oldStudent.status !== newStudent.status && newStudent.status === 'Present') {
             toast({
@@ -69,7 +94,7 @@ export default function SessionDetails({ courseId, sessionId }) {
 
     return () => clearInterval(interval);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sessionId, courseId, getInitialStudentState]);
+  }, [sessionId, courseId]);
 
   const handleStudentStatusChange = (studentId, newStatus) => {
     const currentAttendance = loadAttendance();
@@ -79,7 +104,15 @@ export default function SessionDetails({ courseId, sessionId }) {
     currentAttendance[sessionId][studentId] = newStatus;
     saveAttendance(currentAttendance); // Save changes to localStorage
     const studentList = loadStudentsByCourse(courseId);
-    const updatedStudents = getInitialStudentState(currentAttendance, studentList);
+    
+    const getClientInitialStudentState = () => {
+        const attendanceForSession = currentAttendance[sessionId] || {};
+        return studentList.map(student => ({
+            ...student,
+            status: attendanceForSession[student.id] || 'Absent',
+        }));
+    }
+    const updatedStudents = getClientInitialStudentState();
     setStudents(updatedStudents);
     
     const student = students.find(s => s.id === studentId);
@@ -92,13 +125,6 @@ export default function SessionDetails({ courseId, sessionId }) {
     // Update ref after state change is processed
     previousStudentsRef.current = updatedStudents;
   };
-
-  const getCheckinUrl = () => {
-    if (typeof window === 'undefined') return '';
-    return `${window.location.origin}/checkin/${courseId}/${sessionId}`;
-  }
-  
-  const checkinUrl = getCheckinUrl();
   
   const handleCopy = () => {
     navigator.clipboard.writeText(checkinUrl);
@@ -144,16 +170,23 @@ export default function SessionDetails({ courseId, sessionId }) {
           <DialogHeader>
             <DialogTitle>Session QR Code</DialogTitle>
             <DialogDescription>
-              Students can scan this code or use the link below to check in.
+              Students can scan this code or use the link to check in. For mobile testing, replace the URL with your computer's local IP address.
             </DialogDescription>
           </DialogHeader>
-          <div className="p-6 bg-white rounded-lg flex items-center justify-center">
-            <QRCode value={checkinUrl} size={256} />
-          </div>
-          <div className="pt-4">
-            <p className="text-sm text-center text-muted-foreground mb-2">Or share this link:</p>
+          {checkinUrl && (
+            <div className="p-6 bg-white rounded-lg flex items-center justify-center">
+                <QRCode value={checkinUrl} size={256} />
+            </div>
+          )}
+          <div className="pt-4 space-y-2">
+            <Label htmlFor="checkin-url">Check-in URL</Label>
             <div className="flex items-center space-x-2">
-                <Input value={checkinUrl} readOnly className="flex-1" />
+                <Input 
+                    id="checkin-url"
+                    value={checkinUrl} 
+                    onChange={(e) => setCheckinUrl(e.target.value)}
+                    className="flex-1" 
+                />
                 <Button onClick={handleCopy} size="icon" variant="outline">
                     <Copy className="h-4 w-4" />
                     <span className="sr-only">Copy Link</span>
