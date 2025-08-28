@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { CheckCircle, ArrowLeft, Book, PlusCircle } from 'lucide-react';
@@ -23,11 +23,16 @@ import {
 } from '@/components/ui/alert-dialog';
 import { courseStudents } from '@/lib/mock-data';
 
+const getInitialSessions = (courseId) => {
+  if (typeof window === 'undefined') return [];
+  const storedSessions = localStorage.getItem(`sessions_${courseId}`);
+  return storedSessions ? JSON.parse(storedSessions) : [];
+};
 
 let sessionStore = [];
 
 export default function Dashboard({ courseId }) {
-  const [sessions, setSessions] = useState(sessionStore);
+  const [sessions, setSessions] = useState([]);
   const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -35,12 +40,22 @@ export default function Dashboard({ courseId }) {
   const [sessionToDeleteId, setSessionToDeleteId] = useState(null);
   const { toast } = useToast();
   
+  useEffect(() => {
+    sessionStore = getInitialSessions(courseId);
+    setSessions(sessionStore);
+  }, [courseId]);
+
+  const updateLocalStorage = (newSessions) => {
+    localStorage.setItem(`sessions_${courseId}`, JSON.stringify(newSessions));
+  };
+  
   const students = courseStudents[courseId] || [];
 
   const handleAddSession = (newSession) => {
     const newSessionWithId = { ...newSession, id: `SESS${Date.now()}` };
     sessionStore = [...sessionStore, newSessionWithId];
     setSessions(sessionStore);
+    updateLocalStorage(sessionStore);
     toast({
         title: "Class Session Created",
         description: `The session "${newSession.name}" has been successfully created.`,
@@ -58,6 +73,7 @@ export default function Dashboard({ courseId }) {
       s.id === updatedSession.id ? updatedSession : s
     );
     setSessions(sessionStore);
+    updateLocalStorage(sessionStore);
     setSelectedSession(null);
   };
 
@@ -70,6 +86,7 @@ export default function Dashboard({ courseId }) {
     if (sessionToDeleteId) {
       sessionStore = sessionStore.filter(s => s.id !== sessionToDeleteId);
       setSessions(sessionStore);
+      updateLocalStorage(sessionStore);
       setSessionToDeleteId(null);
     }
     setDeleteDialogOpen(false);
