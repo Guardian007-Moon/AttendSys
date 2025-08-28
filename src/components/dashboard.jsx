@@ -4,12 +4,11 @@ import { useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import AttendanceCard from './attendance-card';
-import SessionCard from './session-card';
-import RemediationCard from './remediation-card';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle, Info, ArrowLeft, Book } from 'lucide-react';
+import { CheckCircle, Info, ArrowLeft, Book, PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
+import ClassSessionList from './class-session-list';
+import CreateClassSessionDialog from './create-class-session-dialog';
 
 const initialStudents = [
   { id: 'S001', name: 'Amelia Harris', status: 'Absent' },
@@ -24,36 +23,24 @@ const initialStudents = [
   { id: 'S010', name: 'Jack Taylor', status: 'Absent' },
 ];
 
+let sessionStore = [];
+
 export default function Dashboard() {
-  const [isSessionActive, setIsSessionActive] = useState(false);
   const [students, setStudents] = useState(initialStudents);
+  const [sessions, setSessions] = useState(sessionStore);
+  const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
   const { toast } = useToast();
   const params = useParams();
   const courseId = params.courseId;
 
-  const handleStartSession = () => {
-    setIsSessionActive(true);
-    // Simulate some students scanning the QR code
-    setTimeout(() => {
-      setStudents(prevStudents =>
-        prevStudents.map(s =>
-          Math.random() > 0.4 ? { ...s, status: 'Present' } : s
-        )
-      );
-    }, 1500);
+  const handleAddSession = (newSession) => {
+    const newSessionWithId = { ...newSession, id: `SESS${Date.now()}` };
+    sessionStore = [...sessionStore, newSessionWithId];
+    setSessions(sessionStore);
     toast({
-      title: 'Session Started',
-      description: 'Attendance tracking is now active.',
-      action: <CheckCircle className="text-green-500" />,
-    });
-  };
-
-  const handleEndSession = () => {
-    setIsSessionActive(false);
-    toast({
-      title: 'Session Ended',
-      description: 'Attendance has been finalized.',
-      action: <Info className="text-primary" />,
+        title: "Class Session Created",
+        description: `The session "${newSession.name}" has been successfully created.`,
+        action: <CheckCircle className="text-green-500" />,
     });
   };
 
@@ -66,29 +53,37 @@ export default function Dashboard() {
             Back to Courses
           </Button>
         </Link>
-        <div className="flex items-center gap-3">
-          <Book className="h-8 w-8 text-primary" />
-          <h1 className="text-3xl font-bold font-headline text-primary">
-            Course: {courseId}
-          </h1>
+        <div className="flex items-center justify-between">
+            <div>
+                <div className="flex items-center gap-3">
+                    <Book className="h-8 w-8 text-primary" />
+                    <h1 className="text-3xl font-bold font-headline text-primary">
+                        Course: {courseId}
+                    </h1>
+                </div>
+                <p className="text-muted-foreground mt-1">
+                    Manage class sessions and track attendance for this course.
+                </p>
+            </div>
+            <Button onClick={() => setCreateDialogOpen(true)}>
+                <PlusCircle />
+                Create Session
+            </Button>
         </div>
-        <p className="text-muted-foreground mt-1">
-          Track attendance for this course session.
-        </p>
       </header>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
         <div className="lg:col-span-2">
           <AttendanceCard students={students} />
         </div>
         <div className="flex flex-col gap-6 lg:gap-8">
-          <SessionCard
-            isSessionActive={isSessionActive}
-            onStart={handleStartSession}
-            onEnd={handleEndSession}
-          />
-          <RemediationCard />
+            <ClassSessionList sessions={sessions} />
         </div>
       </div>
+      <CreateClassSessionDialog
+        isOpen={isCreateDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        onSessionCreate={handleAddSession}
+      />
     </>
   );
 }
