@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import QRCode from "react-qr-code";
 import AttendanceCard from './attendance-card';
-import { ArrowLeft, Book, QrCode } from 'lucide-react';
+import { ArrowLeft, Book, QrCode, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -14,10 +14,13 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { useToast } from '@/hooks/use-toast';
 import { courseStudents, sessionAttendance } from '@/lib/mock-data';
 
 
 export default function SessionDetails({ courseId, sessionId }) {
+  const { toast } = useToast();
   const initialStudents = courseStudents[courseId] || [];
   
   // Initialize student state for this session
@@ -53,6 +56,16 @@ export default function SessionDetails({ courseId, sessionId }) {
   const getCheckinUrl = () => {
     if (typeof window === 'undefined') return '';
     return `${window.location.origin}/checkin/${courseId}/${sessionId}`;
+  }
+  
+  const checkinUrl = getCheckinUrl();
+  
+  const handleCopy = () => {
+    navigator.clipboard.writeText(checkinUrl);
+    toast({
+        title: "Link Copied!",
+        description: "The check-in link has been copied to your clipboard.",
+    });
   }
 
   return (
@@ -91,11 +104,21 @@ export default function SessionDetails({ courseId, sessionId }) {
           <DialogHeader>
             <DialogTitle>Session QR Code</DialogTitle>
             <DialogDescription>
-              Students can scan this code to check in for the session.
+              Students can scan this code or use the link below to check in.
             </DialogDescription>
           </DialogHeader>
           <div className="p-6 bg-white rounded-lg flex items-center justify-center">
-            <QRCode value={getCheckinUrl()} size={256} />
+            <QRCode value={checkinUrl} size={256} />
+          </div>
+          <div className="pt-4">
+            <p className="text-sm text-center text-muted-foreground mb-2">Or share this link:</p>
+            <div className="flex items-center space-x-2">
+                <Input value={checkinUrl} readOnly className="flex-1" />
+                <Button onClick={handleCopy} size="icon" variant="outline">
+                    <Copy className="h-4 w-4" />
+                    <span className="sr-only">Copy Link</span>
+                </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
