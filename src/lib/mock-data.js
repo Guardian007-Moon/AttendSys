@@ -40,5 +40,26 @@ export const courseStudents = {
   ],
 };
 
+const ATTENDANCE_STORAGE_KEY = 'sessionAttendance';
+
 // Store session attendance data in a way that can be accessed across components
 export let sessionAttendance = {};
+
+// Function to load attendance from localStorage
+export const loadAttendance = () => {
+    if (typeof window === 'undefined') {
+        sessionAttendance = {};
+        return;
+    }
+    const storedAttendance = localStorage.getItem(ATTENDANCE_STORAGE_KEY);
+    sessionAttendance = storedAttendance ? JSON.parse(storedAttendance) : {};
+};
+
+// Function to save attendance to localStorage
+export const saveAttendance = () => {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem(ATTENDANCE_STORAGE_KEY, JSON.stringify(sessionAttendance));
+};
+
+// Load attendance when the app starts
+loadAttendance();

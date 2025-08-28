@@ -16,15 +16,14 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { courseStudents, sessionAttendance } from '@/lib/mock-data';
+import { courseStudents, sessionAttendance, loadAttendance, saveAttendance } from '@/lib/mock-data';
 
 
 export default function SessionDetails({ courseId, sessionId }) {
   const { toast } = useToast();
-  const initialStudents = courseStudents[courseId] || [];
   
-  // Initialize student state for this session
   const getInitialStudentState = () => {
+    loadAttendance(); // Load the latest attendance data
     const sessionStudents = courseStudents[courseId] || [];
     const attendanceForSession = sessionAttendance[sessionId] || {};
     return sessionStudents.map(student => ({
@@ -43,6 +42,7 @@ export default function SessionDetails({ courseId, sessionId }) {
     }, 2000); // Check for updates every 2 seconds
 
     return () => clearInterval(interval);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId, courseId]);
 
   const handleStudentStatusChange = (studentId, newStatus) => {
@@ -50,6 +50,7 @@ export default function SessionDetails({ courseId, sessionId }) {
         sessionAttendance[sessionId] = {};
     }
     sessionAttendance[sessionId][studentId] = newStatus;
+    saveAttendance(); // Save changes to localStorage
     setStudents(getInitialStudentState());
   };
 
