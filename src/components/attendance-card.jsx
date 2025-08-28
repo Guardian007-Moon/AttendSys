@@ -21,6 +21,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function AttendanceCard({ students, onStudentStatusChange }) {
   const [presentCount, setPresentCount] = useState(0);
@@ -66,35 +67,52 @@ export default function AttendanceCard({ students, onStudentStatusChange }) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {students.map(student => (
-                <TableRow key={student.id}>
-                  <TableCell className="font-medium">{student.name}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
-                       <Label
-                        htmlFor={`status-switch-${student.id}`}
-                        className={cn(
-                          student.status === 'Present'
-                            ? 'text-accent'
-                            : 'text-muted-foreground'
-                        )}
-                      >
-                        {student.status}
-                      </Label>
-                      <Switch
-                        id={`status-switch-${student.id}`}
-                        checked={student.status === 'Present'}
-                        onCheckedChange={isChecked =>
-                          onStudentStatusChange(
-                            student.id,
-                            isChecked ? 'Present' : 'Absent'
-                          )
-                        }
-                      />
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {isClient ? (
+                students.map(student => (
+                  <TableRow key={student.id}>
+                    <TableCell className="font-medium">{student.name}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                         <Label
+                          htmlFor={`status-switch-${student.id}`}
+                          className={cn(
+                            student.status === 'Present'
+                              ? 'text-accent'
+                              : 'text-muted-foreground'
+                          )}
+                        >
+                          {student.status}
+                        </Label>
+                        <Switch
+                          id={`status-switch-${student.id}`}
+                          checked={student.status === 'Present'}
+                          onCheckedChange={isChecked =>
+                            onStudentStatusChange(
+                              student.id,
+                              isChecked ? 'Present' : 'Absent'
+                            )
+                          }
+                        />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                // Show skeleton loaders on the server and initial client render
+                Array.from({ length: 5 }).map((_, index) => (
+                  <TableRow key={index}>
+                    <TableCell>
+                      <Skeleton className="h-5 w-3/4" />
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Skeleton className="h-5 w-12" />
+                        <Skeleton className="h-6 w-11" />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </ScrollArea>
