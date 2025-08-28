@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState } from 'react';
@@ -7,7 +8,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useToast } from '@/hooks/use-toast';
-import { courseStudents, loadAttendance, saveAttendance } from '@/lib/mock-data';
+import { loadStudentsByCourse, loadAttendance, saveAttendance } from '@/lib/mock-data';
 import {
   Card,
   CardContent,
@@ -43,7 +44,7 @@ export default function CheckinForm({ courseId, sessionId }) {
   });
 
   const onSubmit = (values) => {
-    const studentList = courseStudents[courseId] || [];
+    const studentList = loadStudentsByCourse(courseId);
     const student = studentList.find(
       s => s.name.toLowerCase() === values.name.toLowerCase()
     );

@@ -1,4 +1,5 @@
 
+
 export const initialCourses = [
   {
     id: 'CS101',
@@ -17,7 +18,7 @@ export const initialCourses = [
   },
 ];
 
-export const courseStudents = {
+export const initialCourseStudents = {
   CS101: [
     { id: 'S001', name: 'Amelia Harris', status: 'Absent' },
     { id: 'S002', name: 'Benjamin Carter', status: 'Absent' },
@@ -57,9 +58,8 @@ export const saveAttendance = (attendanceData) => {
     localStorage.setItem(ATTENDANCE_STORAGE_KEY, JSON.stringify(attendanceData));
 };
 
-// DEPRECATED: We no longer use a global variable.
-// We will remove this in a future step to avoid breaking other parts of the app immediately.
-export let sessionAttendance = loadAttendance();
-
-// We need to update the checkin form to use the new load/save functions.
-// This will be done in the next step.
+export const loadStudentsByCourse = (courseId) => {
+    if (typeof window === 'undefined') return initialCourseStudents[courseId] || [];
+    const storedStudents = localStorage.getItem(`students_${courseId}`);
+    return storedStudents ? JSON.parse(storedStudents) : (initialCourseStudents[courseId] || []);
+};

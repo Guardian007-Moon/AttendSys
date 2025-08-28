@@ -21,7 +21,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { courseStudents } from '@/lib/mock-data';
+import { initialCourseStudents } from '@/lib/mock-data';
 
 const getInitialSessions = (courseId) => {
   if (typeof window === 'undefined') return [];
@@ -29,10 +29,18 @@ const getInitialSessions = (courseId) => {
   return storedSessions ? JSON.parse(storedSessions) : [];
 };
 
+const getInitialStudents = (courseId) => {
+  if (typeof window === 'undefined') return initialCourseStudents[courseId] || [];
+  const storedStudents = localStorage.getItem(`students_${courseId}`);
+  return storedStudents ? JSON.parse(storedStudents) : (initialCourseStudents[courseId] || []);
+}
+
 let sessionStore = [];
+let studentStore = [];
 
 export default function Dashboard({ courseId }) {
   const [sessions, setSessions] = useState([]);
+  const [students, setStudents] = useState([]);
   const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -43,19 +51,23 @@ export default function Dashboard({ courseId }) {
   useEffect(() => {
     sessionStore = getInitialSessions(courseId);
     setSessions(sessionStore);
+    studentStore = getInitialStudents(courseId);
+    setStudents(studentStore);
   }, [courseId]);
 
-  const updateLocalStorage = (newSessions) => {
+  const updateSessionsLocalStorage = (newSessions) => {
     localStorage.setItem(`sessions_${courseId}`, JSON.stringify(newSessions));
   };
   
-  const students = courseStudents[courseId] || [];
+  const updateStudentsLocalStorage = (newStudents) => {
+    localStorage.setItem(`students_${courseId}`, JSON.stringify(newStudents));
+  }
 
   const handleAddSession = (newSession) => {
     const newSessionWithId = { ...newSession, id: `SESS${Date.now()}` };
     sessionStore = [...sessionStore, newSessionWithId];
     setSessions(sessionStore);
-    updateLocalStorage(sessionStore);
+    updateSessionsLocalStorage(sessionStore);
     toast({
         title: "Class Session Created",
         description: `The session "${newSession.name}" has been successfully created.`,
@@ -73,7 +85,7 @@ export default function Dashboard({ courseId }) {
       s.id === updatedSession.id ? updatedSession : s
     );
     setSessions(sessionStore);
-    updateLocalStorage(sessionStore);
+    updateSessionsLocalStorage(sessionStore);
     setSelectedSession(null);
   };
 
@@ -86,10 +98,16 @@ export default function Dashboard({ courseId }) {
     if (sessionToDeleteId) {
       sessionStore = sessionStore.filter(s => s.id !== sessionToDeleteId);
       setSessions(sessionStore);
-      updateLocalStorage(sessionStore);
+      updateSessionsLocalStorage(sessionStore);
       setSessionToDeleteId(null);
     }
     setDeleteDialogOpen(false);
+  };
+
+  const handleStudentUpdate = (updatedStudents) => {
+    studentStore = updatedStudents;
+    setStudents(studentStore);
+    updateStudentsLocalStorage(studentStore);
   };
 
   return (
@@ -122,7 +140,7 @@ export default function Dashboard({ courseId }) {
        <Tabs defaultValue="sessions">
         <TabsList className="mb-4">
           <TabsTrigger value="sessions">Class Sessions</TabsTrigger>
-          <TabsTrigger value="attendance">Attendance Dashboard</TabsTrigger>
+          <TabsTrigger value="attendance">Student Roster</TabsTrigger>
         </TabsList>
         <TabsContent value="sessions">
           <ClassSessionList
@@ -133,7 +151,12 @@ export default function Dashboard({ courseId }) {
           />
         </TabsContent>
         <TabsContent value="attendance">
-          <StudentAttendanceDashboard students={students} sessions={sessions} />
+          <StudentAttendanceDashboard 
+            students={students} 
+            sessions={sessions}
+            onStudentUpdate={handleStudentUpdate}
+            courseId={courseId}
+          />
         </TabsContent>
       </Tabs>
       <CreateClassSessionDialog

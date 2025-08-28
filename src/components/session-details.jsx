@@ -1,7 +1,8 @@
 
+
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import QRCode from "react-qr-code";
 import AttendanceCard from './attendance-card';
@@ -16,42 +17,43 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { courseStudents, sessionAttendance, loadAttendance, saveAttendance } from '@/lib/mock-data';
+import { loadStudentsByCourse, loadAttendance, saveAttendance } from '@/lib/mock-data';
 
 
 export default function SessionDetails({ courseId, sessionId }) {
   const { toast } = useToast();
   
-  const getInitialStudentState = (loadedAttendance) => {
-    const sessionStudents = courseStudents[courseId] || [];
+  const getInitialStudentState = useCallback((loadedAttendance, studentList) => {
+    const sessionStudents = studentList || [];
     const attendanceForSession = loadedAttendance[sessionId] || {};
     return sessionStudents.map(student => ({
       ...student,
       status: attendanceForSession[student.id] || 'Absent',
     }));
-  };
+  }, [sessionId]);
   
-  const [students, setStudents] = useState(getInitialStudentState({}));
+  const [students, setStudents] = useState([]);
   const [isQrDialogOpen, setQrDialogOpen] = useState(false);
   
-  // Use a ref to hold the previous students array for comparison
   const previousStudentsRef = useRef(students);
 
   useEffect(() => {
+    const studentList = loadStudentsByCourse(courseId);
     // Load initial data from localStorage on client-side only
     const loadedAttendance = loadAttendance();
-    const initialStudents = getInitialStudentState(loadedAttendance);
+    const initialStudents = getInitialStudentState(loadedAttendance, studentList);
     setStudents(initialStudents);
     previousStudentsRef.current = initialStudents;
 
     const interval = setInterval(() => {
       const currentAttendance = loadAttendance();
-      const newStudents = getInitialStudentState(currentAttendance);
+      const studentList = loadStudentsByCourse(courseId);
+      const newStudents = getInitialStudentState(currentAttendance, studentList);
       
       const previousStudents = previousStudentsRef.current;
       if (JSON.stringify(previousStudents) !== JSON.stringify(newStudents)) {
         newStudents.forEach((newStudent, index) => {
-          const oldStudent = previousStudents[index];
+          const oldStudent = previousStudents.find(s => s.id === newStudent.id);
           if (oldStudent && oldStudent.status !== newStudent.status && newStudent.status === 'Present') {
             toast({
               title: 'Student Checked In',
@@ -67,7 +69,7 @@ export default function SessionDetails({ courseId, sessionId }) {
 
     return () => clearInterval(interval);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sessionId, courseId]);
+  }, [sessionId, courseId, getInitialStudentState]);
 
   const handleStudentStatusChange = (studentId, newStatus) => {
     const currentAttendance = loadAttendance();
@@ -76,10 +78,10 @@ export default function SessionDetails({ courseId, sessionId }) {
     }
     currentAttendance[sessionId][studentId] = newStatus;
     saveAttendance(currentAttendance); // Save changes to localStorage
-    const updatedStudents = getInitialStudentState(currentAttendance);
+    const studentList = loadStudentsByCourse(courseId);
+    const updatedStudents = getInitialStudentState(currentAttendance, studentList);
     setStudents(updatedStudents);
-    previousStudentsRef.current = updatedStudents;
-
+    
     const student = students.find(s => s.id === studentId);
     if (student) {
         toast({
@@ -87,6 +89,8 @@ export default function SessionDetails({ courseId, sessionId }) {
             description: `${student.name} is now marked as ${newStatus}.`,
         });
     }
+    // Update ref after state change is processed
+    previousStudentsRef.current = updatedStudents;
   };
 
   const getCheckinUrl = () => {
