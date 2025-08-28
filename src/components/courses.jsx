@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -16,24 +17,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-
-const initialCourses = [
-  {
-    id: 'CS101',
-    name: 'Introduction to Computer Science',
-    description: 'Learn the fundamentals of programming and computer science.',
-  },
-  {
-    id: 'PHY201',
-    name: 'University Physics I',
-    description: 'Explore classical mechanics and thermodynamics.',
-  },
-  {
-    id: 'ENG303',
-    name: 'Shakespearean Literature',
-    description: 'A deep dive into the works of William Shakespeare.',
-  },
-];
+import { initialCourses } from '@/lib/mock-data';
 
 let courseStore = [...initialCourses];
 

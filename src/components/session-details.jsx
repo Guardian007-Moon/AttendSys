@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import QRCode from "react-qr-code";
 import AttendanceCard from './attendance-card';
@@ -13,31 +14,40 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
+import { courseStudents, sessionAttendance } from '@/lib/mock-data';
 
-
-const initialStudents = [
-  { id: 'S001', name: 'Amelia Harris', status: 'Absent' },
-  { id: 'S002', name: 'Benjamin Carter', status: 'Absent' },
-  { id: 'S003', name: 'Charlotte Davis', status: 'Absent' },
-  { id: 'S004', name: 'Daniel Evans', status: 'Absent' },
-  { id: 'S005', name: 'Emily Garcia', status: 'Absent' },
-  { id: 'S006', name: 'Finn Miller', status: 'Absent' },
-  { id: 'S007', name: 'Grace Rodriguez', status: 'Absent' },
-  { id: 'S008', name: 'Henry Wilson', status: 'Absent' },
-  { id: 'S009', name: 'Isabella Moore', status: 'Absent' },
-  { id: 'S010', name: 'Jack Taylor', status: 'Absent' },
-];
 
 export default function SessionDetails({ courseId, sessionId }) {
-  const [students, setStudents] = useState(initialStudents);
+  const initialStudents = courseStudents[courseId] || [];
+  
+  // Initialize student state for this session
+  const getInitialStudentState = () => {
+    const sessionStudents = courseStudents[courseId] || [];
+    const attendanceForSession = sessionAttendance[sessionId] || {};
+    return sessionStudents.map(student => ({
+      ...student,
+      status: attendanceForSession[student.id] || 'Absent',
+    }));
+  };
+  
+  const [students, setStudents] = useState(getInitialStudentState);
   const [isQrDialogOpen, setQrDialogOpen] = useState(false);
+  
+  // Poll for attendance updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStudents(getInitialStudentState());
+    }, 2000); // Check for updates every 2 seconds
+
+    return () => clearInterval(interval);
+  }, [sessionId, courseId]);
 
   const handleStudentStatusChange = (studentId, newStatus) => {
-    setStudents(prevStudents =>
-      prevStudents.map(student =>
-        student.id === studentId ? { ...student, status: newStatus } : student
-      )
-    );
+    if (!sessionAttendance[sessionId]) {
+        sessionAttendance[sessionId] = {};
+    }
+    sessionAttendance[sessionId][studentId] = newStatus;
+    setStudents(getInitialStudentState());
   };
 
   const getCheckinUrl = () => {

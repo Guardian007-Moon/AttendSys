@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -20,22 +21,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { courseStudents } from '@/lib/mock-data';
 
 
 let sessionStore = [];
-
-const students = [
-  { id: 'S001', name: 'Amelia Harris' },
-  { id: 'S002', name: 'Benjamin Carter' },
-  { id: 'S003', name: 'Charlotte Davis' },
-  { id: 'S004', name: 'Daniel Evans' },
-  { id: 'S005', name: 'Emily Garcia' },
-  { id: 'S006', name: 'Finn Miller' },
-  { id: 'S007', name: 'Grace Rodriguez' },
-  { id: 'S008', name: 'Henry Wilson' },
-  { id: 'S009', name: 'Isabella Moore' },
-  { id: 'S010', name: 'Jack Taylor' },
-];
 
 export default function Dashboard({ courseId }) {
   const [sessions, setSessions] = useState(sessionStore);
@@ -45,6 +34,8 @@ export default function Dashboard({ courseId }) {
   const [selectedSession, setSelectedSession] = useState(null);
   const [sessionToDeleteId, setSessionToDeleteId] = useState(null);
   const { toast } = useToast();
+  
+  const students = courseStudents[courseId] || [];
 
   const handleAddSession = (newSession) => {
     const newSessionWithId = { ...newSession, id: `SESS${Date.now()}` };

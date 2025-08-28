@@ -1,3 +1,4 @@
+
 import { Download } from 'lucide-react';
 import {
   Card,
@@ -16,6 +17,8 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { sessionAttendance } from '@/lib/mock-data';
+
 
 // Mock function to simulate generating and downloading a CSV report.
 const downloadReport = (data) => {
@@ -38,10 +41,13 @@ const downloadReport = (data) => {
 
 
 export default function StudentAttendanceDashboard({ students, sessions }) {
-  // In a real app, this data would be fetched and calculated from session records.
-  // For this prototype, we'll generate some mock data.
   const attendanceData = students.map(student => {
-    const present = Math.floor(Math.random() * (sessions.length + 1));
+    let present = 0;
+    sessions.forEach(session => {
+        if (sessionAttendance[session.id] && sessionAttendance[session.id][student.id] === 'Present') {
+            present++;
+        }
+    });
     const absent = sessions.length - present;
     return {
       name: student.name,
