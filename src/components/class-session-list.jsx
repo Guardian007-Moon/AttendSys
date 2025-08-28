@@ -1,4 +1,5 @@
-import { Clock } from 'lucide-react';
+import Link from 'next/link';
+import { Clock, Eye } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -8,6 +9,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@/components/ui/button';
 
 const formatTime = (timeString) => {
     if (!timeString) return '';
@@ -18,7 +20,7 @@ const formatTime = (timeString) => {
     return `${formattedHour}:${minute} ${ampm}`;
 }
 
-export default function ClassSessionList({ sessions }) {
+export default function ClassSessionList({ sessions, courseId }) {
   if (sessions.length === 0) {
     return (
       <Card className="shadow-lg h-full">
@@ -54,7 +56,7 @@ export default function ClassSessionList({ sessions }) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ScrollArea className="h-[450px]">
+        <ScrollArea className="h-[600px]">
             <div className="space-y-4">
                 {sessions.map(session => (
                     <div key={session.id} className="p-3 rounded-lg border flex justify-between items-center">
@@ -64,7 +66,14 @@ export default function ClassSessionList({ sessions }) {
                                 {new Date(session.date).toLocaleDateString()} - {formatTime(session.startTime)} to {formatTime(session.endTime)}
                             </p>
                         </div>
-                        <Badge>Not Started</Badge>
+                        <div className="flex items-center gap-2">
+                            <Badge>Not Started</Badge>
+                             <Link href={`/courses/${courseId}/sessions/${session.id}`} passHref>
+                                <Button variant="outline" size="icon">
+                                    <Eye className="h-4 w-4" />
+                                </Button>
+                            </Link>
+                        </div>
                     </div>
                 ))}
             </div>

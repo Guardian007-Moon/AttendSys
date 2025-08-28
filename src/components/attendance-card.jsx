@@ -33,7 +33,7 @@ export default function AttendanceCard({ students }) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ScrollArea className="h-[450px]">
+        <ScrollArea className="h-[600px]">
           <Table>
             <TableHeader className="sticky top-0 bg-card">
               <TableRow>
