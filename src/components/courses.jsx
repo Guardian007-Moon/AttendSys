@@ -24,15 +24,18 @@ const initialCourses = [
   },
 ];
 
+// In-memory store for courses to persist across navigation
+let courseStore = [...initialCourses];
+
 export default function Courses() {
-  const [courses, setCourses] = useState(initialCourses);
+  // We use a state to trigger re-renders, but the source of truth is courseStore
+  const [courses, setCourses] = useState(courseStore);
   const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
 
   const handleAddCourse = (newCourse) => {
-    setCourses((prevCourses) => [
-      ...prevCourses,
-      { ...newCourse, id: `C${Date.now()}` },
-    ]);
+    const newCourseWithId = { ...newCourse, id: `C${Date.now()}` };
+    courseStore = [...courseStore, newCourseWithId];
+    setCourses(courseStore);
   };
 
   return (
