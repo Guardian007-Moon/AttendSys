@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import QRCode from "react-qr-code";
 import AttendanceCard from './attendance-card';
@@ -35,27 +35,35 @@ export default function SessionDetails({ courseId, sessionId }) {
   const [students, setStudents] = useState(getInitialStudentState);
   const [isQrDialogOpen, setQrDialogOpen] = useState(false);
   
+  // Use a ref to hold the previous students array for comparison
+  const previousStudentsRef = useRef(students);
+
   // Poll for attendance updates
   useEffect(() => {
     const interval = setInterval(() => {
       const newStudents = getInitialStudentState();
-       // Check if there's a change in student status to show a toast
-      students.forEach((oldStudent, index) => {
-        const newStudent = newStudents[index];
-        if (oldStudent.status !== newStudent.status && newStudent.status === 'Present') {
-          toast({
-            title: 'Student Checked In',
-            description: `${newStudent.name} has been marked as Present.`,
-            action: <CheckCircle className="text-green-500" />,
-          });
-        }
-      });
-      setStudents(newStudents);
+      
+      // Compare with the previous state to detect changes
+      const previousStudents = previousStudentsRef.current;
+      if (JSON.stringify(previousStudents) !== JSON.stringify(newStudents)) {
+        newStudents.forEach((newStudent, index) => {
+          const oldStudent = previousStudents[index];
+          if (oldStudent && oldStudent.status !== newStudent.status && newStudent.status === 'Present') {
+            toast({
+              title: 'Student Checked In',
+              description: `${newStudent.name} has been marked as Present.`,
+              action: <CheckCircle className="text-green-500" />,
+            });
+          }
+        });
+        setStudents(newStudents);
+        previousStudentsRef.current = newStudents;
+      }
     }, 2000); // Check for updates every 2 seconds
 
     return () => clearInterval(interval);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sessionId, courseId, students]);
+  }, [sessionId, courseId]);
 
   const handleStudentStatusChange = (studentId, newStatus) => {
     if (!sessionAttendance[sessionId]) {
@@ -65,6 +73,7 @@ export default function SessionDetails({ courseId, sessionId }) {
     saveAttendance(); // Save changes to localStorage
     const updatedStudents = getInitialStudentState();
     setStudents(updatedStudents);
+    previousStudentsRef.current = updatedStudents; // Update ref immediately
 
     const student = students.find(s => s.id === studentId);
     if (student) {
