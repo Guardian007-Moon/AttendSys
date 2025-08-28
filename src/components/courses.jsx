@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Book, PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import CreateCourseDialog from './create-course-dialog';
@@ -19,20 +19,38 @@ import {
 } from '@/components/ui/alert-dialog';
 import { initialCourses } from '@/lib/mock-data';
 
-let courseStore = [...initialCourses];
+const getInitialCourses = () => {
+  if (typeof window === 'undefined') return initialCourses;
+  const storedCourses = localStorage.getItem('courses');
+  return storedCourses ? JSON.parse(storedCourses) : initialCourses;
+};
+
+let courseStore = [];
 
 export default function Courses() {
-  const [courses, setCourses] = useState(courseStore);
+  const [courses, setCourses] = useState([]);
   const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [courseToDeleteId, setCourseToDeleteId] = useState(null);
 
+  useEffect(() => {
+    courseStore = getInitialCourses();
+    setCourses(courseStore);
+  }, []);
+
+  const updateLocalStorage = (newCourses) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('courses', JSON.stringify(newCourses));
+    }
+  };
+
   const handleAddCourse = newCourse => {
     const newCourseWithId = { ...newCourse, id: `C${Date.now()}` };
     courseStore = [...courseStore, newCourseWithId];
     setCourses(courseStore);
+    updateLocalStorage(courseStore);
   };
 
   const handleOpenEditDialog = course => {
@@ -45,6 +63,7 @@ export default function Courses() {
       c.id === updatedCourse.id ? updatedCourse : c
     );
     setCourses(courseStore);
+    updateLocalStorage(courseStore);
     setSelectedCourse(null);
   };
 
@@ -57,6 +76,7 @@ export default function Courses() {
     if (courseToDeleteId) {
       courseStore = courseStore.filter(c => c.id !== courseToDeleteId);
       setCourses(courseStore);
+      updateLocalStorage(courseStore);
       setCourseToDeleteId(null);
     }
     setDeleteDialogOpen(false);
