@@ -5,12 +5,12 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  CardFooter
+  CardFooter,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Pencil, Trash2 } from 'lucide-react';
 
-export default function CourseList({ courses }) {
+export default function CourseList({ courses, onEdit, onDelete }) {
   if (courses.length === 0) {
     return (
       <div className="text-center py-16 border-2 border-dashed rounded-lg">
@@ -24,17 +24,34 @@ export default function CourseList({ courses }) {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {courses.map((course) => (
+      {courses.map(course => (
         <Card key={course.id} className="flex flex-col">
           <CardHeader>
             <CardTitle>{course.name}</CardTitle>
             <CardDescription>{course.description}</CardDescription>
           </CardHeader>
           <CardContent className="flex-grow" />
-          <CardFooter>
-            <Link href={`/courses/${course.id}`} passHref className="w-full">
+          <CardFooter className="flex justify-between gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onEdit(course)}
+              aria-label="Edit course"
+            >
+              <Pencil className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onDelete(course.id)}
+              className="text-destructive hover:text-destructive"
+              aria-label="Delete course"
+            >
+              <Trash2 className="h-5 w-5" />
+            </Button>
+            <Link href={`/courses/${course.id}`} passHref className="flex-grow">
               <Button variant="outline" className="w-full">
-                View Course
+                View
                 <ArrowRight />
               </Button>
             </Link>
