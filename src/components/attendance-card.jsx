@@ -1,3 +1,6 @@
+
+'use client';
+import { useState, useEffect } from 'react';
 import { Users } from 'lucide-react';
 import {
   Card,
@@ -20,8 +23,20 @@ import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 
 export default function AttendanceCard({ students, onStudentStatusChange }) {
-  const presentCount = students.filter(s => s.status === 'Present').length;
-  const totalCount = students.length;
+  const [presentCount, setPresentCount] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (isClient) {
+      setPresentCount(students.filter(s => s.status === 'Present').length);
+      setTotalCount(students.length);
+    }
+  }, [students, isClient]);
 
   return (
     <Card className="shadow-lg h-full">
@@ -31,8 +46,14 @@ export default function AttendanceCard({ students, onStudentStatusChange }) {
           <CardTitle className="font-headline">Classroom Attendance</CardTitle>
         </div>
         <CardDescription>
-          Live view of student check-ins. {presentCount} of {totalCount}{' '}
-          students present.
+          Live view of student check-ins.{' '}
+          {isClient ? (
+            <>
+              {presentCount} of {totalCount} students present.
+            </>
+          ) : (
+            'Loading attendance...'
+          )}
         </CardDescription>
       </CardHeader>
       <CardContent>
