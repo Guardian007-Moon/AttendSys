@@ -14,14 +14,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 
 export default function AttendanceCard({ students, onStudentStatusChange }) {
@@ -54,27 +49,28 @@ export default function AttendanceCard({ students, onStudentStatusChange }) {
                 <TableRow key={student.id}>
                   <TableCell className="font-medium">{student.name}</TableCell>
                   <TableCell className="text-right">
-                    <Select
-                      value={student.status}
-                      onValueChange={newStatus =>
-                        onStudentStatusChange(student.id, newStatus)
-                      }
-                    >
-                      <SelectTrigger
+                    <div className="flex items-center justify-end gap-2">
+                       <Label
+                        htmlFor={`status-switch-${student.id}`}
                         className={cn(
-                          'w-[120px]',
                           student.status === 'Present'
-                            ? 'bg-accent text-accent-foreground'
-                            : 'bg-muted text-muted-foreground'
+                            ? 'text-accent'
+                            : 'text-muted-foreground'
                         )}
                       >
-                        <SelectValue placeholder="Set status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Present">Present</SelectItem>
-                        <SelectItem value="Absent">Absent</SelectItem>
-                      </SelectContent>
-                    </Select>
+                        {student.status}
+                      </Label>
+                      <Switch
+                        id={`status-switch-${student.id}`}
+                        checked={student.status === 'Present'}
+                        onCheckedChange={isChecked =>
+                          onStudentStatusChange(
+                            student.id,
+                            isChecked ? 'Present' : 'Absent'
+                          )
+                        }
+                      />
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
