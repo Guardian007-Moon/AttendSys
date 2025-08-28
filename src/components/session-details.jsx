@@ -24,16 +24,17 @@ import { Label } from '@/components/ui/label';
 export default function SessionDetails({ courseId, sessionId }) {
   const { toast } = useToast();
   
-  const getInitialStudentState = useCallback(() => {
-    // This function will now be defined within useEffect to avoid re-creation issues
-    // and ensure it captures the correct state.
+  const [students, setStudents] = useState(() => {
+    // Initial state on the server can be an empty array
+    // or a version without localStorage access.
     if (typeof window === 'undefined') {
-        const studentList = loadStudentsByCourse(courseId);
-         return studentList.map(student => ({
-            ...student,
-            status: 'Absent',
-        }));
+      const studentList = loadStudentsByCourse(courseId);
+      return studentList.map(student => ({
+        ...student,
+        status: 'Absent',
+      }));
     }
+    // Client-side initial state with localStorage
     const loadedAttendance = loadAttendance();
     const studentList = loadStudentsByCourse(courseId);
     const sessionStudents = studentList || [];
@@ -42,9 +43,8 @@ export default function SessionDetails({ courseId, sessionId }) {
       ...student,
       status: attendanceForSession[student.id] || 'Absent',
     }));
-  }, [courseId, sessionId]);
-  
-  const [students, setStudents] = useState([]);
+  });
+
   const [isQrDialogOpen, setQrDialogOpen] = useState(false);
   const [checkinUrl, setCheckinUrl] = useState('');
   
@@ -52,10 +52,9 @@ export default function SessionDetails({ courseId, sessionId }) {
 
   useEffect(() => {
     const studentList = loadStudentsByCourse(courseId);
-    // Load initial data from localStorage on client-side only
-    const loadedAttendance = loadAttendance();
     
     const getClientInitialStudentState = () => {
+        const loadedAttendance = loadAttendance();
         const attendanceForSession = loadedAttendance[sessionId] || {};
         return studentList.map(student => ({
         ...student,
@@ -67,12 +66,13 @@ export default function SessionDetails({ courseId, sessionId }) {
     setStudents(initialStudents);
     previousStudentsRef.current = initialStudents;
     
-    // Set initial check-in URL
-    const placeholderUrl = `https://your-public-url.com/checkin/${courseId}/${sessionId}`;
-    setCheckinUrl(placeholderUrl);
+    // Set initial check-in URL based on current location
+    if (typeof window !== 'undefined') {
+      const url = `${window.location.origin}/checkin/${courseId}/${sessionId}`;
+      setCheckinUrl(url);
+    }
 
     const interval = setInterval(() => {
-      const currentAttendance = loadAttendance();
       const newStudents = getClientInitialStudentState();
       
       const previousStudents = previousStudentsRef.current;
@@ -94,7 +94,7 @@ export default function SessionDetails({ courseId, sessionId }) {
 
     return () => clearInterval(interval);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sessionId, courseId]);
+  }, [sessionId, courseId, toast]);
 
   const handleStudentStatusChange = (studentId, newStatus) => {
     const currentAttendance = loadAttendance();
@@ -170,7 +170,7 @@ export default function SessionDetails({ courseId, sessionId }) {
           <DialogHeader>
             <DialogTitle>Session QR Code</DialogTitle>
             <DialogDescription>
-              Students can scan this code or use the link to check in. For mobile testing, replace the URL with your computer's local IP address.
+              Students can scan this code or use the link to check in. Note that scanning with a mobile device may not work in this local development environment due to network restrictions.
             </DialogDescription>
           </DialogHeader>
           {checkinUrl && (
@@ -184,7 +184,7 @@ export default function SessionDetails({ courseId, sessionId }) {
                 <Input 
                     id="checkin-url"
                     value={checkinUrl} 
-                    onChange={(e) => setCheckinUrl(e.target.value)}
+                    readOnly
                     className="flex-1" 
                 />
                 <Button onClick={handleCopy} size="icon" variant="outline">
