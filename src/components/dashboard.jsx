@@ -7,8 +7,24 @@ import { CheckCircle, ArrowLeft, Book, PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ClassSessionList from './class-session-list';
 import CreateClassSessionDialog from './create-class-session-dialog';
+import StudentAttendanceDashboard from './student-attendance-dashboard';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
 
 let sessionStore = [];
+
+const students = [
+  { id: 'S001', name: 'Amelia Harris' },
+  { id: 'S002', name: 'Benjamin Carter' },
+  { id: 'S003', name: 'Charlotte Davis' },
+  { id: 'S004', name: 'Daniel Evans' },
+  { id: 'S005', name: 'Emily Garcia' },
+  { id: 'S006', name: 'Finn Miller' },
+  { id: 'S007', name: 'Grace Rodriguez' },
+  { id: 'S008', name: 'Henry Wilson' },
+  { id: 'S009', name: 'Isabella Moore' },
+  { id: 'S010', name: 'Jack Taylor' },
+];
 
 export default function Dashboard({ courseId }) {
   const [sessions, setSessions] = useState(sessionStore);
@@ -53,9 +69,18 @@ export default function Dashboard({ courseId }) {
             </Button>
         </div>
       </header>
-      <div className="grid grid-cols-1">
-        <ClassSessionList sessions={sessions} courseId={courseId} />
-      </div>
+       <Tabs defaultValue="sessions">
+        <TabsList className="mb-4">
+          <TabsTrigger value="sessions">Class Sessions</TabsTrigger>
+          <TabsTrigger value="attendance">Attendance Dashboard</TabsTrigger>
+        </TabsList>
+        <TabsContent value="sessions">
+          <ClassSessionList sessions={sessions} courseId={courseId} />
+        </TabsContent>
+        <TabsContent value="attendance">
+          <StudentAttendanceDashboard students={students} sessions={sessions} />
+        </TabsContent>
+      </Tabs>
       <CreateClassSessionDialog
         isOpen={isCreateDialogOpen}
         onOpenChange={setCreateDialogOpen}
