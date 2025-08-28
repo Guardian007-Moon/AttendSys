@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import QRCode from "react-qr-code";
 import AttendanceCard from './attendance-card';
-import { ArrowLeft, Book, QrCode, Copy } from 'lucide-react';
+import { ArrowLeft, Book, QrCode, Copy, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -38,12 +38,24 @@ export default function SessionDetails({ courseId, sessionId }) {
   // Poll for attendance updates
   useEffect(() => {
     const interval = setInterval(() => {
-      setStudents(getInitialStudentState());
+      const newStudents = getInitialStudentState();
+       // Check if there's a change in student status to show a toast
+      students.forEach((oldStudent, index) => {
+        const newStudent = newStudents[index];
+        if (oldStudent.status !== newStudent.status && newStudent.status === 'Present') {
+          toast({
+            title: 'Student Checked In',
+            description: `${newStudent.name} has been marked as Present.`,
+            action: <CheckCircle className="text-green-500" />,
+          });
+        }
+      });
+      setStudents(newStudents);
     }, 2000); // Check for updates every 2 seconds
 
     return () => clearInterval(interval);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sessionId, courseId]);
+  }, [sessionId, courseId, students]);
 
   const handleStudentStatusChange = (studentId, newStatus) => {
     if (!sessionAttendance[sessionId]) {
@@ -51,7 +63,16 @@ export default function SessionDetails({ courseId, sessionId }) {
     }
     sessionAttendance[sessionId][studentId] = newStatus;
     saveAttendance(); // Save changes to localStorage
-    setStudents(getInitialStudentState());
+    const updatedStudents = getInitialStudentState();
+    setStudents(updatedStudents);
+
+    const student = students.find(s => s.id === studentId);
+    if (student) {
+        toast({
+            title: `Status Updated for ${student.name}`,
+            description: `${student.name} is now marked as ${newStatus}.`,
+        });
+    }
   };
 
   const getCheckinUrl = () => {
