@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Clock, Eye } from 'lucide-react';
+import { Clock, Eye, MoreVertical, Pencil, Trash2 } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -10,6 +10,12 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const formatTime = (timeString) => {
     if (!timeString) return '';
@@ -20,7 +26,7 @@ const formatTime = (timeString) => {
     return `${formattedHour}:${minute} ${ampm}`;
 }
 
-export default function ClassSessionList({ sessions, courseId }) {
+export default function ClassSessionList({ sessions, courseId, onEdit, onDelete }) {
   if (sessions.length === 0) {
     return (
       <Card className="shadow-lg h-full">
@@ -73,6 +79,27 @@ export default function ClassSessionList({ sessions, courseId }) {
                                     <Eye className="h-4 w-4" />
                                 </Button>
                             </Link>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="icon">
+                                        <MoreVertical className="h-5 w-5" />
+                                        <span className="sr-only">Session options</span>
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <DropdownMenuItem onClick={() => onEdit(session)}>
+                                        <Pencil />
+                                        Edit
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onClick={() => onDelete(session.id)}
+                                        className="text-destructive focus:text-destructive"
+                                    >
+                                        <Trash2 />
+                                        Delete
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </div>
                     </div>
                 ))}
