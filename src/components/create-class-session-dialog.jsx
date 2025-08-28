@@ -36,6 +36,15 @@ const sessionSchema = z.object({
   date: z.date({
     required_error: 'A date for the session is required.',
   }),
+  startTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format. Use HH:MM"),
+  endTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format. Use HH:MM"),
+}).refine((data) => {
+    const start = new Date(`1970-01-01T${data.startTime}:00`);
+    const end = new Date(`1970-01-01T${data.endTime}:00`);
+    return end > start;
+}, {
+    message: "End time must be after start time.",
+    path: ["endTime"],
 });
 
 export default function CreateClassSessionDialog({
@@ -48,6 +57,8 @@ export default function CreateClassSessionDialog({
     defaultValues: {
       name: '',
       date: new Date(),
+      startTime: '',
+      endTime: '',
     },
   });
 
@@ -122,6 +133,34 @@ export default function CreateClassSessionDialog({
                 </FormItem>
               )}
             />
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="startTime"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Start Time</FormLabel>
+                    <FormControl>
+                      <Input type="time" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="endTime"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>End Time</FormLabel>
+                    <FormControl>
+                      <Input type="time" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <DialogFooter>
               <Button
                 type="button"

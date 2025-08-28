@@ -9,6 +9,15 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
+const formatTime = (timeString) => {
+    if (!timeString) return '';
+    const [hour, minute] = timeString.split(':');
+    const hourNum = parseInt(hour, 10);
+    const ampm = hourNum >= 12 ? 'PM' : 'AM';
+    const formattedHour = hourNum % 12 || 12;
+    return `${formattedHour}:${minute} ${ampm}`;
+}
+
 export default function ClassSessionList({ sessions }) {
   if (sessions.length === 0) {
     return (
@@ -51,7 +60,9 @@ export default function ClassSessionList({ sessions }) {
                     <div key={session.id} className="p-3 rounded-lg border flex justify-between items-center">
                         <div>
                             <p className="font-medium">{session.name}</p>
-                            <p className="text-sm text-muted-foreground">{new Date(session.date).toLocaleDateString()}</p>
+                            <p className="text-sm text-muted-foreground">
+                                {new Date(session.date).toLocaleDateString()} - {formatTime(session.startTime)} to {formatTime(session.endTime)}
+                            </p>
                         </div>
                         <Badge>Not Started</Badge>
                     </div>
