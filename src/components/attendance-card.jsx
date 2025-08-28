@@ -14,10 +14,17 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { cn } from '@/lib/utils';
 
-export default function AttendanceCard({ students }) {
+export default function AttendanceCard({ students, onStudentStatusChange }) {
   const presentCount = students.filter(s => s.status === 'Present').length;
   const totalCount = students.length;
 
@@ -29,7 +36,8 @@ export default function AttendanceCard({ students }) {
           <CardTitle className="font-headline">Classroom Attendance</CardTitle>
         </div>
         <CardDescription>
-          Live view of student check-ins. {presentCount} of {totalCount} students present.
+          Live view of student check-ins. {presentCount} of {totalCount}{' '}
+          students present.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -46,15 +54,27 @@ export default function AttendanceCard({ students }) {
                 <TableRow key={student.id}>
                   <TableCell className="font-medium">{student.name}</TableCell>
                   <TableCell className="text-right">
-                    <Badge
-                      className={
-                        student.status === 'Present'
-                          ? 'bg-accent text-accent-foreground'
-                          : 'bg-muted text-muted-foreground'
+                    <Select
+                      value={student.status}
+                      onValueChange={newStatus =>
+                        onStudentStatusChange(student.id, newStatus)
                       }
                     >
-                      {student.status}
-                    </Badge>
+                      <SelectTrigger
+                        className={cn(
+                          'w-[120px]',
+                          student.status === 'Present'
+                            ? 'bg-accent text-accent-foreground'
+                            : 'bg-muted text-muted-foreground'
+                        )}
+                      >
+                        <SelectValue placeholder="Set status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Present">Present</SelectItem>
+                        <SelectItem value="Absent">Absent</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </TableCell>
                 </TableRow>
               ))}

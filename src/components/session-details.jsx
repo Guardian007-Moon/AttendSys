@@ -22,6 +22,14 @@ const initialStudents = [
 export default function SessionDetails({ courseId, sessionId }) {
   const [students, setStudents] = useState(initialStudents);
 
+  const handleStudentStatusChange = (studentId, newStatus) => {
+    setStudents(prevStudents =>
+      prevStudents.map(student =>
+        student.id === studentId ? { ...student, status: newStatus } : student
+      )
+    );
+  };
+
   return (
     <>
       <header className="mb-8">
@@ -46,7 +54,7 @@ export default function SessionDetails({ courseId, sessionId }) {
         </div>
       </header>
       <div className="grid grid-cols-1">
-        <AttendanceCard students={students} />
+        <AttendanceCard students={students} onStudentStatusChange={handleStudentStatusChange} />
       </div>
     </>
   );
