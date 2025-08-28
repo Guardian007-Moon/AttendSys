@@ -126,6 +126,26 @@ export default function CreateClassSessionDialog({
                           date < new Date(new Date().setHours(0,0,0,0))
                         }
                         initialFocus
+                        footer={
+                            <div className="flex justify-end gap-2 p-2 border-t">
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => field.onChange(new Date())}
+                                >
+                                    Today
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => field.onChange(undefined)}
+                                >
+                                    Clear
+                                </Button>
+                            </div>
+                        }
                       />
                     </PopoverContent>
                   </Popover>
