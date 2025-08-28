@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useToast } from '@/hooks/use-toast';
-import { courseStudents, sessionAttendance, saveAttendance } from '@/lib/mock-data';
+import { courseStudents, loadAttendance, saveAttendance } from '@/lib/mock-data';
 import {
   Card,
   CardContent,
@@ -49,12 +49,13 @@ export default function CheckinForm({ courseId, sessionId }) {
     );
 
     if (student) {
-      if (!sessionAttendance[sessionId]) {
-        sessionAttendance[sessionId] = {};
+      const currentAttendance = loadAttendance();
+      if (!currentAttendance[sessionId]) {
+        currentAttendance[sessionId] = {};
       }
       // Set student status to Present for this session
-      sessionAttendance[sessionId][student.id] = 'Present';
-      saveAttendance(); // Save the updated attendance to localStorage
+      currentAttendance[sessionId][student.id] = 'Present';
+      saveAttendance(currentAttendance); // Save the updated attendance to localStorage
 
       toast({
         title: 'Check-in Successful!',

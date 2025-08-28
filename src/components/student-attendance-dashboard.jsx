@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { sessionAttendance } from '@/lib/mock-data';
+import { loadAttendance } from '@/lib/mock-data';
 
 
 // Mock function to simulate generating and downloading a CSV report.
@@ -41,6 +41,7 @@ const downloadReport = (data) => {
 
 
 export default function StudentAttendanceDashboard({ students, sessions }) {
+  const sessionAttendance = loadAttendance();
   const attendanceData = students.map(student => {
     let present = 0;
     sessions.forEach(session => {

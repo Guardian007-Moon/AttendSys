@@ -42,24 +42,24 @@ export const courseStudents = {
 
 const ATTENDANCE_STORAGE_KEY = 'sessionAttendance';
 
-// Store session attendance data in a way that can be accessed across components
-export let sessionAttendance = {};
-
-// Function to load attendance from localStorage
+// This is now the single source of truth for loading from localStorage
 export const loadAttendance = () => {
     if (typeof window === 'undefined') {
-        sessionAttendance = {};
-        return;
+        return {};
     }
     const storedAttendance = localStorage.getItem(ATTENDANCE_STORAGE_KEY);
-    sessionAttendance = storedAttendance ? JSON.parse(storedAttendance) : {};
+    return storedAttendance ? JSON.parse(storedAttendance) : {};
 };
 
-// Function to save attendance to localStorage
-export const saveAttendance = () => {
+// This is now the single source of truth for saving to localStorage
+export const saveAttendance = (attendanceData) => {
     if (typeof window === 'undefined') return;
-    localStorage.setItem(ATTENDANCE_STORAGE_KEY, JSON.stringify(sessionAttendance));
+    localStorage.setItem(ATTENDANCE_STORAGE_KEY, JSON.stringify(attendanceData));
 };
 
-// Load attendance when the app starts
-loadAttendance();
+// DEPRECATED: We no longer use a global variable.
+// We will remove this in a future step to avoid breaking other parts of the app immediately.
+export let sessionAttendance = loadAttendance();
+
+// We need to update the checkin form to use the new load/save functions.
+// This will be done in the next step.

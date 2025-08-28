@@ -22,28 +22,32 @@ import { courseStudents, sessionAttendance, loadAttendance, saveAttendance } fro
 export default function SessionDetails({ courseId, sessionId }) {
   const { toast } = useToast();
   
-  const getInitialStudentState = () => {
-    loadAttendance(); // Load the latest attendance data
+  const getInitialStudentState = (loadedAttendance) => {
     const sessionStudents = courseStudents[courseId] || [];
-    const attendanceForSession = sessionAttendance[sessionId] || {};
+    const attendanceForSession = loadedAttendance[sessionId] || {};
     return sessionStudents.map(student => ({
       ...student,
       status: attendanceForSession[student.id] || 'Absent',
     }));
   };
   
-  const [students, setStudents] = useState(getInitialStudentState);
+  const [students, setStudents] = useState(getInitialStudentState({}));
   const [isQrDialogOpen, setQrDialogOpen] = useState(false);
   
   // Use a ref to hold the previous students array for comparison
   const previousStudentsRef = useRef(students);
 
-  // Poll for attendance updates
   useEffect(() => {
+    // Load initial data from localStorage on client-side only
+    const loadedAttendance = loadAttendance();
+    const initialStudents = getInitialStudentState(loadedAttendance);
+    setStudents(initialStudents);
+    previousStudentsRef.current = initialStudents;
+
     const interval = setInterval(() => {
-      const newStudents = getInitialStudentState();
+      const currentAttendance = loadAttendance();
+      const newStudents = getInitialStudentState(currentAttendance);
       
-      // Compare with the previous state to detect changes
       const previousStudents = previousStudentsRef.current;
       if (JSON.stringify(previousStudents) !== JSON.stringify(newStudents)) {
         newStudents.forEach((newStudent, index) => {
@@ -59,21 +63,22 @@ export default function SessionDetails({ courseId, sessionId }) {
         setStudents(newStudents);
         previousStudentsRef.current = newStudents;
       }
-    }, 2000); // Check for updates every 2 seconds
+    }, 2000); 
 
     return () => clearInterval(interval);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId, courseId]);
 
   const handleStudentStatusChange = (studentId, newStatus) => {
-    if (!sessionAttendance[sessionId]) {
-        sessionAttendance[sessionId] = {};
+    const currentAttendance = loadAttendance();
+    if (!currentAttendance[sessionId]) {
+        currentAttendance[sessionId] = {};
     }
-    sessionAttendance[sessionId][studentId] = newStatus;
-    saveAttendance(); // Save changes to localStorage
-    const updatedStudents = getInitialStudentState();
+    currentAttendance[sessionId][studentId] = newStatus;
+    saveAttendance(currentAttendance); // Save changes to localStorage
+    const updatedStudents = getInitialStudentState(currentAttendance);
     setStudents(updatedStudents);
-    previousStudentsRef.current = updatedStudents; // Update ref immediately
+    previousStudentsRef.current = updatedStudents;
 
     const student = students.find(s => s.id === studentId);
     if (student) {
