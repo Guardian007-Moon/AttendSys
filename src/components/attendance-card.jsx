@@ -21,10 +21,25 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 
-const statusIcons = {
-    Present: <Smile className="h-6 w-6 text-green-500" />,
-    Absent: <Frown className="h-6 w-6 text-red-500" />,
-    Late: <Meh className="h-6 w-6 text-yellow-500" />,
+const statusDisplay = {
+    Present: (
+        <div className="flex items-center justify-end gap-2 text-green-500 font-medium">
+            <Smile className="h-6 w-6" />
+            <span>Present</span>
+        </div>
+    ),
+    Absent: (
+        <div className="flex items-center justify-end gap-2 text-red-500 font-medium">
+            <Frown className="h-6 w-6" />
+            <span>Absent</span>
+        </div>
+    ),
+    Late: (
+        <div className="flex items-center justify-end gap-2 text-yellow-500 font-medium">
+            <Meh className="h-6 w-6" />
+            <span>Late</span>
+        </div>
+    ),
 };
 
 
@@ -77,7 +92,7 @@ export default function AttendanceCard({ students, onStudentStatusChange }) {
                   <TableRow key={student.id}>
                     <TableCell className="font-medium">{student.name}</TableCell>
                     <TableCell className="text-right">
-                      {statusIcons[student.status] || statusIcons['Absent']}
+                      {statusDisplay[student.status] || statusDisplay['Absent']}
                     </TableCell>
                   </TableRow>
                 ))
@@ -87,8 +102,8 @@ export default function AttendanceCard({ students, onStudentStatusChange }) {
                     <TableCell>
                       <Skeleton className="h-5 w-3/4" />
                     </TableCell>
-                    <TableCell className="text-right">
-                      <Skeleton className="h-6 w-6 rounded-full" />
+                    <TableCell className="flex justify-end">
+                      <Skeleton className="h-6 w-24" />
                     </TableCell>
                   </TableRow>
                 ))
