@@ -39,10 +39,14 @@ export default function SessionDetails({ courseId, sessionId }) {
     const getClientInitialStudentState = () => {
         const loadedAttendance = loadAttendance();
         const attendanceForSession = loadedAttendance[sessionId] || {};
-        return studentList.map(student => ({
-        ...student,
-        status: attendanceForSession[student.id] || 'Absent',
-        }));
+        return studentList.map(student => {
+            const attendanceRecord = attendanceForSession[student.id];
+            return {
+                ...student,
+                status: attendanceRecord ? attendanceRecord.status : 'Absent',
+                checkinTime: attendanceRecord ? attendanceRecord.time : null,
+            };
+        });
     }
 
     const initialStudents = getClientInitialStudentState();

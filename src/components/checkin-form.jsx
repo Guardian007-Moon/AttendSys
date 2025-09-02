@@ -66,7 +66,10 @@ export default function CheckinForm({ courseId, sessionId }) {
         }
       }
 
-      currentAttendance[sessionId][student.id] = studentStatus;
+      currentAttendance[sessionId][student.id] = {
+        status: studentStatus,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }),
+      };
       saveAttendance(currentAttendance); // Save the updated attendance to localStorage
 
       toast({

@@ -49,10 +49,10 @@ import { Label } from '@/components/ui/label';
 
 // Mock function to simulate generating and downloading a CSV report.
 const downloadReport = (data) => {
-  const headers = ['Student Name', 'Present', 'Absent', 'Total Sessions'];
+  const headers = ['Student Name', 'Present', 'Late', 'Absent', 'Total Sessions'];
   const csvRows = [
     headers.join(','),
-    ...data.map(row => [row.name, row.present, row.absent, row.total].join(',')),
+    ...data.map(row => [row.name, row.present, row.late, row.absent, row.total].join(',')),
   ];
   
   const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
@@ -77,16 +77,24 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
   const sessionAttendance = loadAttendance();
   const attendanceData = students.map(student => {
     let present = 0;
+    let late = 0;
     sessions.forEach(session => {
-        if (sessionAttendance[session.id] && sessionAttendance[session.id][student.id] === 'Present') {
-            present++;
+        const attendanceRecord = sessionAttendance[session.id] && sessionAttendance[session.id][student.id];
+        if (attendanceRecord) {
+            if (attendanceRecord.status === 'Present') {
+                present++;
+            } else if (attendanceRecord.status === 'Late') {
+                late++;
+            }
         }
     });
-    const absent = sessions.length - present;
+    const attended = present + late;
+    const absent = sessions.length - attended;
     return {
       id: student.id,
       name: student.name,
       present: present,
+      late: late,
       absent: absent,
       total: sessions.length,
     };
@@ -170,6 +178,7 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
               <TableRow>
                 <TableHead>Student Name</TableHead>
                 <TableHead className="text-center">Present</TableHead>
+                <TableHead className="text-center">Late</TableHead>
                 <TableHead className="text-center">Absent</TableHead>
                 <TableHead className="text-center">Total Sessions</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
@@ -178,7 +187,7 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
             <TableBody>
               {students.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan="5" className="h-24 text-center">
+                  <TableCell colSpan="6" className="h-24 text-center">
                     No students in this course yet. Click "Add Student" to get started.
                   </TableCell>
                 </TableRow>
@@ -187,6 +196,7 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
                   <TableRow key={student.id}>
                     <TableCell className="font-medium">{student.name}</TableCell>
                     <TableCell className="text-center text-green-600 font-semibold">{student.present}</TableCell>
+                    <TableCell className="text-center text-yellow-500 font-semibold">{student.late}</TableCell>
                     <TableCell className="text-center text-red-600 font-semibold">{student.absent}</TableCell>
                     <TableCell className="text-center">{student.total}</TableCell>
                     <TableCell className="text-right">

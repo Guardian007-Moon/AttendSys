@@ -83,6 +83,7 @@ export default function AttendanceCard({ students, onStudentStatusChange }) {
             <TableHeader className="sticky top-0 bg-card">
               <TableRow>
                 <TableHead>Student Name</TableHead>
+                <TableHead className="text-center">Check-in Time</TableHead>
                 <TableHead className="text-right">Status</TableHead>
               </TableRow>
             </TableHeader>
@@ -91,6 +92,9 @@ export default function AttendanceCard({ students, onStudentStatusChange }) {
                 students.map(student => (
                   <TableRow key={student.id}>
                     <TableCell className="font-medium">{student.name}</TableCell>
+                    <TableCell className="text-center">
+                        {student.checkinTime || 'N/A'}
+                    </TableCell>
                     <TableCell className="text-right">
                       {statusDisplay[student.status] || statusDisplay['Absent']}
                     </TableCell>
@@ -101,6 +105,9 @@ export default function AttendanceCard({ students, onStudentStatusChange }) {
                   <TableRow key={index}>
                     <TableCell>
                       <Skeleton className="h-5 w-3/4" />
+                    </TableCell>
+                     <TableCell className="text-center">
+                      <Skeleton className="h-5 w-20 mx-auto" />
                     </TableCell>
                     <TableCell className="flex justify-end">
                       <Skeleton className="h-6 w-24" />
