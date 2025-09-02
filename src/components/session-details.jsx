@@ -1,12 +1,10 @@
-
-
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import QRCode from "react-qr-code";
 import AttendanceCard from './attendance-card';
-import { ArrowLeft, Book, QrCode, Copy, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Book, QrCode, Copy, CheckCircle, MapPin, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -17,7 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { loadStudentsByCourse, loadAttendance, saveAttendance } from '@/lib/mock-data';
+import { loadStudentsByCourse, loadAttendance, loadSession, saveSession } from '@/lib/mock-data';
 import { Label } from '@/components/ui/label';
 
 
@@ -29,11 +27,16 @@ export default function SessionDetails({ courseId, sessionId }) {
 
   const [isQrDialogOpen, setQrDialogOpen] = useState(false);
   const [checkinUrl, setCheckinUrl] = useState('');
+  const [isSharingLocation, setIsSharingLocation] = useState(false);
+  const [session, setSession] = useState(null);
   
   const previousStudentsRef = useRef(students);
 
   useEffect(() => {
     setIsClient(true);
+    const currentSession = loadSession(courseId, sessionId);
+    setSession(currentSession);
+
     const studentList = loadStudentsByCourse(courseId);
     
     const getClientInitialStudentState = () => {
@@ -81,9 +84,40 @@ export default function SessionDetails({ courseId, sessionId }) {
     return () => clearInterval(interval);
   }, [sessionId, courseId, toast]);
 
-  const handleStudentStatusChange = (studentId, newStatus) => {
-    // This function is kept for potential future use but is not active
-    // since the switch is removed.
+  const handleShareLocation = () => {
+    setIsSharingLocation(true);
+    if (!navigator.geolocation) {
+        toast({
+            variant: "destructive",
+            title: "Location Error",
+            description: "Geolocation is not supported by your browser.",
+        });
+        setIsSharingLocation(false);
+        return;
+    }
+    
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            const { latitude, longitude } = position.coords;
+            const updatedSession = { ...session, teacherLocation: { latitude, longitude } };
+            saveSession(courseId, updatedSession);
+            setSession(updatedSession);
+            toast({
+                title: "Location Shared",
+                description: "Your location has been set for this session.",
+                action: <CheckCircle className="text-green-500" />,
+            });
+            setIsSharingLocation(false);
+        },
+        (error) => {
+            toast({
+                variant: "destructive",
+                title: "Location Error",
+                description: `Could not get location: ${error.message}`,
+            });
+            setIsSharingLocation(false);
+        }
+    );
   };
   
   const handleCopy = () => {
@@ -115,14 +149,20 @@ export default function SessionDetails({ courseId, sessionId }) {
                     Track attendance for this session.
                 </p>
             </div>
-            <Button onClick={() => setQrDialogOpen(true)}>
-                <QrCode className="mr-2 h-4 w-4" />
-                Generate QR Code
-            </Button>
+            <div className="flex items-center gap-2">
+                <Button onClick={handleShareLocation} disabled={isSharingLocation || !!session?.teacherLocation}>
+                    {isSharingLocation ? <Loader2 className="animate-spin" /> : <MapPin />}
+                    {session?.teacherLocation ? "Location Set" : (isSharingLocation ? "Sharing..." : "Share Location")}
+                </Button>
+                <Button onClick={() => setQrDialogOpen(true)}>
+                    <QrCode />
+                    Generate QR Code
+                </Button>
+            </div>
         </div>
       </header>
       <div className="grid grid-cols-1">
-        <AttendanceCard students={isClient ? students : []} onStudentStatusChange={handleStudentStatusChange} />
+        <AttendanceCard students={isClient ? students : []} onStudentStatusChange={() => {}} />
       </div>
 
        <Dialog open={isQrDialogOpen} onOpenChange={setQrDialogOpen}>

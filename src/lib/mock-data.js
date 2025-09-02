@@ -1,5 +1,3 @@
-
-
 export const initialCourses = [
   {
     id: 'CS101',
@@ -70,4 +68,13 @@ export const loadSession = (courseId, sessionId) => {
     if (!storedSessions) return null;
     const sessions = JSON.parse(storedSessions);
     return sessions.find(s => s.id === sessionId) || null;
+}
+
+export const saveSession = (courseId, updatedSession) => {
+    if (typeof window === 'undefined') return;
+    const storedSessions = localStorage.getItem(`sessions_${courseId}`);
+    if (!storedSessions) return;
+    let sessions = JSON.parse(storedSessions);
+    sessions = sessions.map(s => s.id === updatedSession.id ? updatedSession : s);
+    localStorage.setItem(`sessions_${courseId}`, JSON.stringify(sessions));
 }
