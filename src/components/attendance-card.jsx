@@ -1,7 +1,7 @@
 
 'use client';
 import { useState, useEffect } from 'react';
-import { Users } from 'lucide-react';
+import { Users, Smile, Frown, Meh } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -18,15 +18,15 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 
-const statusStyles = {
-  Present: 'bg-green-100 text-green-800 border-green-200 hover:bg-green-100',
-  Absent: 'bg-red-100 text-red-800 border-red-200 hover:bg-red-100',
-  Late: 'bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-100',
+const statusIcons = {
+    Present: <Smile className="h-6 w-6 text-green-500" />,
+    Absent: <Frown className="h-6 w-6 text-red-500" />,
+    Late: <Meh className="h-6 w-6 text-yellow-500" />,
 };
+
 
 export default function AttendanceCard({ students, onStudentStatusChange }) {
   const [presentCount, setPresentCount] = useState(0);
@@ -77,15 +77,7 @@ export default function AttendanceCard({ students, onStudentStatusChange }) {
                   <TableRow key={student.id}>
                     <TableCell className="font-medium">{student.name}</TableCell>
                     <TableCell className="text-right">
-                       <Badge
-                        variant="outline"
-                        className={cn(
-                          'font-semibold',
-                          statusStyles[student.status] || statusStyles['Absent']
-                        )}
-                      >
-                        {student.status}
-                      </Badge>
+                      {statusIcons[student.status] || statusIcons['Absent']}
                     </TableCell>
                   </TableRow>
                 ))
@@ -96,7 +88,7 @@ export default function AttendanceCard({ students, onStudentStatusChange }) {
                       <Skeleton className="h-5 w-3/4" />
                     </TableCell>
                     <TableCell className="text-right">
-                      <Skeleton className="h-6 w-16" />
+                      <Skeleton className="h-6 w-6 rounded-full" />
                     </TableCell>
                   </TableRow>
                 ))
