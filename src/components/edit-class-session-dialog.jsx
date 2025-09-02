@@ -69,8 +69,11 @@ export default function EditClassSessionDialog({
   useEffect(() => {
     if (session) {
       form.reset({
-        ...session,
-        date: new Date(session.date),
+        name: session.name || '',
+        date: session.date ? new Date(session.date) : new Date(),
+        startTime: session.startTime || '',
+        endTime: session.endTime || '',
+        checkinTimeLimit: session.checkinTimeLimit ?? 15,
       });
     }
   }, [session, form]);
