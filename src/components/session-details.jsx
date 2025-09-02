@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -48,6 +49,7 @@ export default function SessionDetails({ courseId, sessionId }) {
                 ...student,
                 status: attendanceRecord ? attendanceRecord.status : 'Absent',
                 checkinTime: attendanceRecord ? attendanceRecord.time : null,
+                distance: attendanceRecord ? attendanceRecord.distance : null,
             };
         });
     }

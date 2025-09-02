@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -118,6 +119,7 @@ export default function CheckinForm({ courseId, sessionId }) {
         currentAttendance[sessionId][student.id] = {
             status: studentStatus,
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }),
+            distance: distance,
         };
         saveAttendance(currentAttendance); // Save the updated attendance to localStorage
 

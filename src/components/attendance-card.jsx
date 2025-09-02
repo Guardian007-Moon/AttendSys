@@ -84,6 +84,7 @@ export default function AttendanceCard({ students, onStudentStatusChange }) {
               <TableRow>
                 <TableHead>Student Name</TableHead>
                 <TableHead className="text-center">Check-in Time</TableHead>
+                <TableHead className="text-center">Distance</TableHead>
                 <TableHead className="text-right">Status</TableHead>
               </TableRow>
             </TableHeader>
@@ -94,6 +95,9 @@ export default function AttendanceCard({ students, onStudentStatusChange }) {
                     <TableCell className="font-medium">{student.name}</TableCell>
                     <TableCell className="text-center">
                         {student.checkinTime || 'N/A'}
+                    </TableCell>
+                    <TableCell className="text-center">
+                        {student.distance != null ? `${student.distance}m` : 'N/A'}
                     </TableCell>
                     <TableCell className="text-right">
                       {statusDisplay[student.status] || statusDisplay['Absent']}
@@ -107,6 +111,9 @@ export default function AttendanceCard({ students, onStudentStatusChange }) {
                       <Skeleton className="h-5 w-3/4" />
                     </TableCell>
                      <TableCell className="text-center">
+                      <Skeleton className="h-5 w-20 mx-auto" />
+                    </TableCell>
+                    <TableCell className="text-center">
                       <Skeleton className="h-5 w-20 mx-auto" />
                     </TableCell>
                     <TableCell className="flex justify-end">
