@@ -102,14 +102,16 @@ export default function CheckinForm({ courseId, sessionId }) {
         }
 
         let studentStatus = 'Present';
-        if (session && session.checkinTimeLimit) {
+        if (session && session.startTime && session.checkinTimeLimit >= 0) {
             const now = new Date();
-            const deadline = new Date(session.date);
-            const [hours, minutes] = session.checkinTimeLimit.split(':');
+            const sessionDate = new Date(session.date);
+            const [hours, minutes] = session.startTime.split(':');
+            const deadline = new Date(sessionDate.getTime());
             deadline.setHours(hours, minutes, 0, 0);
+            deadline.setMinutes(deadline.getMinutes() + session.checkinTimeLimit);
 
             if (now > deadline) {
-            studentStatus = 'Late';
+              studentStatus = 'Late';
             }
         }
 

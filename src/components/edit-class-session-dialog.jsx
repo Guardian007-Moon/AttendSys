@@ -39,7 +39,7 @@ const sessionSchema = z.object({
   }),
   startTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format. Use HH:MM"),
   endTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format. Use HH:MM"),
-  checkinTimeLimit: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format. Use HH:MM"),
+  checkinTimeLimit: z.coerce.number().int().min(0, "Grace period must be 0 or a positive number."),
 }).refine((data) => {
     const start = new Date(`1970-01-01T${data.startTime}:00`);
     const end = new Date(`1970-01-01T${data.endTime}:00`);
@@ -47,14 +47,6 @@ const sessionSchema = z.object({
 }, {
     message: "End time must be after start time.",
     path: ["endTime"],
-}).refine((data) => {
-    if (!data.startTime || !data.checkinTimeLimit) return true;
-    const start = new Date(`1970-01-01T${data.startTime}:00`);
-    const limit = new Date(`1970-01-01T${data.checkinTimeLimit}:00`);
-    return limit >= start;
-}, {
-    message: "Check-in deadline cannot be before start time.",
-    path: ["checkinTimeLimit"],
 });
 
 export default function EditClassSessionDialog({
@@ -70,7 +62,7 @@ export default function EditClassSessionDialog({
       date: new Date(),
       startTime: '',
       endTime: '',
-      checkinTimeLimit: '',
+      checkinTimeLimit: 15,
     },
   });
 
@@ -186,9 +178,9 @@ export default function EditClassSessionDialog({
                 name="checkinTimeLimit"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Check-in Deadline</FormLabel>
+                    <FormLabel>Check-in Grace Period (minutes)</FormLabel>
                     <FormControl>
-                      <Input type="time" {...field} />
+                      <Input type="number" {...field} />
                     </FormControl>
                      <FormMessage />
                   </FormItem>
