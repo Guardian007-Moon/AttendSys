@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useToast } from '@/hooks/use-toast';
-import { loadStudentsByCourse, loadAttendance, saveAttendance } from '@/lib/mock-data';
+import { loadStudentsByCourse, loadAttendance, saveAttendance, loadSession } from '@/lib/mock-data';
 import {
   Card,
   CardContent,
@@ -48,17 +48,30 @@ export default function CheckinForm({ courseId, sessionId }) {
     );
 
     if (student) {
+      const session = loadSession(courseId, sessionId);
       const currentAttendance = loadAttendance();
       if (!currentAttendance[sessionId]) {
         currentAttendance[sessionId] = {};
       }
-      // Set student status to Present for this session
-      currentAttendance[sessionId][student.id] = 'Present';
+
+      let studentStatus = 'Present';
+      if (session && session.checkinTimeLimit) {
+        const now = new Date();
+        const deadline = new Date(session.date);
+        const [hours, minutes] = session.checkinTimeLimit.split(':');
+        deadline.setHours(hours, minutes, 0, 0);
+
+        if (now > deadline) {
+          studentStatus = 'Late';
+        }
+      }
+
+      currentAttendance[sessionId][student.id] = studentStatus;
       saveAttendance(currentAttendance); // Save the updated attendance to localStorage
 
       toast({
         title: 'Check-in Successful!',
-        description: `Welcome, ${student.name}. You've been marked as present.`,
+        description: `Welcome, ${student.name}. You've been marked as ${studentStatus}.`,
         action: <CheckCircle className="text-green-500" />,
       });
       setIsCheckedIn(true);

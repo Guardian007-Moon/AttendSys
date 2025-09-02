@@ -63,3 +63,11 @@ export const loadStudentsByCourse = (courseId) => {
     const storedStudents = localStorage.getItem(`students_${courseId}`);
     return storedStudents ? JSON.parse(storedStudents) : (initialCourseStudents[courseId] || []);
 };
+
+export const loadSession = (courseId, sessionId) => {
+    if (typeof window === 'undefined') return null;
+    const storedSessions = localStorage.getItem(`sessions_${courseId}`);
+    if (!storedSessions) return null;
+    const sessions = JSON.parse(storedSessions);
+    return sessions.find(s => s.id === sessionId) || null;
+}

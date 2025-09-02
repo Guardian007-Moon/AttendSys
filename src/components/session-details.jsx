@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import QRCode from "react-qr-code";
 import AttendanceCard from './attendance-card';
@@ -24,26 +24,8 @@ import { Label } from '@/components/ui/label';
 export default function SessionDetails({ courseId, sessionId }) {
   const { toast } = useToast();
   
-  const [students, setStudents] = useState(() => {
-    // Initial state on the server can be an empty array
-    // or a version without localStorage access.
-    if (typeof window === 'undefined') {
-      const studentList = loadStudentsByCourse(courseId);
-      return studentList.map(student => ({
-        ...student,
-        status: 'Absent',
-      }));
-    }
-    // Client-side initial state with localStorage
-    const loadedAttendance = loadAttendance();
-    const studentList = loadStudentsByCourse(courseId);
-    const sessionStudents = studentList || [];
-    const attendanceForSession = loadedAttendance[sessionId] || {};
-    return sessionStudents.map(student => ({
-      ...student,
-      status: attendanceForSession[student.id] || 'Absent',
-    }));
-  });
+  const [students, setStudents] = useState([]);
+  const [isClient, setIsClient] = useState(false);
 
   const [isQrDialogOpen, setQrDialogOpen] = useState(false);
   const [checkinUrl, setCheckinUrl] = useState('');
@@ -51,6 +33,7 @@ export default function SessionDetails({ courseId, sessionId }) {
   const previousStudentsRef = useRef(students);
 
   useEffect(() => {
+    setIsClient(true);
     const studentList = loadStudentsByCourse(courseId);
     
     const getClientInitialStudentState = () => {
@@ -66,7 +49,6 @@ export default function SessionDetails({ courseId, sessionId }) {
     setStudents(initialStudents);
     previousStudentsRef.current = initialStudents;
     
-    // Set initial check-in URL based on current location
     if (typeof window !== 'undefined') {
       const url = `${window.location.origin}/checkin/${courseId}/${sessionId}`;
       setCheckinUrl(url);
@@ -79,10 +61,10 @@ export default function SessionDetails({ courseId, sessionId }) {
       if (JSON.stringify(previousStudents) !== JSON.stringify(newStudents)) {
         newStudents.forEach((newStudent) => {
           const oldStudent = previousStudents.find(s => s.id === newStudent.id);
-          if (oldStudent && oldStudent.status !== newStudent.status && newStudent.status === 'Present') {
+          if (oldStudent && oldStudent.status !== newStudent.status && (newStudent.status === 'Present' || newStudent.status === 'Late')) {
             toast({
               title: 'Student Checked In',
-              description: `${newStudent.name} has been marked as Present.`,
+              description: `${newStudent.name} has been marked as ${newStudent.status}.`,
               action: <CheckCircle className="text-green-500" />,
             });
           }
@@ -93,37 +75,11 @@ export default function SessionDetails({ courseId, sessionId }) {
     }, 2000); 
 
     return () => clearInterval(interval);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId, courseId, toast]);
 
   const handleStudentStatusChange = (studentId, newStatus) => {
-    const currentAttendance = loadAttendance();
-    if (!currentAttendance[sessionId]) {
-        currentAttendance[sessionId] = {};
-    }
-    currentAttendance[sessionId][studentId] = newStatus;
-    saveAttendance(currentAttendance); // Save changes to localStorage
-    const studentList = loadStudentsByCourse(courseId);
-    
-    const getClientInitialStudentState = () => {
-        const attendanceForSession = currentAttendance[sessionId] || {};
-        return studentList.map(student => ({
-            ...student,
-            status: attendanceForSession[student.id] || 'Absent',
-        }));
-    }
-    const updatedStudents = getClientInitialStudentState();
-    setStudents(updatedStudents);
-    
-    const student = students.find(s => s.id === studentId);
-    if (student) {
-        toast({
-            title: `Status Updated for ${student.name}`,
-            description: `${student.name} is now marked as ${newStatus}.`,
-        });
-    }
-    // Update ref after state change is processed
-    previousStudentsRef.current = updatedStudents;
+    // This function is kept for potential future use but is not active
+    // since the switch is removed.
   };
   
   const handleCopy = () => {
@@ -162,7 +118,7 @@ export default function SessionDetails({ courseId, sessionId }) {
         </div>
       </header>
       <div className="grid grid-cols-1">
-        <AttendanceCard students={students} onStudentStatusChange={handleStudentStatusChange} />
+        <AttendanceCard students={isClient ? students : []} onStudentStatusChange={handleStudentStatusChange} />
       </div>
 
        <Dialog open={isQrDialogOpen} onOpenChange={setQrDialogOpen}>

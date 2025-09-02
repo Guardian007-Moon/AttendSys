@@ -38,6 +38,7 @@ const sessionSchema = z.object({
   }),
   startTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format. Use HH:MM"),
   endTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format. Use HH:MM"),
+  checkinTimeLimit: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format. Use HH:MM"),
 }).refine((data) => {
     const start = new Date(`1970-01-01T${data.startTime}:00`);
     const end = new Date(`1970-01-01T${data.endTime}:00`);
@@ -45,6 +46,14 @@ const sessionSchema = z.object({
 }, {
     message: "End time must be after start time.",
     path: ["endTime"],
+}).refine((data) => {
+    if (!data.startTime || !data.checkinTimeLimit) return true;
+    const start = new Date(`1970-01-01T${data.startTime}:00`);
+    const limit = new Date(`1970-01-01T${data.checkinTimeLimit}:00`);
+    return limit >= start;
+}, {
+    message: "Check-in deadline cannot be before start time.",
+    path: ["checkinTimeLimit"],
 });
 
 export default function CreateClassSessionDialog({
@@ -59,6 +68,7 @@ export default function CreateClassSessionDialog({
       date: new Date(),
       startTime: '',
       endTime: '',
+      checkinTimeLimit: '',
     },
   });
 
@@ -126,26 +136,6 @@ export default function CreateClassSessionDialog({
                           date < new Date(new Date().setHours(0,0,0,0))
                         }
                         initialFocus
-                        footer={
-                            <div className="flex justify-end gap-2 p-2 border-t">
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => field.onChange(new Date())}
-                                >
-                                    Today
-                                </Button>
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => field.onChange(undefined)}
-                                >
-                                    Clear
-                                </Button>
-                            </div>
-                        }
                       />
                     </PopoverContent>
                   </Popover>
@@ -181,6 +171,19 @@ export default function CreateClassSessionDialog({
                 )}
               />
             </div>
+             <FormField
+                control={form.control}
+                name="checkinTimeLimit"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Check-in Deadline</FormLabel>
+                    <FormControl>
+                      <Input type="time" {...field} />
+                    </FormControl>
+                     <FormMessage />
+                  </FormItem>
+                )}
+              />
             <DialogFooter>
               <Button
                 type="button"
