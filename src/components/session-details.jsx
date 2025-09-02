@@ -18,6 +18,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { loadStudentsByCourse, loadAttendance, loadSession, saveSession } from '@/lib/mock-data';
 import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 
 export default function SessionDetails({ courseId, sessionId }) {
@@ -152,13 +153,9 @@ export default function SessionDetails({ courseId, sessionId }) {
                 </p>
             </div>
             <div className="flex items-center gap-2">
-                <Button onClick={handleShareLocation} disabled={isSharingLocation || !!session?.teacherLocation}>
-                    {isSharingLocation ? <Loader2 className="animate-spin" /> : <MapPin />}
-                    {session?.teacherLocation ? "Location Set" : (isSharingLocation ? "Sharing..." : "Share Location")}
-                </Button>
                 <Button onClick={() => setQrDialogOpen(true)}>
                     <QrCode />
-                    Generate QR Code
+                    Show Check-in QR
                 </Button>
             </div>
         </div>
@@ -172,28 +169,43 @@ export default function SessionDetails({ courseId, sessionId }) {
           <DialogHeader>
             <DialogTitle>Session QR Code</DialogTitle>
             <DialogDescription>
-              Students can scan this code or use the link to check in. Note that scanning with a mobile device may not work in this local development environment due to network restrictions.
+              Share your location, then have students scan this code to check in.
             </DialogDescription>
           </DialogHeader>
-          {checkinUrl && (
+          <div className="space-y-4 pt-4">
+            <Button onClick={handleShareLocation} disabled={isSharingLocation || !!session?.teacherLocation} className="w-full">
+                {isSharingLocation ? <Loader2 className="animate-spin" /> : <MapPin />}
+                {session?.teacherLocation ? "Location Set" : (isSharingLocation ? "Sharing Location..." : "Step 1: Share Your Location")}
+            </Button>
+
+            {!session?.teacherLocation && (
+                 <Alert variant="destructive">
+                    <AlertTitle>Action Required</AlertTitle>
+                    <AlertDescription>
+                        You must share your location before students can check in.
+                    </AlertDescription>
+                </Alert>
+            )}
+           
             <div className="p-6 bg-white rounded-lg flex items-center justify-center">
                 <QRCode value={checkinUrl} size={256} />
             </div>
-          )}
-          <div className="pt-4 space-y-2">
-            <Label htmlFor="checkin-url">Check-in URL</Label>
-            <div className="flex items-center space-x-2">
-                <Input 
-                    id="checkin-url"
-                    value={checkinUrl} 
-                    readOnly
-                    className="flex-1" 
-                />
-                <Button onClick={handleCopy} size="icon" variant="outline">
-                    <Copy className="h-4 w-4" />
-                    <span className="sr-only">Copy Link</span>
-                </Button>
+            <div className="space-y-2">
+                <Label htmlFor="checkin-url">Or share this check-in URL:</Label>
+                <div className="flex items-center space-x-2">
+                    <Input 
+                        id="checkin-url"
+                        value={checkinUrl} 
+                        readOnly
+                        className="flex-1" 
+                    />
+                    <Button onClick={handleCopy} size="icon" variant="outline">
+                        <Copy className="h-4 w-4" />
+                        <span className="sr-only">Copy Link</span>
+                    </Button>
+                </div>
             </div>
+             <p className="text-xs text-muted-foreground text-center pt-2">Note: QR scanning with a mobile device may not work in a local development environment due to network restrictions.</p>
           </div>
         </DialogContent>
       </Dialog>
