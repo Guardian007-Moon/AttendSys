@@ -21,7 +21,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { initialCourseStudents } from '@/lib/mock-data';
+import { initialCourseStudents, loadAttendance, saveAttendance } from '@/lib/mock-data';
 
 const getInitialSessions = (courseId) => {
   if (typeof window === 'undefined') return [];
@@ -80,13 +80,63 @@ export default function Dashboard({ courseId }) {
     setEditDialogOpen(true);
   };
 
+  const reevaluateAttendanceForSession = (updatedSession) => {
+    const allAttendance = loadAttendance();
+    const sessionAttendance = allAttendance[updatedSession.id];
+
+    if (!sessionAttendance) return; // No attendance for this session yet
+
+    const sessionDate = new Date(updatedSession.date);
+    const [hours, minutes] = updatedSession.startTime.split(':');
+    const deadline = new Date(sessionDate.getTime());
+    deadline.setHours(hours, minutes, 0, 0);
+    deadline.setMinutes(deadline.getMinutes() + updatedSession.checkinTimeLimit);
+
+    for (const studentId in sessionAttendance) {
+        const record = sessionAttendance[studentId];
+        // We only re-evaluate for students who have already checked in
+        if (record.time) {
+            const checkinTimeParts = record.time.match(/(\d+):(\d+):(\d+) (AM|PM)/);
+            if (checkinTimeParts) {
+                let [_, chour, cmin, csec, campm] = checkinTimeParts;
+                let checkinHour = parseInt(chour, 10);
+
+                if (campm === 'PM' && checkinHour < 12) {
+                    checkinHour += 12;
+                } else if (campm === 'AM' && checkinHour === 12) {
+                    checkinHour = 0;
+                }
+
+                const checkinDateTime = new Date(sessionDate.getTime());
+                checkinDateTime.setHours(checkinHour, parseInt(cmin, 10), parseInt(csec, 10), 0);
+
+                const newStatus = checkinDateTime > deadline ? 'Late' : 'Present';
+                
+                if(record.status !== newStatus) {
+                    allAttendance[updatedSession.id][studentId].status = newStatus;
+                }
+            }
+        }
+    }
+    saveAttendance(allAttendance);
+};
+
   const handleUpdateSession = (updatedSession) => {
     sessionStore = sessionStore.map(s =>
       s.id === updatedSession.id ? updatedSession : s
     );
     setSessions(sessionStore);
     updateSessionsLocalStorage(sessionStore);
+    
+    // Re-evaluate attendance statuses based on new deadline
+    reevaluateAttendanceForSession(updatedSession);
+
     setSelectedSession(null);
+     toast({
+        title: "Class Session Updated",
+        description: `The session "${updatedSession.name}" has been successfully updated.`,
+        action: <CheckCircle className="text-green-500" />,
+    });
   };
 
   const handleOpenDeleteDialog = (sessionId) => {
