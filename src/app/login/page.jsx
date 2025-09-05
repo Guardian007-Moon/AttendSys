@@ -3,15 +3,21 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { School, Mail, Lock, CheckCircle, Activity, FileText, Smartphone } from 'lucide-react';
+import { School, Mail, Lock, CheckCircle, Activity, FileText, Smartphone, Loader2 } from 'lucide-react';
 import Head from 'next/head';
 
 export default function LoginPage() {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    router.push('/courses');
+    setIsLoading(true);
+
+    // Simulate network delay then navigate
+    setTimeout(() => {
+      router.push('/courses');
+    }, 1000);
   };
 
   return (
@@ -152,10 +158,18 @@ export default function LoginPage() {
           transition: 0.3s;
           font-size: 16px;
           box-shadow: 0 4px 12px rgba(46, 125, 255, 0.25);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
         }
-        .login-btn:hover {
+        .login-btn:hover:not(:disabled) {
           background: var(--primary-dark);
           transform: translateY(-2px);
+        }
+        .login-btn:disabled {
+          cursor: not-allowed;
+          opacity: 0.7;
         }
         .login-divider {
           display: flex;
@@ -259,6 +273,13 @@ export default function LoginPage() {
           .info-box { display: none; }
           .login-box { padding: 30px 25px; }
         }
+        .animate-spin {
+          animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
       `}</style>
       <main className="login-body">
         <div className="login-container">
@@ -274,24 +295,27 @@ export default function LoginPage() {
             <form onSubmit={handleSubmit}>
               <div className="input-group">
                 <label htmlFor="email">Email Address</label>
-                <input type="email" id="email" placeholder="Enter your email" required />
+                <input type="email" id="email" placeholder="Enter your email" required disabled={isLoading}/>
                 <Mail className="icon" />
               </div>
               
               <div className="input-group">
                 <label htmlFor="password">Password</label>
-                <input type="password" id="password" placeholder="Enter your password" required />
+                <input type="password" id="password" placeholder="Enter your password" required disabled={isLoading}/>
                 <Lock className="icon" />
               </div>
               
               <div className="login-options">
                 <label className="login-remember">
-                  <input type="checkbox" /> Remember me
+                  <input type="checkbox" disabled={isLoading}/> Remember me
                 </label>
                 <a href="#">Forgot Password?</a>
               </div>
               
-              <button type="submit" className="login-btn">Sign In</button>
+              <button type="submit" className="login-btn" disabled={isLoading}>
+                {isLoading && <Loader2 className="animate-spin" />}
+                {isLoading ? 'Signing In...' : 'Sign In'}
+              </button>
             </form>
             
             <div className="login-divider"><span>Or continue with</span></div>
