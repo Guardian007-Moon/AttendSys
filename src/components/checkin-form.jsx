@@ -33,8 +33,6 @@ const checkinSchema = z.object({
   name: z.string().min(3, 'Please enter your full name.'),
 });
 
-const MAX_DISTANCE_METERS = 100;
-
 export default function CheckinForm({ courseId, sessionId }) {
   const { toast } = useToast();
   const [isCheckedIn, setIsCheckedIn] = useState(false);
@@ -79,8 +77,10 @@ export default function CheckinForm({ courseId, sessionId }) {
             { latitude: session.teacherLocation.latitude, longitude: session.teacherLocation.longitude },
             { latitude: studentCoords.latitude, longitude: studentCoords.longitude }
         );
+        
+        const maxDistance = session.maxDistance || 100; // Default to 100 if not set
 
-        if (distance > MAX_DISTANCE_METERS) {
+        if (distance > maxDistance) {
             toast({
                 variant: "destructive",
                 title: "Check-in Failed",

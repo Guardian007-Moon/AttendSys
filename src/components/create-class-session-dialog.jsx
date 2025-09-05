@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useForm } from 'react-hook-form';
@@ -39,6 +40,7 @@ const sessionSchema = z.object({
   startTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format. Use HH:MM"),
   endTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format. Use HH:MM"),
   checkinTimeLimit: z.coerce.number().int().min(0, "Grace period must be 0 or a positive number."),
+  maxDistance: z.coerce.number().int().min(1, "Distance must be at least 1 meter."),
 }).refine((data) => {
     const start = new Date(`1970-01-01T${data.startTime}:00`);
     const end = new Date(`1970-01-01T${data.endTime}:00`);
@@ -61,6 +63,7 @@ export default function CreateClassSessionDialog({
       startTime: '',
       endTime: '',
       checkinTimeLimit: 15,
+      maxDistance: 100,
     },
   });
 
@@ -169,6 +172,19 @@ export default function CreateClassSessionDialog({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Check-in Grace Period (minutes)</FormLabel>
+                    <FormControl>
+                      <Input type="number" {...field} />
+                    </FormControl>
+                     <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="maxDistance"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Max Check-in Distance (meters)</FormLabel>
                     <FormControl>
                       <Input type="number" {...field} />
                     </FormControl>
