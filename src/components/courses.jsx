@@ -145,7 +145,9 @@ export default function Courses() {
     });
 
     const sortedGroupKeys = Array.from(groups.keys());
-    if (sortOptions.length > 0 && sortOptions[0].key === 'year') {
+    const primarySortKey = sortOptions.length > 0 ? sortOptions[0].key : null;
+
+    if (primarySortKey === 'year') {
         const yearSortOrder = sortOptions[0].order;
         sortedGroupKeys.sort((a, b) => {
             if (a === 'Uncategorized') return 1;
@@ -196,12 +198,36 @@ export default function Courses() {
   };
 
 
+  const getMostEngagingCourse = () => {
+    if (typeof window === 'undefined' || courses.length === 0) return null;
+    
+    const allAttendance = loadAttendance();
+    
+    const courseEngagement = courses.map(course => {
+        const storedSessions = localStorage.getItem(`sessions_${course.id}`);
+        const sessions = storedSessions ? JSON.parse(storedSessions) : [];
+        let totalPresent = 0;
+
+        sessions.forEach(session => {
+            const sessionAttendance = allAttendance[session.id] || {};
+            const presentCount = Object.values(sessionAttendance).filter(
+                record => record.status === 'Present'
+            ).length;
+            totalPresent += presentCount;
+        });
+
+        return { ...course, totalPresent };
+    });
+
+    if (courseEngagement.length === 0) return null;
+
+    return courseEngagement.sort((a,b) => b.totalPresent - a.totalPresent)[0];
+  }
+
   // Calculate summary statistics
   const totalStudents = courses.reduce((sum, course) => sum + (course.studentCount || 0), 0);
   const averageAttendance = calculateAverageAttendance();
-  const mostPopularCourse = courses.length > 0 
-    ? [...courses].sort((a,b) => (b.studentCount || 0) - (a.studentCount || 0))[0]
-    : null;
+  const mostEngagingCourse = getMostEngagingCourse();
 
   const updateLocalStorage = (newCourses) => {
     if (typeof window !== 'undefined') {
@@ -370,12 +396,12 @@ export default function Courses() {
                 <Award className="h-6 w-6 text-amber-500" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-muted-foreground">Most Popular</p>
+                <p className="text-sm text-muted-foreground">Most Engaging</p>
                 <h3 className="text-lg font-bold whitespace-normal">
-                  {mostPopularCourse ? mostPopularCourse.name : 'N/A'}
+                  {mostEngagingCourse ? mostEngagingCourse.name : 'N/A'}
                 </h3>
                 <p className="text-xs text-muted-foreground">
-                  {mostPopularCourse ? `${mostPopularCourse.studentCount} students` : ''}
+                  {mostEngagingCourse ? `${mostEngagingCourse.totalPresent} total present` : ''}
                 </p>
               </div>
             </CardContent>
