@@ -11,7 +11,6 @@ export default function LoginPage() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    alert('Login Successful ✅');
     router.push('/courses');
   };
 
