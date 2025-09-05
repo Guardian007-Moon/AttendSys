@@ -11,14 +11,8 @@ export default function LoginPage() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const email = event.target.email.value;
-    const pass = event.target.password.value;
-    if(email === 'teacher@example.com' && pass === '123456') {
-        alert('Login Successful ✅');
-        router.push('/courses');
-      } else {
-        alert('Invalid credentials ❌');
-      }
+    alert('Login Successful ✅');
+    router.push('/courses');
   };
 
   return (
