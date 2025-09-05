@@ -145,13 +145,20 @@ export default function Courses() {
     });
 
     const sortedGroupKeys = Array.from(groups.keys());
-    // Only sort the groups if the primary sort is by year
     if (sortOptions.length > 0 && sortOptions[0].key === 'year') {
         const yearSortOrder = sortOptions[0].order;
         sortedGroupKeys.sort((a, b) => {
             if (a === 'Uncategorized') return 1;
             if (b === 'Uncategorized') return -1;
-            const comparison = parseInt(a) - parseInt(b);
+            
+            const numA = parseInt(a);
+            const numB = parseInt(b);
+
+            if (isNaN(numA) && isNaN(numB)) return a.localeCompare(b);
+            if (isNaN(numA)) return 1;
+            if (isNaN(numB)) return -1;
+
+            const comparison = numA - numB;
             return yearSortOrder === 'asc' ? comparison : -comparison;
         });
     }
@@ -220,7 +227,9 @@ export default function Courses() {
     updateLocalStorage(courseStore);
   };
 
-  const handleOpenEditDialog = course => {
+  const handleOpenEditDialog = (e, course) => {
+    e.stopPropagation();
+    e.preventDefault();
     setSelectedCourse(course);
     setEditDialogOpen(true);
   };
@@ -239,7 +248,9 @@ export default function Courses() {
     updateProfileLocalStorage(updatedProfile);
   };
 
-  const handleOpenDeleteDialog = courseId => {
+  const handleOpenDeleteDialog = (e, courseId) => {
+    e.stopPropagation();
+    e.preventDefault();
     setCourseToDeleteId(courseId);
     setDeleteDialogOpen(true);
   };
@@ -452,59 +463,60 @@ export default function Courses() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {coursesInYear.map((course, index) => (
-                    <Card 
-                      key={course.id} 
-                      className="card card-hover overflow-hidden border-0 rounded-xl"
-                      style={{ animationDelay: `${index * 0.05}s` }}
-                    >
-                      <CardHeader className="pb-4 gradient-primary text-white p-5">
-                        <div className="flex justify-between items-start">
-                          <Link href={`/courses/${course.id}`} className="block flex-1">
-                            <CardTitle className="text-white text-xl font-semibold">{course.name}</CardTitle>
-                            <CardDescription className="text-white/90 mt-1">{course.code}</CardDescription>
-                          </Link>
-                          <div className="glass p-2 rounded-lg">
-                            <Book size={20} className="text-white" />
+                    <Link href={`/courses/${course.id}`} key={course.id} className="block">
+                      <Card 
+                        className="card card-hover overflow-hidden border-0 rounded-xl h-full flex flex-col"
+                        style={{ animationDelay: `${index * 0.05}s` }}
+                      >
+                        <CardHeader className="pb-4 gradient-primary text-white p-5">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <CardTitle className="text-white text-xl font-semibold">{course.name}</CardTitle>
+                              <CardDescription className="text-white/90 mt-1">{course.code}</CardDescription>
+                            </div>
+                            <div className="glass p-2 rounded-lg">
+                              <Book size={20} className="text-white" />
+                            </div>
                           </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="p-5">
-                        <p className="text-sm text-muted-foreground mb-4 line-clamp-2 h-12">
-                          {course.description || "No description available."}
-                        </p>
-                        
-                        <div className="flex items-center text-sm text-muted-foreground mb-4">
-                          <Calendar className="h-4 w-4 mr-2 text-primary" />
-                          <span>{course.schedule || "Schedule not set"}</span>
-                        </div>
-                        
-                        <div className="flex justify-between items-center text-sm border-t pt-4">
-                          <div className="flex items-center text-muted-foreground">
-                            <Users className="h-4 w-4 mr-2 text-primary" />
-                            <span>{course.studentCount || 0} students</span>
+                        </CardHeader>
+                        <CardContent className="p-5 flex-grow flex flex-col">
+                          <p className="text-sm text-muted-foreground mb-4 line-clamp-2 h-12 flex-grow">
+                            {course.description || "No description available."}
+                          </p>
+                          
+                          <div className="flex items-center text-sm text-muted-foreground mb-4">
+                            <Calendar className="h-4 w-4 mr-2 text-primary" />
+                            <span>{course.schedule || "Schedule not set"}</span>
                           </div>
                           
-                          <div className="flex gap-2">
-                            <Button 
-                              variant="ghost" 
-                              size="icon"
-                              onClick={() => handleOpenEditDialog(course)}
-                              className="h-9 w-9 rounded-lg hover:bg-primary/10"
-                            >
-                              <Edit3 size={16} className="text-primary" />
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="icon"
-                              onClick={() => handleOpenDeleteDialog(course.id)}
-                              className="h-9 w-9 rounded-lg hover:bg-red-50"
-                            >
-                              <Trash2 size={16} className="text-red-500" />
-                            </Button>
+                          <div className="flex justify-between items-center text-sm border-t pt-4">
+                            <div className="flex items-center text-muted-foreground">
+                              <Users className="h-4 w-4 mr-2 text-primary" />
+                              <span>{course.studentCount || 0} students</span>
+                            </div>
+                            
+                            <div className="flex gap-2">
+                              <Button 
+                                variant="ghost" 
+                                size="icon"
+                                onClick={(e) => handleOpenEditDialog(e, course)}
+                                className="h-9 w-9 rounded-lg hover:bg-primary/10"
+                              >
+                                <Edit3 size={16} className="text-primary" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="icon"
+                                onClick={(e) => handleOpenDeleteDialog(e, course.id)}
+                                className="h-9 w-9 rounded-lg hover:bg-red-50"
+                              >
+                                <Trash2 size={16} className="text-red-500" />
+                              </Button>
+                            </div>
                           </div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                        </CardContent>
+                      </Card>
+                    </Link>
                   ))}
                 </div>
               </div>
@@ -585,3 +597,5 @@ export default function Courses() {
     </div>
   );
 }
+
+    
