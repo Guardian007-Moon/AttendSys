@@ -81,52 +81,55 @@ export default function Courses() {
     const sortOrder = sortOption.split('-')[1];
     const sortKey = sortOption.split('-')[0];
     
-    if (sortKey === 'year') {
-        results.sort((a, b) => {
+    results.sort((a, b) => {
+        if (sortKey === 'year') {
             const yearA = parseInt(a.year) || 0;
             const yearB = parseInt(b.year) || 0;
             return sortOrder === 'asc' ? yearA - yearB : yearB - yearA;
-        });
-    } else {
-        results.sort((a, b) => {
-            if (sortKey === 'name') {
-                return sortOrder === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
-            }
-            if (sortKey === 'students') {
-                const countA = a.studentCount || 0;
-                const countB = b.studentCount || 0;
-                return sortOrder === 'asc' ? countA - countB : countB - countA;
-            }
-            return 0;
-        });
-    }
+        }
+        if (sortKey === 'name') {
+            return sortOrder === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+        }
+        if (sortKey === 'students') {
+            const countA = a.studentCount || 0;
+            const countB = b.studentCount || 0;
+            return sortOrder === 'asc' ? countA - countB : countB - countA;
+        }
+        return 0;
+    });
+    
     return results;
   }, [searchTerm, courses, sortOption]);
   
   const groupedCourses = useMemo(() => {
-      const groups = {};
-      filteredAndSortedCourses.forEach(course => {
-          const year = course.year || 'Uncategorized';
-          if(!groups[year]) {
-              groups[year] = [];
-          }
-          groups[year].push(course);
-      });
-      
-      const yearSortOrder = Object.keys(groups).sort((yearA, yearB) => {
-          if (yearA === 'Uncategorized') return 1;
-          if (yearB === 'Uncategorized') return -1;
-          const sortDirection = sortOption.startsWith('year-desc') ? -1 : 1;
-          return (parseInt(yearA) - parseInt(yearB)) * sortDirection;
-      });
+    const groups = {};
+    filteredAndSortedCourses.forEach(course => {
+        const year = course.year || 'Uncategorized';
+        if(!groups[year]) {
+            groups[year] = [];
+        }
+        groups[year].push(course);
+    });
+    
+    const sortedGroupKeys = Object.keys(groups);
 
-      const sortedGroups = {};
-      yearSortOrder.forEach(year => {
-          sortedGroups[year] = groups[year];
+    // If sorting by year, we need to sort the year groups themselves
+    if (sortOption.startsWith('year-')) {
+      sortedGroupKeys.sort((yearA, yearB) => {
+        if (yearA === 'Uncategorized') return 1;
+        if (yearB === 'Uncategorized') return -1;
+        const sortDirection = sortOption.endsWith('desc') ? -1 : 1;
+        return (parseInt(yearA) - parseInt(yearB)) * sortDirection;
       });
+    }
 
-      return sortedGroups;
-  }, [filteredAndSortedCourses, sortOption]);
+    const sortedGroups = {};
+    sortedGroupKeys.forEach(year => {
+        sortedGroups[year] = groups[year];
+    });
+
+    return sortedGroups;
+}, [filteredAndSortedCourses, sortOption]);
 
   const calculateAverageAttendance = () => {
     if (typeof window === 'undefined' || courses.length === 0) return 0;
