@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Book, PlusCircle, Search, Filter, Calendar, Users, Clock, Edit3, Trash2, ArrowUp, ArrowDown, ChevronsUpDown, BarChart3, TrendingUp, Award, Target, CheckSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import CreateCourseDialog from './create-course-dialog';
@@ -205,6 +206,27 @@ export default function Courses() {
             Create Course
           </Button>
         </header>
+
+        {/* Teacher Profile Section */}
+        <Card className="mb-8 card card-hover rounded-xl border-0 overflow-hidden animate-fade-in">
+          <CardContent className="p-5 flex items-center gap-6">
+            <Image
+              src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&h=200&auto=format&fit=crop"
+              width={80}
+              height={80}
+              alt="Teacher Profile Picture"
+              className="rounded-full border-4 border-white shadow-md"
+              data-ai-hint="teacher profile"
+            />
+            <div>
+              <h2 className="text-2xl font-bold">Welcome Back, Professor!</h2>
+              <p className="text-muted-foreground mt-1">
+                Here's your dashboard to manage courses, track attendance, and gain insights into student engagement. Have a productive day!
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
 
         {/* Summary Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
