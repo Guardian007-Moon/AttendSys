@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Book, PlusCircle, Search, Filter, Calendar, Users, Clock, Edit3, Trash2, ArrowUp, ArrowDown, ChevronsUpDown, BarChart3, TrendingUp, Award, Target, CheckSquare } from 'lucide-react';
+import { Book, PlusCircle, Search, Filter, Calendar, Users, Clock, Edit3, Trash2, ArrowUp, ArrowDown, ChevronsUpDown, BarChart3, TrendingUp, Award, Target, CheckSquare, Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import CreateCourseDialog from './create-course-dialog';
 import EditCourseDialog from './edit-course-dialog';
+import EditProfileDialog from './edit-profile-dialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -42,22 +43,33 @@ const getInitialCourses = () => {
   }));
 };
 
+const getInitialProfile = () => {
+    if (typeof window === 'undefined') {
+        return { name: 'Professor', summary: "Here's your dashboard to manage courses, track attendance, and gain insights into student engagement. Have a productive day!" };
+    }
+    const storedProfile = localStorage.getItem('teacherProfile');
+    return storedProfile ? JSON.parse(storedProfile) : { name: 'Professor', summary: "Here's your dashboard to manage courses, track attendance, and gain insights into student engagement. Have a productive day!" };
+}
+
 let courseStore = [];
 
 export default function Courses() {
   const [courses, setCourses] = useState([]);
+  const [profile, setProfile] = useState({ name: '', summary: ''});
   const [filteredCourses, setFilteredCourses] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOption, setSortOption] = useState('name-asc');
   const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isProfileDialogOpen, setProfileDialogOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [courseToDeleteId, setCourseToDeleteId] = useState(null);
 
   useEffect(() => {
     courseStore = getInitialCourses();
     setCourses(courseStore);
+    setProfile(getInitialProfile());
   }, []);
 
   useEffect(() => {
@@ -129,6 +141,12 @@ export default function Courses() {
       localStorage.setItem('courses', JSON.stringify(newCourses));
     }
   };
+  
+  const updateProfileLocalStorage = (newProfile) => {
+      if(typeof window !== 'undefined') {
+          localStorage.setItem('teacherProfile', JSON.stringify(newProfile));
+      }
+  }
 
   const handleAddCourse = newCourse => {
     const newCourseWithId = { 
@@ -154,6 +172,11 @@ export default function Courses() {
     setCourses(courseStore);
     updateLocalStorage(courseStore);
     setSelectedCourse(null);
+  };
+
+  const handleUpdateProfile = (updatedProfile) => {
+    setProfile(updatedProfile);
+    updateProfileLocalStorage(updatedProfile);
   };
 
   const handleOpenDeleteDialog = courseId => {
@@ -218,12 +241,15 @@ export default function Courses() {
               className="rounded-full border-4 border-white shadow-md"
               data-ai-hint="teacher profile"
             />
-            <div>
-              <h2 className="text-2xl font-bold">Welcome Back, Professor!</h2>
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold">Welcome Back, {profile.name}!</h2>
               <p className="text-muted-foreground mt-1">
-                Here's your dashboard to manage courses, track attendance, and gain insights into student engagement. Have a productive day!
+                {profile.summary}
               </p>
             </div>
+            <Button variant="ghost" size="icon" onClick={() => setProfileDialogOpen(true)}>
+                <Edit className="h-5 w-5" />
+            </Button>
           </CardContent>
         </Card>
 
@@ -423,6 +449,15 @@ export default function Courses() {
           onCourseUpdate={handleUpdateCourse}
           course={selectedCourse}
         />
+      )}
+
+      {profile && (
+          <EditProfileDialog
+            isOpen={isProfileDialogOpen}
+            onOpenChange={setProfileDialogOpen}
+            onProfileUpdate={handleUpdateProfile}
+            profile={profile}
+            />
       )}
       
       <AlertDialog
