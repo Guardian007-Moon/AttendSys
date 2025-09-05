@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Book, PlusCircle, Search, Filter, Calendar, Users, Clock, Edit3, Trash2, ArrowUp, ArrowDown, ChevronsUpDown, BarChart3, TrendingUp, Award, Target } from 'lucide-react';
+import { Book, PlusCircle, Search, Filter, Calendar, Users, Clock, Edit3, Trash2, ArrowUp, ArrowDown, ChevronsUpDown, BarChart3, TrendingUp, Award, Target, CheckSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import CreateCourseDialog from './create-course-dialog';
 import EditCourseDialog from './edit-course-dialog';
@@ -16,7 +16,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { initialCourses, initialCourseStudents as allStudents } from '@/lib/mock-data';
+import { initialCourses, initialCourseStudents as allStudents, loadAttendance } from '@/lib/mock-data';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -85,9 +85,40 @@ export default function Courses() {
     setFilteredCourses(results);
   }, [searchTerm, courses, sortOption]);
 
+  const calculateAverageAttendance = () => {
+    if (typeof window === 'undefined' || courses.length === 0) return 0;
+    
+    const allAttendance = loadAttendance();
+    let totalCoursesWithSessions = 0;
+    const totalAverageAttendance = courses.reduce((courseSum, course) => {
+      const storedSessions = localStorage.getItem(`sessions_${course.id}`);
+      const sessions = storedSessions ? JSON.parse(storedSessions) : [];
+      
+      if (sessions.length > 0) {
+        let totalPresentInCourse = 0;
+        sessions.forEach(session => {
+          const sessionAttendance = allAttendance[session.id] || {};
+          const presentCount = Object.values(sessionAttendance).filter(
+            record => record.status === 'Present' || record.status === 'Late'
+          ).length;
+          totalPresentInCourse += presentCount;
+        });
+        
+        totalCoursesWithSessions++;
+        return courseSum + (totalPresentInCourse / sessions.length);
+      }
+      
+      return courseSum;
+    }, 0);
+
+    if (totalCoursesWithSessions === 0) return 0;
+    return (totalAverageAttendance / totalCoursesWithSessions).toFixed(1);
+  };
+
+
   // Calculate summary statistics
   const totalStudents = courses.reduce((sum, course) => sum + (course.studentCount || 0), 0);
-  const averageStudents = courses.length > 0 ? (totalStudents / courses.length).toFixed(1) : 0;
+  const averageAttendance = calculateAverageAttendance();
   const mostPopularCourse = courses.length > 0 
     ? courses.reduce((max, course) => (course.studentCount > max.studentCount ? course : max), courses[0])
     : null;
@@ -204,11 +235,11 @@ export default function Courses() {
           <Card className="card card-hover rounded-xl border-0 overflow-hidden animate-fade-in" style={{ animationDelay: '0.2s' }}>
             <CardContent className="p-5 flex items-center">
               <div className="bg-blue-500/10 p-3 rounded-xl mr-4">
-                <TrendingUp className="h-6 w-6 text-blue-500" />
+                <CheckSquare className="h-6 w-6 text-blue-500" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Avg. per Course</p>
-                <h3 className="text-2xl font-bold">{averageStudents}</h3>
+                <p className="text-sm text-muted-foreground">Avg. Attendance</p>
+                <h3 className="text-2xl font-bold">{averageAttendance}</h3>
               </div>
             </CardContent>
           </Card>
