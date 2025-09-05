@@ -147,11 +147,12 @@ export default function Courses() {
     const sortedGroupKeys = Array.from(groups.keys());
     // Only sort the groups if the primary sort is by year
     if (sortOptions.length > 0 && sortOptions[0].key === 'year') {
+        const yearSortOrder = sortOptions[0].order;
         sortedGroupKeys.sort((a, b) => {
             if (a === 'Uncategorized') return 1;
             if (b === 'Uncategorized') return -1;
             const comparison = parseInt(a) - parseInt(b);
-            return sortOptions[0].order === 'asc' ? comparison : -comparison;
+            return yearSortOrder === 'asc' ? comparison : -comparison;
         });
     }
 
@@ -162,30 +163,29 @@ export default function Courses() {
     if (typeof window === 'undefined' || courses.length === 0) return 0;
     
     const allAttendance = loadAttendance();
-    let totalCoursesWithSessions = 0;
-    const totalAverageAttendance = courses.reduce((courseSum, course) => {
-      const storedSessions = localStorage.getItem(`sessions_${course.id}`);
-      const sessions = storedSessions ? JSON.parse(storedSessions) : [];
-      
-      if (sessions.length > 0) {
-        let totalPresentInCourse = 0;
-        sessions.forEach(session => {
-          const sessionAttendance = allAttendance[session.id] || {};
-          const presentCount = Object.values(sessionAttendance).filter(
-            record => record.status === 'Present' || record.status === 'Late'
-          ).length;
-          totalPresentInCourse += presentCount;
-        });
-        
-        totalCoursesWithSessions++;
-        return courseSum + (totalPresentInCourse / sessions.length);
-      }
-      
-      return courseSum;
-    }, 0);
+    let totalPresent = 0;
+    let totalSessionsWithAttendance = 0;
 
-    if (totalCoursesWithSessions === 0) return 0;
-    return (totalAverageAttendance / totalCoursesWithSessions).toFixed(1);
+    courses.forEach(course => {
+        const storedSessions = localStorage.getItem(`sessions_${course.id}`);
+        const sessions = storedSessions ? JSON.parse(storedSessions) : [];
+
+        sessions.forEach(session => {
+            const sessionAttendance = allAttendance[session.id] || {};
+            const presentCount = Object.values(sessionAttendance).filter(
+                record => record.status === 'Present' || record.status === 'Late'
+            ).length;
+            
+            if(Object.keys(sessionAttendance).length > 0) {
+                totalPresent += presentCount;
+                totalSessionsWithAttendance++;
+            }
+        });
+    });
+
+    if (totalSessionsWithAttendance === 0) return 0;
+    const average = totalPresent / totalSessionsWithAttendance;
+    return average.toFixed(1);
   };
 
 
@@ -258,8 +258,8 @@ export default function Courses() {
     switch(`${option.key}-${option.order}`) {
       case 'name-asc': return 'Name (A-Z)';
       case 'name-desc': return 'Name (Z-A)';
-      case 'students-asc': return 'Students (Fewest)';
-      case 'students-desc': return 'Students (Most)';
+      case 'studentCount-asc': return 'Students (Fewest to Most)';
+      case 'studentCount-desc': return 'Students (Most to Fewest)';
       case 'year-asc': return 'Year (Asc)';
       case 'year-desc': return 'Year (Desc)';
       default: return '';
