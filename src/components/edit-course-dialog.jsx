@@ -38,7 +38,7 @@ const courseSchema = z.object({
   year: z.string({ required_error: 'Please select a year.' }),
 });
 
-const academicYears = ["Freshman", "Sophomore", "Junior", "Senior", "Graduate"];
+const academicYears = ['1', '2', '3', '4', '5'];
 
 export default function EditCourseDialog({
   isOpen,
@@ -104,7 +104,7 @@ export default function EditCourseDialog({
                     </FormControl>
                     <SelectContent>
                       {academicYears.map(year => (
-                        <SelectItem key={year} value={year}>{year}</SelectItem>
+                        <SelectItem key={year} value={year}>Year {year}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>

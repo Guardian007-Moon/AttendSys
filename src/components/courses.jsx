@@ -106,7 +106,14 @@ export default function Courses() {
           }
           groups[year].push(course);
       });
-      return groups;
+      // Sort years numerically, putting 'Uncategorized' last
+      return Object.fromEntries(
+        Object.entries(groups).sort(([yearA], [yearB]) => {
+          if (yearA === 'Uncategorized') return 1;
+          if (yearB === 'Uncategorized') return -1;
+          return parseInt(yearA) - parseInt(yearB);
+        })
+      );
   }, [filteredAndSortedCourses]);
 
   const calculateAverageAttendance = () => {
@@ -373,7 +380,7 @@ export default function Courses() {
               <div key={year} className="animate-fade-in">
                 <div className="flex items-center gap-3 mb-4">
                   <GraduationCap className="h-6 w-6 text-primary/80" />
-                  <h2 className="text-xl font-bold text-foreground">{year}</h2>
+                  <h2 className="text-xl font-bold text-foreground">{year === 'Uncategorized' ? 'Uncategorized' : `Year ${year}`}</h2>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {coursesInYear.map((course, index) => (

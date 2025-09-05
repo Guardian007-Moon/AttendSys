@@ -4,19 +4,19 @@ export const initialCourses = [
     id: 'CS101',
     name: 'Introduction to Computer Science',
     description: 'Learn the fundamentals of programming and computer science.',
-    year: 'Freshman',
+    year: '1',
   },
   {
     id: 'PHY201',
     name: 'University Physics I',
     description: 'Explore classical mechanics and thermodynamics.',
-    year: 'Sophomore',
+    year: '2',
   },
   {
     id: 'ENG303',
     name: 'Shakespearean Literature',
     description: 'A deep dive into the works of William Shakespeare.',
-    year: 'Junior',
+    year: '3',
   },
 ];
 
