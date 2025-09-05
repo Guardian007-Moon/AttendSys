@@ -1,11 +1,15 @@
-import Courses from '@/components/courses';
+
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
-  return (
-    <main className="min-h-screen bg-background font-body text-foreground">
-      <div className="container mx-auto p-4 sm:p-6 lg:p-8">
-        <Courses />
-      </div>
-    </main>
-  );
+  const router = useRouter();
+
+  useEffect(() => {
+    router.replace('/login');
+  }, [router]);
+
+  return null; // or a loading spinner
 }
