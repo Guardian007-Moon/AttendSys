@@ -23,11 +23,22 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const courseSchema = z.object({
   name: z.string().min(5, 'Course name must be at least 5 characters.'),
   description: z.string().optional(),
+  year: z.string({ required_error: 'Please select a year.' }),
 });
+
+const academicYears = ["Freshman", "Sophomore", "Junior", "Senior", "Graduate"];
+
 
 export default function CreateCourseDialog({
   isOpen,
@@ -39,6 +50,7 @@ export default function CreateCourseDialog({
     defaultValues: {
       name: '',
       description: '',
+      year: '',
     },
   });
 
@@ -68,6 +80,28 @@ export default function CreateCourseDialog({
                   <FormControl>
                     <Input placeholder="e.g., 'Creative Writing 101'" {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="year"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Academic Year</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a year level" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {academicYears.map(year => (
+                        <SelectItem key={year} value={year}>{year}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

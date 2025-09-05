@@ -1,9 +1,10 @@
+
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Book, PlusCircle, Search, Filter, Calendar, Users, Clock, Edit3, Trash2, ArrowUp, ArrowDown, ChevronsUpDown, BarChart3, TrendingUp, Award, Target, CheckSquare, Edit } from 'lucide-react';
+import { Book, PlusCircle, Search, Filter, Calendar, Users, Clock, Edit3, Trash2, ArrowUp, ArrowDown, ChevronsUpDown, BarChart3, TrendingUp, Award, Target, CheckSquare, Edit, GraduationCap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import CreateCourseDialog from './create-course-dialog';
 import EditCourseDialog from './edit-course-dialog';
@@ -48,7 +49,7 @@ const getInitialProfile = () => {
         return { name: 'Professor', summary: "Here's your dashboard to manage courses, track attendance, and gain insights into student engagement. Have a productive day!", imageUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&h=200&auto=format&fit=crop' };
     }
     const storedProfile = localStorage.getItem('teacherProfile');
-    return storedProfile ? JSON.parse(storedProfile) : { name: 'Professor', summary: "Here's your dashboard to manage courses, track attendance, and gain insights into student engagement. Have a productive day!", imageUrl: 'https://images.unsplash.com/photo-15734963  59142-b8d87734a5a2?q=80&w=200&h=200&auto=format&fit=crop' };
+    return storedProfile ? JSON.parse(storedProfile) : { name: 'Professor', summary: "Here's your dashboard to manage courses, track attendance, and gain insights into student engagement. Have a productive day!", imageUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&h=200&auto=format&fit=crop' };
 }
 
 let courseStore = [];
@@ -56,7 +57,6 @@ let courseStore = [];
 export default function Courses() {
   const [courses, setCourses] = useState([]);
   const [profile, setProfile] = useState({ name: '', summary: '', imageUrl: ''});
-  const [filteredCourses, setFilteredCourses] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOption, setSortOption] = useState('name-asc');
   const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
@@ -72,7 +72,7 @@ export default function Courses() {
     setProfile(getInitialProfile());
   }, []);
 
-  useEffect(() => {
+  const filteredAndSortedCourses = useMemo(() => {
     let results = courses.filter(course =>
       course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (course.code && course.code.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -94,9 +94,20 @@ export default function Courses() {
       default:
         break;
     }
-
-    setFilteredCourses(results);
+    return results;
   }, [searchTerm, courses, sortOption]);
+  
+  const groupedCourses = useMemo(() => {
+      const groups = {};
+      filteredAndSortedCourses.forEach(course => {
+          const year = course.year || 'Uncategorized';
+          if(!groups[year]) {
+              groups[year] = [];
+          }
+          groups[year].push(course);
+      });
+      return groups;
+  }, [filteredAndSortedCourses]);
 
   const calculateAverageAttendance = () => {
     if (typeof window === 'undefined' || courses.length === 0) return 0;
@@ -356,62 +367,72 @@ export default function Courses() {
         </div>
 
         {/* Courses Grid */}
-        {filteredCourses.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredCourses.map((course, index) => (
-              <Card 
-                key={course.id} 
-                className="card card-hover overflow-hidden border-0 rounded-xl animate-fade-in"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <CardHeader className="pb-4 gradient-primary text-white p-5">
-                  <div className="flex justify-between items-start">
-                    <Link href={`/courses/${course.id}`} className="block flex-1">
-                      <CardTitle className="text-white text-xl font-semibold">{course.name}</CardTitle>
-                      <CardDescription className="text-white/90 mt-1">{course.code}</CardDescription>
-                    </Link>
-                    <div className="glass p-2 rounded-lg">
-                      <Book size={20} className="text-white" />
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-5">
-                  <p className="text-sm text-muted-foreground mb-4 line-clamp-2 h-12">
-                    {course.description || "No description available."}
-                  </p>
-                  
-                  <div className="flex items-center text-sm text-muted-foreground mb-4">
-                    <Calendar className="h-4 w-4 mr-2 text-primary" />
-                    <span>{course.schedule || "Schedule not set"}</span>
-                  </div>
-                  
-                  <div className="flex justify-between items-center text-sm border-t pt-4">
-                    <div className="flex items-center text-muted-foreground">
-                      <Users className="h-4 w-4 mr-2 text-primary" />
-                      <span>{course.studentCount || 0} students</span>
-                    </div>
-                    
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        onClick={() => handleOpenEditDialog(course)}
-                        className="h-9 w-9 rounded-lg hover:bg-primary/10"
-                      >
-                        <Edit3 size={16} className="text-primary" />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        onClick={() => handleOpenDeleteDialog(course.id)}
-                        className="h-9 w-9 rounded-lg hover:bg-red-50"
-                      >
-                        <Trash2 size={16} className="text-red-500" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+        {Object.keys(groupedCourses).length > 0 ? (
+          <div className="space-y-8">
+            {Object.entries(groupedCourses).map(([year, coursesInYear]) => (
+              <div key={year} className="animate-fade-in">
+                <div className="flex items-center gap-3 mb-4">
+                  <GraduationCap className="h-6 w-6 text-primary/80" />
+                  <h2 className="text-xl font-bold text-foreground">{year}</h2>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {coursesInYear.map((course, index) => (
+                    <Card 
+                      key={course.id} 
+                      className="card card-hover overflow-hidden border-0 rounded-xl"
+                      style={{ animationDelay: `${index * 0.05}s` }}
+                    >
+                      <CardHeader className="pb-4 gradient-primary text-white p-5">
+                        <div className="flex justify-between items-start">
+                          <Link href={`/courses/${course.id}`} className="block flex-1">
+                            <CardTitle className="text-white text-xl font-semibold">{course.name}</CardTitle>
+                            <CardDescription className="text-white/90 mt-1">{course.code}</CardDescription>
+                          </Link>
+                          <div className="glass p-2 rounded-lg">
+                            <Book size={20} className="text-white" />
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="p-5">
+                        <p className="text-sm text-muted-foreground mb-4 line-clamp-2 h-12">
+                          {course.description || "No description available."}
+                        </p>
+                        
+                        <div className="flex items-center text-sm text-muted-foreground mb-4">
+                          <Calendar className="h-4 w-4 mr-2 text-primary" />
+                          <span>{course.schedule || "Schedule not set"}</span>
+                        </div>
+                        
+                        <div className="flex justify-between items-center text-sm border-t pt-4">
+                          <div className="flex items-center text-muted-foreground">
+                            <Users className="h-4 w-4 mr-2 text-primary" />
+                            <span>{course.studentCount || 0} students</span>
+                          </div>
+                          
+                          <div className="flex gap-2">
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              onClick={() => handleOpenEditDialog(course)}
+                              className="h-9 w-9 rounded-lg hover:bg-primary/10"
+                            >
+                              <Edit3 size={16} className="text-primary" />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              onClick={() => handleOpenDeleteDialog(course.id)}
+                              className="h-9 w-9 rounded-lg hover:bg-red-50"
+                            >
+                              <Trash2 size={16} className="text-red-500" />
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         ) : (
