@@ -163,7 +163,7 @@ export default function Dashboard({ courseId }) {
   return (
     <>
       <header className="mb-8">
-        <Link href="/" passHref>
+        <Link href="/courses" passHref>
           <Button variant="outline" className="mb-4">
             <ArrowLeft />
             Back to Courses
