@@ -101,35 +101,17 @@ export default function Courses() {
     return results;
   }, [searchTerm, courses, sortOption]);
   
-  const groupedCourses = useMemo(() => {
-    const groups = {};
+ const groupedCourses = useMemo(() => {
+    const groups = new Map();
     filteredAndSortedCourses.forEach(course => {
-        const year = course.year || 'Uncategorized';
-        if(!groups[year]) {
-            groups[year] = [];
-        }
-        groups[year].push(course);
+      const year = course.year || 'Uncategorized';
+      if (!groups.has(year)) {
+        groups.set(year, []);
+      }
+      groups.get(year).push(course);
     });
-    
-    const sortedGroupKeys = Object.keys(groups);
-
-    // If sorting by year, we need to sort the year groups themselves
-    if (sortOption.startsWith('year-')) {
-      sortedGroupKeys.sort((yearA, yearB) => {
-        if (yearA === 'Uncategorized') return 1;
-        if (yearB === 'Uncategorized') return -1;
-        const sortDirection = sortOption.endsWith('desc') ? -1 : 1;
-        return (parseInt(yearA) - parseInt(yearB)) * sortDirection;
-      });
-    }
-
-    const sortedGroups = {};
-    sortedGroupKeys.forEach(year => {
-        sortedGroups[year] = groups[year];
-    });
-
-    return sortedGroups;
-}, [filteredAndSortedCourses, sortOption]);
+    return groups;
+  }, [filteredAndSortedCourses]);
 
   const calculateAverageAttendance = () => {
     if (typeof window === 'undefined' || courses.length === 0) return 0;
@@ -331,9 +313,9 @@ export default function Courses() {
               <div className="bg-amber-500/10 p-3 rounded-xl mr-4">
                 <Award className="h-6 w-6 text-amber-500" />
               </div>
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <p className="text-sm text-muted-foreground">Most Popular</p>
-                <h3 className="text-lg font-bold">
+                <h3 className="text-lg font-bold whitespace-normal">
                   {mostPopularCourse ? mostPopularCourse.name : 'N/A'}
                 </h3>
                 <p className="text-xs text-muted-foreground">
@@ -399,9 +381,9 @@ export default function Courses() {
         </div>
 
         {/* Courses Grid */}
-        {Object.keys(groupedCourses).length > 0 ? (
+        {groupedCourses.size > 0 ? (
           <div className="space-y-8">
-            {Object.entries(groupedCourses).map(([year, coursesInYear]) => (
+            {Array.from(groupedCourses.entries()).map(([year, coursesInYear]) => (
               <div key={year} className="animate-fade-in">
                 <div className="flex items-center gap-3 mb-4">
                   <GraduationCap className="h-6 w-6 text-primary/80" />
@@ -542,3 +524,5 @@ export default function Courses() {
     </div>
   );
 }
+
+    
