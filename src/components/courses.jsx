@@ -296,9 +296,9 @@ export default function Courses() {
               <div className="bg-amber-500/10 p-3 rounded-xl mr-4">
                 <Award className="h-6 w-6 text-amber-500" />
               </div>
-              <div>
+              <div className="flex-1">
                 <p className="text-sm text-muted-foreground">Most Popular</p>
-                <h3 className="text-lg font-bold truncate">
+                <h3 className="text-lg font-bold">
                   {mostPopularCourse ? mostPopularCourse.name : 'N/A'}
                 </h3>
                 <p className="text-xs text-muted-foreground">
