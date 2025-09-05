@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Book, PlusCircle, Search, Filter, Calendar, Users, Clock, Edit3, Trash2 } from 'lucide-react';
+import { Book, PlusCircle, Search, Filter, Calendar, Users, Clock, Edit3, Trash2, ArrowUp, ArrowDown, ChevronsUpDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import CreateCourseDialog from './create-course-dialog';
 import EditCourseDialog from './edit-course-dialog';
@@ -16,14 +16,29 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { initialCourses } from '@/lib/mock-data';
+import { initialCourses, initialCourseStudents as allStudents } from '@/lib/mock-data';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const getInitialCourses = () => {
   if (typeof window === 'undefined') return initialCourses;
   const storedCourses = localStorage.getItem('courses');
-  return storedCourses ? JSON.parse(storedCourses) : initialCourses;
+  const courses = storedCourses ? JSON.parse(storedCourses) : initialCourses;
+  // Attach student counts
+  return courses.map(course => ({
+    ...course,
+    studentCount: (allStudents[course.id] || []).length
+  }));
 };
 
 let courseStore = [];
@@ -32,6 +47,7 @@ export default function Courses() {
   const [courses, setCourses] = useState([]);
   const [filteredCourses, setFilteredCourses] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortOption, setSortOption] = useState('name-asc');
   const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -41,15 +57,32 @@ export default function Courses() {
   useEffect(() => {
     courseStore = getInitialCourses();
     setCourses(courseStore);
-    setFilteredCourses(courseStore);
   }, []);
 
   useEffect(() => {
-    const filtered = courses.filter(course =>
+    let results = courses.filter(course =>
       course.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    setFilteredCourses(filtered);
-  }, [searchTerm, courses]);
+
+    switch (sortOption) {
+      case 'name-asc':
+        results.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'name-desc':
+        results.sort((a, b) => b.name.localeCompare(a.name));
+        break;
+      case 'students-desc':
+        results.sort((a, b) => (b.studentCount || 0) - (a.studentCount || 0));
+        break;
+      case 'students-asc':
+        results.sort((a, b) => (a.studentCount || 0) - (b.studentCount || 0));
+        break;
+      default:
+        break;
+    }
+
+    setFilteredCourses(results);
+  }, [searchTerm, courses, sortOption]);
 
   const updateLocalStorage = (newCourses) => {
     if (typeof window !== 'undefined') {
@@ -58,7 +91,7 @@ export default function Courses() {
   };
 
   const handleAddCourse = newCourse => {
-    const newCourseWithId = { ...newCourse, id: `C${Date.now()}` };
+    const newCourseWithId = { ...newCourse, id: `C${Date.now()}`, studentCount: 0 };
     courseStore = [...courseStore, newCourseWithId];
     setCourses(courseStore);
     updateLocalStorage(courseStore);
@@ -71,7 +104,7 @@ export default function Courses() {
 
   const handleUpdateCourse = updatedCourse => {
     courseStore = courseStore.map(c =>
-      c.id === updatedCourse.id ? updatedCourse : c
+      c.id === updatedCourse.id ? { ...c, ...updatedCourse } : c
     );
     setCourses(courseStore);
     updateLocalStorage(courseStore);
@@ -122,19 +155,33 @@ export default function Courses() {
         {/* Search and Filter Section */}
         <div className="mb-8 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
           <div className="flex flex-col sm:flex-row gap-4 items-center">
-            <div className="relative flex-1">
+            <div className="relative flex-1 w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
                 placeholder="Search courses by name..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 py-2 rounded-lg border-gray-200 focus:border-primary"
+                className="pl-10 py-2 rounded-lg border-gray-200 focus:border-primary w-full"
               />
             </div>
-            <Button variant="outline" className="flex items-center gap-2 border-gray-200">
-              <Filter size={16} />
-              Filter
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="flex items-center gap-2 border-gray-200">
+                  <Filter size={16} />
+                  Filter
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Sort by</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuRadioGroup value={sortOption} onValueChange={setSortOption}>
+                  <DropdownMenuRadioItem value="name-asc">Course Name (A-Z)</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="name-desc">Course Name (Z-A)</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="students-desc">Students (Most to Fewest)</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="students-asc">Students (Fewest to Most)</DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
@@ -159,7 +206,7 @@ export default function Courses() {
                     <div className="flex justify-between items-center text-sm text-muted-foreground border-t pt-4">
                        <div className="flex items-center">
                          <Users className="h-4 w-4 mr-2" />
-                         <span>{course.students?.length || 0} students</span>
+                         <span>{course.studentCount || 0} students</span>
                        </div>
                         <div className="flex gap-2">
                            <Button 
