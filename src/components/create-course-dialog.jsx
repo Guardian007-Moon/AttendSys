@@ -33,6 +33,7 @@ import {
 
 const courseSchema = z.object({
   name: z.string().min(5, 'Course name must be at least 5 characters.'),
+  code: z.string().optional(),
   description: z.string().optional(),
   year: z.string({ required_error: 'Please select a year.' }),
   bannerUrl: z.string().url({ message: 'Please enter a valid URL.' }).optional().or(z.literal('')),
@@ -50,6 +51,7 @@ export default function CreateCourseDialog({
     resolver: zodResolver(courseSchema),
     defaultValues: {
       name: '',
+      code: '',
       description: '',
       year: '',
       bannerUrl: '',
@@ -81,6 +83,19 @@ export default function CreateCourseDialog({
                   <FormLabel>Course Name</FormLabel>
                   <FormControl>
                     <Input placeholder="e.g., 'Creative Writing 101'" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="code"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Course Code (Optional)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., 'CW101'" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
