@@ -4,7 +4,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Book, PlusCircle, Search, Filter, Calendar, Users, Clock, Edit3, Trash2, ArrowUp, ArrowDown, ChevronsUpDown, BarChart3, TrendingUp, Award, Target, CheckSquare, Edit, GraduationCap } from 'lucide-react';
+import { Book, PlusCircle, Search, Filter, Calendar, Users, Clock, Edit3, Trash2, ArrowUp, ArrowDown, ChevronsUpDown, BarChart3, TrendingUp, Award, Target, CheckSquare, Edit, GraduationCap, X, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import CreateCourseDialog from './create-course-dialog';
 import EditCourseDialog from './edit-course-dialog';
@@ -26,12 +26,14 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
+  DropdownMenuCheckboxItem,
   DropdownMenuSeparator,
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+
 
 const getInitialCourses = () => {
   if (typeof window === 'undefined') return initialCourses;
@@ -54,11 +56,25 @@ const getInitialProfile = () => {
 
 let courseStore = [];
 
+const Sorter = ({ onCheckedChange, checked, children }) => (
+  <DropdownMenuCheckboxItem
+    onCheckedChange={onCheckedChange}
+    checked={checked}
+    onSelect={(e) => e.preventDefault()}
+    className="cursor-pointer"
+  >
+    {children}
+  </DropdownMenuCheckboxItem>
+);
+
 export default function Courses() {
   const [courses, setCourses] = useState([]);
   const [profile, setProfile] = useState({ name: '', summary: '', imageUrl: ''});
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortOption, setSortOption] = useState('name-asc');
+  const [sortOptions, setSortOptions] = useState([
+    { key: 'year', order: 'asc' },
+    { key: 'name', order: 'asc' },
+  ]);
   const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -71,6 +87,23 @@ export default function Courses() {
     setCourses(courseStore);
     setProfile(getInitialProfile());
   }, []);
+  
+  const handleSortChange = (key, order) => {
+    setSortOptions(prev => {
+      const existing = prev.find(opt => opt.key === key && opt.order === order);
+      if (existing) {
+        return prev.filter(opt => !(opt.key === key && opt.order === order));
+      } else {
+        // Remove any other sorts for the same key
+        const otherRemoved = prev.filter(opt => opt.key !== key);
+        return [...otherRemoved, { key, order }];
+      }
+    });
+  };
+  
+  const getSortState = (key, order) => {
+    return sortOptions.some(opt => opt.key === key && opt.order === order);
+  };
 
   const filteredAndSortedCourses = useMemo(() => {
     let results = courses.filter(course =>
@@ -78,28 +111,28 @@ export default function Courses() {
       (course.code && course.code.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
-    const sortOrder = sortOption.split('-')[1];
-    const sortKey = sortOption.split('-')[0];
-    
     results.sort((a, b) => {
-        if (sortKey === 'year') {
-            const yearA = parseInt(a.year) || 0;
-            const yearB = parseInt(b.year) || 0;
-            return sortOrder === 'asc' ? yearA - yearB : yearB - yearA;
+      for (const sortOption of sortOptions) {
+        const { key, order } = sortOption;
+        const valA = a[key];
+        const valB = b[key];
+        
+        let comparison = 0;
+        if (key === 'year' || key === 'studentCount') {
+          comparison = (parseInt(valA) || 0) - (parseInt(valB) || 0);
+        } else if (typeof valA === 'string' && typeof valB === 'string') {
+          comparison = valA.localeCompare(valB);
         }
-        if (sortKey === 'name') {
-            return sortOrder === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+
+        if (comparison !== 0) {
+          return order === 'asc' ? comparison : -comparison;
         }
-        if (sortKey === 'students') {
-            const countA = a.studentCount || 0;
-            const countB = b.studentCount || 0;
-            return sortOrder === 'asc' ? countA - countB : countB - countA;
-        }
-        return 0;
+      }
+      return 0;
     });
     
     return results;
-  }, [searchTerm, courses, sortOption]);
+  }, [searchTerm, courses, sortOptions]);
   
  const groupedCourses = useMemo(() => {
     const groups = new Map();
@@ -110,8 +143,20 @@ export default function Courses() {
       }
       groups.get(year).push(course);
     });
-    return groups;
-  }, [filteredAndSortedCourses]);
+
+    const sortedGroupKeys = Array.from(groups.keys());
+    // Only sort the groups if the primary sort is by year
+    if (sortOptions.length > 0 && sortOptions[0].key === 'year') {
+        sortedGroupKeys.sort((a, b) => {
+            if (a === 'Uncategorized') return 1;
+            if (b === 'Uncategorized') return -1;
+            const comparison = parseInt(a) - parseInt(b);
+            return sortOptions[0].order === 'asc' ? comparison : -comparison;
+        });
+    }
+
+    return new Map(sortedGroupKeys.map(key => [key, groups.get(key)]));
+}, [filteredAndSortedCourses, sortOptions]);
 
   const calculateAverageAttendance = () => {
     if (typeof window === 'undefined' || courses.length === 0) return 0;
@@ -209,15 +254,15 @@ export default function Courses() {
     setDeleteDialogOpen(false);
   };
 
-  const getSortLabel = () => {
-    switch(sortOption) {
+  const getSortLabel = (option) => {
+    switch(`${option.key}-${option.order}`) {
       case 'name-asc': return 'Name (A-Z)';
       case 'name-desc': return 'Name (Z-A)';
-      case 'students-desc': return 'Students (Most)';
       case 'students-asc': return 'Students (Fewest)';
-      case 'year-asc': return 'Year (Ascending)';
-      case 'year-desc': return 'Year (Descending)';
-      default: return 'Sort by';
+      case 'students-desc': return 'Students (Most)';
+      case 'year-asc': return 'Year (Asc)';
+      case 'year-desc': return 'Year (Desc)';
+      default: return '';
     }
   };
 
@@ -338,46 +383,62 @@ export default function Courses() {
                 className="input pl-10 py-2.5 rounded-xl w-full"
               />
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="flex items-center gap-2 rounded-xl">
-                  <Filter size={16} />
-                  {getSortLabel()}
-                  <ChevronsUpDown size={16} />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="rounded-xl w-56">
-                <DropdownMenuLabel>Sort by</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuRadioGroup value={sortOption} onValueChange={setSortOption}>
-                  <DropdownMenuRadioItem value="name-asc" className="cursor-pointer">
-                    <ArrowUp size={14} className="mr-2" />
-                    Course Name (A-Z)
-                  </DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="name-desc" className="cursor-pointer">
-                    <ArrowDown size={14} className="mr-2" />
-                    Course Name (Z-A)
-                  </DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="students-desc" className="cursor-pointer">
-                    <Users size={14} className="mr-2" />
-                    Students (Most to Fewest)
-                  </DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="students-asc" className="cursor-pointer">
-                    <Users size={14} className="mr-2" />
-                    Students (Fewest to Most)
-                  </DropdownMenuRadioItem>
-                   <DropdownMenuRadioItem value="year-asc" className="cursor-pointer">
-                    <GraduationCap size={14} className="mr-2" />
-                    Year (Ascending)
-                  </DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="year-desc" className="cursor-pointer">
-                    <GraduationCap size={14} className="mr-2" />
-                    Year (Descending)
-                  </DropdownMenuRadioItem>
-                </DropdownMenuRadioGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex items-center gap-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="flex items-center gap-2 rounded-xl">
+                    <Filter size={16} />
+                    Sort
+                    {sortOptions.length > 0 && <Badge variant="secondary">{sortOptions.length}</Badge>}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="rounded-xl w-64">
+                  <DropdownMenuLabel>Sort by</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                   <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground">Name</DropdownMenuLabel>
+                   <Sorter onCheckedChange={() => handleSortChange('name', 'asc')} checked={getSortState('name', 'asc')}>
+                      <ArrowUp size={14} className="mr-2" /> Name (A-Z)
+                   </Sorter>
+                   <Sorter onCheckedChange={() => handleSortChange('name', 'desc')} checked={getSortState('name', 'desc')}>
+                      <ArrowDown size={14} className="mr-2" /> Name (Z-A)
+                   </Sorter>
+                   <DropdownMenuSeparator />
+                   <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground">Students</DropdownMenuLabel>
+                   <Sorter onCheckedChange={() => handleSortChange('studentCount', 'desc')} checked={getSortState('studentCount', 'desc')}>
+                      <Users size={14} className="mr-2" /> Students (Most to Fewest)
+                   </Sorter>
+                   <Sorter onCheckedChange={() => handleSortChange('studentCount', 'asc')} checked={getSortState('studentCount', 'asc')}>
+                      <Users size={14} className="mr-2" /> Students (Fewest to Most)
+                   </Sorter>
+                   <DropdownMenuSeparator />
+                   <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground">Year</DropdownMenuLabel>
+                   <Sorter onCheckedChange={() => handleSortChange('year', 'asc')} checked={getSortState('year', 'asc')}>
+                     <GraduationCap size={14} className="mr-2" /> Year (Ascending)
+                   </Sorter>
+                   <Sorter onCheckedChange={() => handleSortChange('year', 'desc')} checked={getSortState('year', 'desc')}>
+                     <GraduationCap size={14} className="mr-2" /> Year (Descending)
+                   </Sorter>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
+            {sortOptions.length > 0 && (
+                <div className="flex items-center flex-wrap gap-2 mt-4">
+                  <span className="text-sm font-medium">Active Sorts:</span>
+                  {sortOptions.map(opt => (
+                    <Badge key={`${opt.key}-${opt.order}`} variant="secondary" className="gap-1.5 pr-1">
+                      {getSortLabel(opt)}
+                      <button
+                        onClick={() => handleSortChange(opt.key, opt.order)}
+                        className="rounded-full hover:bg-black/10 dark:hover:bg-white/10 p-0.5"
+                        aria-label={`Remove ${getSortLabel(opt)} sort`}
+                      >
+                        <X size={12} />
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+            )}
         </div>
 
         {/* Courses Grid */}
@@ -524,5 +585,3 @@ export default function Courses() {
     </div>
   );
 }
-
-    
