@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { School, Mail, Lock, CheckCircle, MonitorPlay, FileText, Database, Smartphone } from 'lucide-react';
+import { School, Mail, Lock, CheckCircle, Activity, FileText, Smartphone } from 'lucide-react';
 import Head from 'next/head';
 
 export default function LoginPage() {
@@ -272,7 +272,7 @@ export default function LoginPage() {
           <div className="login-box">
             <div className="login-logo">
               <School className="icon" />
-              <span>QTrack</span>
+              <span>AttendSys</span>
             </div>
             
             <h2>Welcome Back</h2>
@@ -323,7 +323,7 @@ export default function LoginPage() {
               <div className="features">
                 <div className="feature"><CheckCircle className="icon" size={16} /><span>Track student attendance</span></div>
                 <div className="feature"><FileText className="icon" size={16}/><span>Generate reports</span></div>
-                <div className="feature"><Database className="icon" size={16}/><span>Export data</span></div>
+                <div className="feature"><Activity className="icon" size={16}/><span>Analyze the student's behavior</span></div>
                 <div className="feature"><Smartphone className="icon" size={16}/><span>Mobile access</span></div>
               </div>
             </div>
