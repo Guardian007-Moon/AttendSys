@@ -28,6 +28,7 @@ import { Textarea } from '@/components/ui/textarea';
 const profileSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters.'),
   summary: z.string().min(10, 'Summary must be at least 10 characters.'),
+  imageUrl: z.string().url({ message: 'Please enter a valid URL.' }).optional().or(z.literal('')),
 });
 
 export default function EditProfileDialog({
@@ -41,6 +42,7 @@ export default function EditProfileDialog({
     defaultValues: {
       name: '',
       summary: '',
+      imageUrl: '',
     },
   });
 
@@ -61,7 +63,7 @@ export default function EditProfileDialog({
         <DialogHeader>
           <DialogTitle>Edit Profile</DialogTitle>
           <DialogDescription>
-            Update your name and portfolio summary.
+            Update your name, portfolio summary, and profile image URL.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -90,6 +92,19 @@ export default function EditProfileDialog({
                       placeholder="e.g., 'A passionate educator with 10 years of experience...'"
                       {...field}
                     />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="imageUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Profile Image URL</FormLabel>
+                  <FormControl>
+                    <Input placeholder="https://example.com/your-image.jpg" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

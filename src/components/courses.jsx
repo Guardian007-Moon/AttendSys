@@ -45,17 +45,17 @@ const getInitialCourses = () => {
 
 const getInitialProfile = () => {
     if (typeof window === 'undefined') {
-        return { name: 'Professor', summary: "Here's your dashboard to manage courses, track attendance, and gain insights into student engagement. Have a productive day!" };
+        return { name: 'Professor', summary: "Here's your dashboard to manage courses, track attendance, and gain insights into student engagement. Have a productive day!", imageUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&h=200&auto=format&fit=crop' };
     }
     const storedProfile = localStorage.getItem('teacherProfile');
-    return storedProfile ? JSON.parse(storedProfile) : { name: 'Professor', summary: "Here's your dashboard to manage courses, track attendance, and gain insights into student engagement. Have a productive day!" };
+    return storedProfile ? JSON.parse(storedProfile) : { name: 'Professor', summary: "Here's your dashboard to manage courses, track attendance, and gain insights into student engagement. Have a productive day!", imageUrl: 'https://images.unsplash.com/photo-15734963  59142-b8d87734a5a2?q=80&w=200&h=200&auto=format&fit=crop' };
 }
 
 let courseStore = [];
 
 export default function Courses() {
   const [courses, setCourses] = useState([]);
-  const [profile, setProfile] = useState({ name: '', summary: ''});
+  const [profile, setProfile] = useState({ name: '', summary: '', imageUrl: ''});
   const [filteredCourses, setFilteredCourses] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOption, setSortOption] = useState('name-asc');
@@ -207,6 +207,29 @@ export default function Courses() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50/80 to-green-50/80 p-6">
       <div className="max-w-7xl mx-auto">
+        {/* Teacher Profile Section */}
+        <Card className="mb-8 card card-hover rounded-xl border-0 overflow-hidden animate-fade-in">
+            <CardContent className="p-5 flex items-center gap-6">
+                <Image
+                src={profile.imageUrl || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&h=200&auto=format&fit=crop"}
+                width={80}
+                height={80}
+                alt="Teacher Profile Picture"
+                className="rounded-full border-4 border-white shadow-md object-cover"
+                data-ai-hint="teacher profile"
+                />
+                <div className="flex-1">
+                <h2 className="text-2xl font-bold">Welcome Back, {profile.name}!</h2>
+                <p className="text-muted-foreground mt-1">
+                    {profile.summary}
+                </p>
+                </div>
+                <Button variant="ghost" size="icon" onClick={() => setProfileDialogOpen(true)}>
+                    <Edit className="h-5 w-5" />
+                </Button>
+            </CardContent>
+        </Card>
+      
         <header className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="animate-fade-in">
             <div className="flex items-center gap-3 mb-2">
@@ -229,30 +252,6 @@ export default function Courses() {
             Create Course
           </Button>
         </header>
-
-        {/* Teacher Profile Section */}
-        <Card className="mb-8 card card-hover rounded-xl border-0 overflow-hidden animate-fade-in">
-          <CardContent className="p-5 flex items-center gap-6">
-            <Image
-              src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&h=200&auto=format&fit=crop"
-              width={80}
-              height={80}
-              alt="Teacher Profile Picture"
-              className="rounded-full border-4 border-white shadow-md"
-              data-ai-hint="teacher profile"
-            />
-            <div className="flex-1">
-              <h2 className="text-2xl font-bold">Welcome Back, {profile.name}!</h2>
-              <p className="text-muted-foreground mt-1">
-                {profile.summary}
-              </p>
-            </div>
-            <Button variant="ghost" size="icon" onClick={() => setProfileDialogOpen(true)}>
-                <Edit className="h-5 w-5" />
-            </Button>
-          </CardContent>
-        </Card>
-
 
         {/* Summary Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
