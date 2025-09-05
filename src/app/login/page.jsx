@@ -275,13 +275,13 @@ export default function LoginPage() {
               <span>AttendSys</span>
             </div>
             
-            <h2>Welcome Back</h2>
+            <h2>Welcome Back, Professor!{'\u{1F60A}'}</h2>
             <p className="login-subtitle">Sign in to access your teacher dashboard</p>
             
             <form onSubmit={handleSubmit}>
               <div className="input-group">
                 <label htmlFor="email">Email Address</label>
-                <input type="email" id="email" placeholder="teacher@example.com" required />
+                <input type="email" id="email" placeholder="Enter your email" required />
                 <Mail className="icon" />
               </div>
               
