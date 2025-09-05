@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Book, PlusCircle, Search, Filter, Calendar, Users, Clock, Edit3, Trash2, ArrowUp, ArrowDown, ChevronsUpDown } from 'lucide-react';
+import { Book, PlusCircle, Search, Filter, Calendar, Users, Clock, Edit3, Trash2, ArrowUp, ArrowDown, ChevronsUpDown, BarChart3, TrendingUp, Award, Target } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import CreateCourseDialog from './create-course-dialog';
 import EditCourseDialog from './edit-course-dialog';
@@ -61,7 +61,8 @@ export default function Courses() {
 
   useEffect(() => {
     let results = courses.filter(course =>
-      course.name.toLowerCase().includes(searchTerm.toLowerCase())
+      course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (course.code && course.code.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
     switch (sortOption) {
@@ -84,6 +85,13 @@ export default function Courses() {
     setFilteredCourses(results);
   }, [searchTerm, courses, sortOption]);
 
+  // Calculate summary statistics
+  const totalStudents = courses.reduce((sum, course) => sum + (course.studentCount || 0), 0);
+  const averageStudents = courses.length > 0 ? (totalStudents / courses.length).toFixed(1) : 0;
+  const mostPopularCourse = courses.length > 0 
+    ? courses.reduce((max, course) => (course.studentCount > max.studentCount ? course : max), courses[0])
+    : null;
+
   const updateLocalStorage = (newCourses) => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('courses', JSON.stringify(newCourses));
@@ -91,7 +99,12 @@ export default function Courses() {
   };
 
   const handleAddCourse = newCourse => {
-    const newCourseWithId = { ...newCourse, id: `C${Date.now()}`, studentCount: 0 };
+    const newCourseWithId = { 
+      ...newCourse, 
+      id: `C${Date.now()}`, 
+      studentCount: 0,
+      code: newCourse.code || `CRS${Date.now().toString().slice(-4)}`
+    };
     courseStore = [...courseStore, newCourseWithId];
     setCourses(courseStore);
     updateLocalStorage(courseStore);
@@ -126,16 +139,26 @@ export default function Courses() {
     setDeleteDialogOpen(false);
   };
 
+  const getSortLabel = () => {
+    switch(sortOption) {
+      case 'name-asc': return 'Name (A-Z)';
+      case 'name-desc': return 'Name (Z-A)';
+      case 'students-desc': return 'Students (Most)';
+      case 'students-asc': return 'Students (Fewest)';
+      default: return 'Sort by';
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50/80 to-green-50/80 p-6">
       <div className="max-w-7xl mx-auto">
         <header className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
+          <div className="animate-fade-in">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-primary/10 rounded-lg">
+              <div className="p-2 bg-primary/10 rounded-xl">
                 <Book className="h-7 w-7 text-primary" />
               </div>
-              <h1 className="text-3xl font-bold font-headline text-primary">
+              <h1 className="text-3xl font-bold font-headline text-gradient">
                 My Courses
               </h1>
             </div>
@@ -145,40 +168,109 @@ export default function Courses() {
           </div>
           <Button 
             onClick={() => setCreateDialogOpen(true)} 
-            className="bg-primary hover:bg-primary/90 shadow-md px-4 py-2 rounded-lg flex items-center gap-2"
+            className="btn-primary shadow-glow px-5 py-2.5 rounded-xl flex items-center gap-2 animate-fade-in"
           >
             <PlusCircle size={18} />
             Create Course
           </Button>
         </header>
 
+        {/* Summary Statistics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+          <Card className="card card-hover rounded-xl border-0 overflow-hidden animate-fade-in">
+            <CardContent className="p-5 flex items-center">
+              <div className="bg-primary/10 p-3 rounded-xl mr-4">
+                <Book className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Total Courses</p>
+                <h3 className="text-2xl font-bold">{courses.length}</h3>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="card card-hover rounded-xl border-0 overflow-hidden animate-fade-in" style={{ animationDelay: '0.1s' }}>
+            <CardContent className="p-5 flex items-center">
+              <div className="bg-green-500/10 p-3 rounded-xl mr-4">
+                <Users className="h-6 w-6 text-green-500" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Total Students</p>
+                <h3 className="text-2xl font-bold">{totalStudents}</h3>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="card card-hover rounded-xl border-0 overflow-hidden animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            <CardContent className="p-5 flex items-center">
+              <div className="bg-blue-500/10 p-3 rounded-xl mr-4">
+                <TrendingUp className="h-6 w-6 text-blue-500" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Avg. per Course</p>
+                <h3 className="text-2xl font-bold">{averageStudents}</h3>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="card card-hover rounded-xl border-0 overflow-hidden animate-fade-in" style={{ animationDelay: '0.3s' }}>
+            <CardContent className="p-5 flex items-center">
+              <div className="bg-amber-500/10 p-3 rounded-xl mr-4">
+                <Award className="h-6 w-6 text-amber-500" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Most Popular</p>
+                <h3 className="text-lg font-bold truncate">
+                  {mostPopularCourse ? mostPopularCourse.name : 'N/A'}
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  {mostPopularCourse ? `${mostPopularCourse.studentCount} students` : ''}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Search and Filter Section */}
-        <div className="mb-8 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+        <div className="mb-8 card p-5 rounded-xl animate-fade-in">
           <div className="flex flex-col sm:flex-row gap-4 items-center">
             <div className="relative flex-1 w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
-                placeholder="Search courses by name..."
+                placeholder="Search courses by name or code..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 py-2 rounded-lg border-gray-200 focus:border-primary w-full"
+                className="input pl-10 py-2.5 rounded-xl w-full"
               />
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="flex items-center gap-2 border-gray-200">
+                <Button variant="outline" className="flex items-center gap-2 rounded-xl">
                   <Filter size={16} />
-                  Filter
+                  {getSortLabel()}
+                  <ChevronsUpDown size={16} />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className="rounded-xl w-56">
                 <DropdownMenuLabel>Sort by</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuRadioGroup value={sortOption} onValueChange={setSortOption}>
-                  <DropdownMenuRadioItem value="name-asc">Course Name (A-Z)</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="name-desc">Course Name (Z-A)</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="students-desc">Students (Most to Fewest)</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="students-asc">Students (Fewest to Most)</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="name-asc" className="cursor-pointer">
+                    <ArrowUp size={14} className="mr-2" />
+                    Course Name (A-Z)
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="name-desc" className="cursor-pointer">
+                    <ArrowDown size={14} className="mr-2" />
+                    Course Name (Z-A)
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="students-desc" className="cursor-pointer">
+                    <Users size={14} className="mr-2" />
+                    Students (Most to Fewest)
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="students-asc" className="cursor-pointer">
+                    <Users size={14} className="mr-2" />
+                    Students (Fewest to Most)
+                  </DropdownMenuRadioItem>
                 </DropdownMenuRadioGroup>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -188,59 +280,74 @@ export default function Courses() {
         {/* Courses Grid */}
         {filteredCourses.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredCourses.map((course) => (
-               <Card key={course.id} className="overflow-hidden border-0 shadow-md hover:shadow-lg transition-all duration-300 group">
-                <CardHeader className="pb-3 bg-gradient-to-r from-primary to-primary/80 text-white">
-                    <div className="flex justify-between items-start">
-                        <Link href={`/courses/${course.id}`} className="block">
-                            <CardTitle className="text-white text-xl group-hover:underline">{course.name}</CardTitle>
-                            <CardDescription className="text-white/80">{course.id}</CardDescription>
-                        </Link>
-                        <div className="bg-white/20 p-2 rounded-lg">
-                            <Book size={20} className="text-white" />
-                        </div>
+            {filteredCourses.map((course, index) => (
+              <Card 
+                key={course.id} 
+                className="card card-hover overflow-hidden border-0 rounded-xl animate-fade-in"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <CardHeader className="pb-4 gradient-primary text-white p-5">
+                  <div className="flex justify-between items-start">
+                    <Link href={`/courses/${course.id}`} className="block flex-1">
+                      <CardTitle className="text-white text-xl font-semibold">{course.name}</CardTitle>
+                      <CardDescription className="text-white/90 mt-1">{course.code}</CardDescription>
+                    </Link>
+                    <div className="glass p-2 rounded-lg">
+                      <Book size={20} className="text-white" />
                     </div>
+                  </div>
                 </CardHeader>
-                <CardContent className="p-4 pt-4">
-                    <p className="text-sm text-muted-foreground mb-4 h-10">{course.description}</p>
-                    <div className="flex justify-between items-center text-sm text-muted-foreground border-t pt-4">
-                       <div className="flex items-center">
-                         <Users className="h-4 w-4 mr-2" />
-                         <span>{course.studentCount || 0} students</span>
-                       </div>
-                        <div className="flex gap-2">
-                           <Button 
-                              variant="ghost" 
-                              size="icon"
-                              onClick={() => handleOpenEditDialog(course)}
-                              className="h-8 w-8 hover:bg-primary/10"
-                            >
-                              <Edit3 size={16} className="text-primary" />
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="icon"
-                              onClick={() => handleOpenDeleteDialog(course.id)}
-                              className="h-8 w-8 hover:bg-red-50"
-                            >
-                              <Trash2 size={16} className="text-red-500" />
-                            </Button>
-                        </div>
+                <CardContent className="p-5">
+                  <p className="text-sm text-muted-foreground mb-4 line-clamp-2 h-12">
+                    {course.description || "No description available."}
+                  </p>
+                  
+                  <div className="flex items-center text-sm text-muted-foreground mb-4">
+                    <Calendar className="h-4 w-4 mr-2 text-primary" />
+                    <span>{course.schedule || "Schedule not set"}</span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center text-sm border-t pt-4">
+                    <div className="flex items-center text-muted-foreground">
+                      <Users className="h-4 w-4 mr-2 text-primary" />
+                      <span>{course.studentCount || 0} students</span>
                     </div>
+                    
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => handleOpenEditDialog(course)}
+                        className="h-9 w-9 rounded-lg hover:bg-primary/10"
+                      >
+                        <Edit3 size={16} className="text-primary" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => handleOpenDeleteDialog(course.id)}
+                        className="h-9 w-9 rounded-lg hover:bg-red-50"
+                      >
+                        <Trash2 size={16} className="text-red-500" />
+                      </Button>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             ))}
           </div>
         ) : (
-          <div className="text-center py-12 bg-white rounded-xl shadow-sm border border-gray-100">
-            <Book className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-500 mb-2">No courses found</h3>
-            <p className="text-gray-400 mb-4">
+          <div className="card text-center py-16 rounded-xl animate-fade-in">
+            <div className="glass p-4 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
+              <Book className="h-10 w-10 text-muted-foreground" />
+            </div>
+            <h3 className="text-xl font-semibold text-foreground mb-2">No courses found</h3>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
               {searchTerm ? 'Try adjusting your search term' : 'Get started by creating your first course'}
             </p>
             <Button 
               onClick={() => setCreateDialogOpen(true)} 
-              className="bg-primary hover:bg-primary/90"
+              className="btn-primary shadow-glow"
             >
               <PlusCircle size={16} className="mr-2" />
               Create Course
@@ -269,18 +376,23 @@ export default function Courses() {
         open={isDeleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
       >
-        <AlertDialogContent className="bg-white rounded-xl border-0 shadow-xl">
+        <AlertDialogContent className="card rounded-xl border-0 p-6 max-w-md">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-lg font-semibold">Delete Course</AlertDialogTitle>
-            <AlertDialogDescription className="text-gray-500">
-              This action cannot be undone. This will permanently delete this course and all its attendance records.
+            <div className="bg-red-50 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+              <Trash2 className="h-6 w-6 text-red-500" />
+            </div>
+            <AlertDialogTitle className="text-lg font-semibold text-foreground">
+              Delete Course
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground">
+              This action cannot be undone. This will permanently delete the course "{courses.find(c => c.id === courseToDeleteId)?.name}" and all its attendance records.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="border-gray-200 hover:bg-gray-50">Cancel</AlertDialogCancel>
+          <AlertDialogFooter className="flex gap-3 mt-6">
+            <AlertDialogCancel className="btn-secondary rounded-lg flex-1">Cancel</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleDeleteCourse}
-              className="bg-red-500 hover:bg-red-600 text-white"
+              className="btn bg-red-500 hover:bg-red-600 text-white rounded-lg flex-1"
             >
               Delete Course
             </AlertDialogAction>
