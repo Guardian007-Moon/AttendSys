@@ -322,8 +322,8 @@ export default function LoginPage() {
               
               <div className="features">
                 <div className="feature"><CheckCircle className="icon" size={16} /><span>Track student attendance</span></div>
-                <div className="feature"><FileText className="icon" size={16}/><span>Generate reports</span></div>
                 <div className="feature"><Activity className="icon" size={16}/><span>Analyze the student's behavior</span></div>
+                <div className="feature"><FileText className="icon" size={16}/><span>Generate reports</span></div>
                 <div className="feature"><Smartphone className="icon" size={16}/><span>Mobile access</span></div>
               </div>
             </div>
@@ -333,5 +333,3 @@ export default function LoginPage() {
     </>
   );
 }
-
-    
