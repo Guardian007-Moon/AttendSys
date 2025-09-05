@@ -5,18 +5,21 @@ export const initialCourses = [
     name: 'Introduction to Computer Science',
     description: 'Learn the fundamentals of programming and computer science.',
     year: '1',
+    bannerUrl: 'https://picsum.photos/seed/CS101/600/200',
   },
   {
     id: 'PHY201',
     name: 'University Physics I',
     description: 'Explore classical mechanics and thermodynamics.',
     year: '2',
+    bannerUrl: 'https://picsum.photos/seed/PHY201/600/200',
   },
   {
     id: 'ENG303',
     name: 'Shakespearean Literature',
     description: 'A deep dive into the works of William Shakespeare.',
     year: '3',
+    bannerUrl: 'https://picsum.photos/seed/ENG303/600/200',
   },
 ];
 

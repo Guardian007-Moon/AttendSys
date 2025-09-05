@@ -134,39 +134,41 @@ export default function Courses() {
     return results;
   }, [searchTerm, courses, sortOptions]);
   
- const groupedCourses = useMemo(() => {
-    const groups = new Map();
-    filteredAndSortedCourses.forEach(course => {
-      const year = course.year || 'Uncategorized';
-      if (!groups.has(year)) {
-        groups.set(year, []);
+  const groupedCourses = useMemo(() => {
+      const groups = new Map();
+      filteredAndSortedCourses.forEach(course => {
+          const year = course.year || 'Uncategorized';
+          if (!groups.has(year)) {
+              groups.set(year, []);
+          }
+          groups.get(year).push(course);
+      });
+
+      const sortedGroupKeys = Array.from(groups.keys());
+      const primarySortKey = sortOptions.length > 0 ? sortOptions[0].key : null;
+
+      if (primarySortKey === 'year') {
+          const yearSortOrder = sortOptions[0].order;
+          sortedGroupKeys.sort((a, b) => {
+              if (a === 'Uncategorized') return 1;
+              if (b === 'Uncategorized') return -1;
+              
+              const numA = parseInt(a);
+              const numB = parseInt(b);
+
+              if (isNaN(numA) && isNaN(numB)) return a.localeCompare(b);
+              if (isNaN(numA)) return 1;
+              if (isNaN(numB)) return -1;
+
+              const comparison = numA - numB;
+              return yearSortOrder === 'asc' ? comparison : -comparison;
+          });
+          return new Map(sortedGroupKeys.map(key => [key, groups.get(key)]));
       }
-      groups.get(year).push(course);
-    });
 
-    const sortedGroupKeys = Array.from(groups.keys());
-    const primarySortKey = sortOptions.length > 0 ? sortOptions[0].key : null;
-
-    if (primarySortKey === 'year') {
-        const yearSortOrder = sortOptions[0].order;
-        sortedGroupKeys.sort((a, b) => {
-            if (a === 'Uncategorized') return 1;
-            if (b === 'Uncategorized') return -1;
-            
-            const numA = parseInt(a);
-            const numB = parseInt(b);
-
-            if (isNaN(numA) && isNaN(numB)) return a.localeCompare(b);
-            if (isNaN(numA)) return 1;
-            if (isNaN(numB)) return -1;
-
-            const comparison = numA - numB;
-            return yearSortOrder === 'asc' ? comparison : -comparison;
-        });
-    }
-
-    return new Map(sortedGroupKeys.map(key => [key, groups.get(key)]));
-}, [filteredAndSortedCourses, sortOptions]);
+      // If not sorting by year, return the groups in the order they were found, which respects the primary sort
+      return groups;
+  }, [filteredAndSortedCourses, sortOptions]);
 
   const calculateAverageAttendance = () => {
     if (typeof window === 'undefined' || courses.length === 0) return 0;
@@ -246,7 +248,8 @@ export default function Courses() {
       ...newCourse, 
       id: `C${Date.now()}`, 
       studentCount: 0,
-      code: newCourse.code || `CRS${Date.now().toString().slice(-4)}`
+      code: newCourse.code || `CRS${Date.now().toString().slice(-4)}`,
+      bannerUrl: newCourse.bannerUrl || `https://picsum.photos/seed/${Date.now()}/600/200`
     };
     courseStore = [...courseStore, newCourseWithId];
     setCourses(courseStore);
@@ -396,7 +399,7 @@ export default function Courses() {
                 <Award className="h-6 w-6 text-amber-500" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-muted-foreground">Most Engaging</p>
+                <p className="text-sm text-muted-foreground">Course with Most Present</p>
                 <h3 className="text-lg font-bold whitespace-normal">
                   {mostEngagingCourse ? mostEngagingCourse.name : 'N/A'}
                 </h3>
@@ -494,19 +497,27 @@ export default function Courses() {
                         className="card card-hover overflow-hidden border-0 rounded-xl h-full flex flex-col"
                         style={{ animationDelay: `${index * 0.05}s` }}
                       >
-                        <CardHeader className="pb-4 gradient-primary text-white p-5">
+                        <div className="relative">
+                           <Image
+                                src={course.bannerUrl || 'https://picsum.photos/600/200'}
+                                width={600}
+                                height={200}
+                                alt={`${course.name} banner`}
+                                className="w-full h-32 object-cover"
+                                data-ai-hint="course banner"
+                            />
+                            <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/80 to-transparent" />
+                        </div>
+                        <CardHeader className="pt-4">
                           <div className="flex justify-between items-start">
                             <div className="flex-1">
-                              <CardTitle className="text-white text-xl font-semibold">{course.name}</CardTitle>
-                              <CardDescription className="text-white/90 mt-1">{course.code}</CardDescription>
-                            </div>
-                            <div className="glass p-2 rounded-lg">
-                              <Book size={20} className="text-white" />
+                              <CardTitle className="text-xl font-semibold">{course.name}</CardTitle>
+                              <CardDescription className="mt-1">{course.code}</CardDescription>
                             </div>
                           </div>
                         </CardHeader>
-                        <CardContent className="p-5 flex-grow flex flex-col">
-                          <p className="text-sm text-muted-foreground mb-4 line-clamp-2 h-12 flex-grow">
+                        <CardContent className="p-5 pt-2 flex-grow flex flex-col">
+                          <p className="text-sm text-muted-foreground mb-4 line-clamp-2 h-10 flex-grow">
                             {course.description || "No description available."}
                           </p>
                           
@@ -623,5 +634,3 @@ export default function Courses() {
     </div>
   );
 }
-
-    

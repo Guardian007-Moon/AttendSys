@@ -36,6 +36,7 @@ const courseSchema = z.object({
   name: z.string().min(5, 'Course name must be at least 5 characters.'),
   description: z.string().optional(),
   year: z.string({ required_error: 'Please select a year.' }),
+  bannerUrl: z.string().url({ message: 'Please enter a valid URL.' }).optional().or(z.literal('')),
 });
 
 const academicYears = ['1', '2', '3', '4', '5'];
@@ -52,6 +53,7 @@ export default function EditCourseDialog({
       name: '',
       description: '',
       year: '',
+      bannerUrl: '',
     },
   });
 
@@ -123,6 +125,19 @@ export default function EditCourseDialog({
                       placeholder="e.g., 'An introductory course on fiction and poetry.'"
                       {...field}
                     />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="bannerUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Banner Image URL (Optional)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="https://example.com/your-image.jpg" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
