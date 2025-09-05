@@ -91,6 +91,12 @@ export default function Courses() {
       case 'students-asc':
         results.sort((a, b) => (a.studentCount || 0) - (b.studentCount || 0));
         break;
+      case 'year-asc':
+        results.sort((a, b) => (parseInt(a.year) || 0) - (parseInt(b.year) || 0));
+        break;
+      case 'year-desc':
+        results.sort((a, b) => (parseInt(b.year) || 0) - (parseInt(a.year) || 0));
+        break;
       default:
         break;
     }
@@ -218,6 +224,8 @@ export default function Courses() {
       case 'name-desc': return 'Name (Z-A)';
       case 'students-desc': return 'Students (Most)';
       case 'students-asc': return 'Students (Fewest)';
+      case 'year-asc': return 'Year (Ascending)';
+      case 'year-desc': return 'Year (Descending)';
       default: return 'Sort by';
     }
   };
@@ -366,6 +374,14 @@ export default function Courses() {
                   <DropdownMenuRadioItem value="students-asc" className="cursor-pointer">
                     <Users size={14} className="mr-2" />
                     Students (Fewest to Most)
+                  </DropdownMenuRadioItem>
+                   <DropdownMenuRadioItem value="year-asc" className="cursor-pointer">
+                    <GraduationCap size={14} className="mr-2" />
+                    Year (Ascending)
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="year-desc" className="cursor-pointer">
+                    <GraduationCap size={14} className="mr-2" />
+                    Year (Descending)
                   </DropdownMenuRadioItem>
                 </DropdownMenuRadioGroup>
               </DropdownMenuContent>
