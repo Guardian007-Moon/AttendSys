@@ -78,27 +78,27 @@ export default function Courses() {
       (course.code && course.code.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
-    switch (sortOption) {
-      case 'name-asc':
-        results.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case 'name-desc':
-        results.sort((a, b) => b.name.localeCompare(a.name));
-        break;
-      case 'students-desc':
-        results.sort((a, b) => (b.studentCount || 0) - (a.studentCount || 0));
-        break;
-      case 'students-asc':
-        results.sort((a, b) => (a.studentCount || 0) - (b.studentCount || 0));
-        break;
-      case 'year-asc':
-        results.sort((a, b) => (parseInt(a.year) || 0) - (parseInt(b.year) || 0));
-        break;
-      case 'year-desc':
-        results.sort((a, b) => (parseInt(b.year) || 0) - (parseInt(a.year) || 0));
-        break;
-      default:
-        break;
+    const sortOrder = sortOption.split('-')[1];
+    const sortKey = sortOption.split('-')[0];
+    
+    if (sortKey === 'year') {
+        results.sort((a, b) => {
+            const yearA = parseInt(a.year) || 0;
+            const yearB = parseInt(b.year) || 0;
+            return sortOrder === 'asc' ? yearA - yearB : yearB - yearA;
+        });
+    } else {
+        results.sort((a, b) => {
+            if (sortKey === 'name') {
+                return sortOrder === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+            }
+            if (sortKey === 'students') {
+                const countA = a.studentCount || 0;
+                const countB = b.studentCount || 0;
+                return sortOrder === 'asc' ? countA - countB : countB - countA;
+            }
+            return 0;
+        });
     }
     return results;
   }, [searchTerm, courses, sortOption]);
@@ -112,15 +112,21 @@ export default function Courses() {
           }
           groups[year].push(course);
       });
-      // Sort years numerically, putting 'Uncategorized' last
-      return Object.fromEntries(
-        Object.entries(groups).sort(([yearA], [yearB]) => {
+      
+      const yearSortOrder = Object.keys(groups).sort((yearA, yearB) => {
           if (yearA === 'Uncategorized') return 1;
           if (yearB === 'Uncategorized') return -1;
-          return parseInt(yearA) - parseInt(yearB);
-        })
-      );
-  }, [filteredAndSortedCourses]);
+          const sortDirection = sortOption.startsWith('year-desc') ? -1 : 1;
+          return (parseInt(yearA) - parseInt(yearB)) * sortDirection;
+      });
+
+      const sortedGroups = {};
+      yearSortOrder.forEach(year => {
+          sortedGroups[year] = groups[year];
+      });
+
+      return sortedGroups;
+  }, [filteredAndSortedCourses, sortOption]);
 
   const calculateAverageAttendance = () => {
     if (typeof window === 'undefined' || courses.length === 0) return 0;
@@ -157,7 +163,7 @@ export default function Courses() {
   const totalStudents = courses.reduce((sum, course) => sum + (course.studentCount || 0), 0);
   const averageAttendance = calculateAverageAttendance();
   const mostPopularCourse = courses.length > 0 
-    ? courses.reduce((max, course) => (course.studentCount > max.studentCount ? course : max), courses[0])
+    ? [...courses].sort((a,b) => (b.studentCount || 0) - (a.studentCount || 0))[0]
     : null;
 
   const updateLocalStorage = (newCourses) => {
