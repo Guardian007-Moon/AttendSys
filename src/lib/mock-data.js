@@ -6,6 +6,8 @@ export const initialCourses = [
     description: 'Learn the fundamentals of programming and computer science.',
     year: '1',
     bannerUrl: 'https://picsum.photos/seed/CS101/600/200',
+    schedule: 'Mon/Wed/Fri 10:00-11:00',
+    code: 'CS101',
   },
   {
     id: 'PHY201',
@@ -13,6 +15,8 @@ export const initialCourses = [
     description: 'Explore classical mechanics and thermodynamics.',
     year: '2',
     bannerUrl: 'https://picsum.photos/seed/PHY201/600/200',
+    schedule: 'Tue/Thu 13:00-14:30',
+    code: 'PHY201',
   },
   {
     id: 'ENG303',
@@ -20,6 +24,8 @@ export const initialCourses = [
     description: 'A deep dive into the works of William Shakespeare.',
     year: '3',
     bannerUrl: 'https://picsum.photos/seed/ENG303/600/200',
+    schedule: 'Mon/Wed 15:00-16:30',
+    code: 'ENG303',
   },
 ];
 
