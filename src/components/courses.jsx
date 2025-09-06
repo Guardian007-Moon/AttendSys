@@ -249,7 +249,7 @@ export default function Courses() {
       id: `C${Date.now()}`, 
       studentCount: 0,
       code: newCourse.code || `CRS${Date.now().toString().slice(-4)}`,
-      bannerUrl: newCourse.bannerUrl || `https://picsum.photos/seed/${Date.now()}/600/200`
+      bannerUrl: newCourse.bannerUrl || `https://picsum.photos/seed/${Math.random()}/600/200`
     };
     courseStore = [...courseStore, newCourseWithId];
     setCourses(courseStore);
