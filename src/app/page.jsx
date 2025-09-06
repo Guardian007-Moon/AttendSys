@@ -12,11 +12,7 @@ export default function LandingPage() {
       <div className="bg-white">
         <header className="container mx-auto px-6 py-4 flex justify-between items-center">
           <div className="text-2xl font-bold text-black">AttendSys</div>
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/courses" className="hover:text-primary">Dashboard</Link>
-            <Link href="#" className="hover:text-primary">Features</Link>
-            <Link href="#" className="hover:text-primary">Contact</Link>
-          </nav>
+          
           <div className="flex items-center space-x-4">
             <Link href="/login" passHref>
               <button className="hidden md:block text-black font-medium">Login</button>
@@ -40,18 +36,6 @@ export default function LandingPage() {
             <p className="text-lg text-gray-600 mb-8">
               Save time, reduce paperwork, and get real-time insights into student attendance with our easy-to-use system. Perfect for modern educators.
             </p>
-            <div className="flex justify-center md:justify-start space-x-4">
-              <Link href="/login" passHref>
-                <Button className="bg-black text-white px-8 py-4 rounded-full font-semibold flex items-center space-x-2">
-                  <span>Go to Dashboard</span>
-                  <ArrowRight size={20} />
-                </Button>
-              </Link>
-               <button className="bg-white text-black px-8 py-4 rounded-full font-semibold border border-gray-300 flex items-center space-x-2">
-                <PlayCircle size={20} />
-                <span>Watch Demo</span>
-              </button>
-            </div>
           </div>
           
           <div className="relative">
