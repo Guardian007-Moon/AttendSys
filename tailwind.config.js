@@ -16,11 +16,14 @@ module.exports = {
     },
     extend: {
       fontFamily: {
+        sans: ['Inter', 'sans-serif'],
         body: ['PT Sans', 'sans-serif'],
         headline: ['PT Sans', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {
+        'pastel-beige': 'hsl(var(--pastel-beige))',
+        'pastel-mint': 'hsl(var(--pastel-mint))',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {

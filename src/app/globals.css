@@ -53,6 +53,9 @@ body {
     --success: 142 72% 45%;
     --warning: 38 92% 55%;
     --info: 199 89% 50%;
+
+    --pastel-beige: 45 40% 95%;
+    --pastel-mint: 150 40% 95%;
   }
 
   .dark {
