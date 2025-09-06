@@ -73,12 +73,13 @@ export default function LandingPage() {
                     </div>
                 </div>
             </div>
-             <div className="absolute -top-8 -right-12 bg-white p-4 rounded-xl shadow-lg w-56 animate-fade-in" style={{ animationDelay: '0.7s' }}>
-                <p className="font-bold mb-2">Share QR Code</p>
-                <div className="flex justify-center">
-                    <QrCode className="w-24 h-24 text-gray-700" />
+             <div className="absolute -top-8 -right-12 bg-white p-4 rounded-xl shadow-lg w-64 animate-fade-in" style={{ animationDelay: '0.7s' }}>
+                <div className="flex items-center space-x-3">
+                  <div>
+                    <p className="font-bold">Share QR Code</p>
+                    <p className="text-sm text-gray-500">Students scan a unique code to check in instantly.</p>
+                  </div>
                 </div>
-                 <p className="text-xs text-gray-400 mt-2 text-center">Students scan to check in instantly.</p>
             </div>
           </div>
         </div>
