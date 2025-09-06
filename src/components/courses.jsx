@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -30,6 +29,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
   DropdownMenuTrigger,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -71,6 +72,7 @@ export default function Courses() {
   const [courses, setCourses] = useState([]);
   const [profile, setProfile] = useState({ name: '', summary: '', imageUrl: ''});
   const [searchTerm, setSearchTerm] = useState('');
+  const [yearFilter, setYearFilter] = useState('all');
   const [sortOptions, setSortOptions] = useState([
     { key: 'year', order: 'asc' },
     { key: 'name', order: 'asc' },
@@ -105,10 +107,16 @@ export default function Courses() {
     return sortOptions.some(opt => opt.key === key && opt.order === order);
   };
 
+  const availableYears = useMemo(() => {
+    const years = new Set(courses.map(c => c.year).filter(Boolean));
+    return ['all', ...Array.from(years).sort()];
+  }, [courses]);
+
   const filteredAndSortedCourses = useMemo(() => {
     let results = courses.filter(course =>
-      course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (course.code && course.code.toLowerCase().includes(searchTerm.toLowerCase()))
+      (course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (course.code && course.code.toLowerCase().includes(searchTerm.toLowerCase()))) &&
+      (yearFilter === 'all' || course.year === yearFilter)
     );
 
     results.sort((a, b) => {
@@ -132,7 +140,7 @@ export default function Courses() {
     });
     
     return results;
-  }, [searchTerm, courses, sortOptions]);
+  }, [searchTerm, courses, sortOptions, yearFilter]);
   
   const groupedCourses = useMemo(() => {
       const groups = new Map();
@@ -147,7 +155,7 @@ export default function Courses() {
       const sortedGroupKeys = Array.from(groups.keys());
       const primarySortKey = sortOptions.length > 0 ? sortOptions[0].key : null;
 
-      if (primarySortKey === 'year') {
+      if (primarySortKey === 'year' && yearFilter === 'all') {
           const yearSortOrder = sortOptions[0].order;
           sortedGroupKeys.sort((a, b) => {
               if (a === 'Uncategorized') return 1;
@@ -168,7 +176,7 @@ export default function Courses() {
 
       // If not sorting by year, return the groups in the order they were found, which respects the primary sort
       return groups;
-  }, [filteredAndSortedCourses, sortOptions]);
+  }, [filteredAndSortedCourses, sortOptions, yearFilter]);
 
   const calculateAverageAttendance = () => {
     if (typeof window === 'undefined' || courses.length === 0) return 0;
@@ -428,6 +436,26 @@ export default function Courses() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="flex items-center gap-2 rounded-xl">
                     <Filter size={16} />
+                    Filter by Year
+                    {yearFilter !== 'all' && <Badge variant="secondary">Year {yearFilter}</Badge>}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="rounded-xl w-48">
+                  <DropdownMenuLabel>Filter by Year</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuRadioGroup value={yearFilter} onValueChange={setYearFilter}>
+                    {availableYears.map(year => (
+                      <DropdownMenuRadioItem key={year} value={year} className="cursor-pointer">
+                        {year === 'all' ? 'All Years' : `Year ${year}`}
+                      </DropdownMenuRadioItem>
+                    ))}
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="flex items-center gap-2 rounded-xl">
+                    <ChevronsUpDown size={16} />
                     Sort
                     {sortOptions.length > 0 && <Badge variant="secondary">{sortOptions.length}</Badge>}
                   </Button>
@@ -566,7 +594,7 @@ export default function Courses() {
             </div>
             <h3 className="text-xl font-semibold text-foreground mb-2">No courses found</h3>
             <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-              {searchTerm ? 'Try adjusting your search term' : 'Get started by creating your first course'}
+              {searchTerm ? 'Try adjusting your search term or year filter' : 'Get started by creating your first course'}
             </p>
             <Button 
               onClick={() => setCreateDialogOpen(true)} 
