@@ -16,7 +16,7 @@ export default function LandingPage() {
             <Link href="/courses" className="hover:text-primary">Courses</Link>
             <Link href="#" className="hover:text-primary">Pages</Link>
             <Link href="#" className="hover:text-primary">Event</Link>
-            <Link href="#" className="hover:text-primary">Contact Us</Link>
+            <Link href="#" className="hovertext-primary">Contact Us</Link>
           </nav>
           <div className="flex items-center space-x-4">
             <Link href="/login" passHref>
@@ -58,7 +58,7 @@ export default function LandingPage() {
           <div className="relative">
             <div className="bg-pastel-mint rounded-full w-full aspect-square flex items-center justify-center">
                <Image
-                  src="https://images.unsplash.com/photo-1529068755536-7949e67d7ec6?q=80&w=800&auto=format&fit=crop"
+                  src="https://picsum.photos/seed/mentor/700/700"
                   width={700}
                   height={700}
                   alt="Smiling woman mentor"
@@ -68,7 +68,7 @@ export default function LandingPage() {
             </div>
             <div className="absolute bottom-8 -left-12 bg-white p-4 rounded-xl shadow-lg w-64 animate-fade-in" style={{ animationDelay: '0.5s' }}>
                 <div className="flex items-center space-x-3">
-                    <Image src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=100&auto=format&fit=crop" width={48} height={48} alt="Dennis Barrett" className="rounded-full" data-ai-hint="man portrait"/>
+                    <Image src="https://picsum.photos/seed/student/48/48" width={48} height={48} alt="Dennis Barrett" className="rounded-full" data-ai-hint="man portrait"/>
                     <div>
                         <p className="font-bold">UI Design Pattern</p>
                         <p className="text-sm text-gray-500">Dennis Barrett</p>
