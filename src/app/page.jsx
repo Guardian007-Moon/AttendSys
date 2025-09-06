@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { PlayCircle, ArrowRight, QrCode, BarChart2 } from 'lucide-react';
+import { PlayCircle, ArrowRight, QrCode, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function LandingPage() {
@@ -67,6 +67,7 @@ export default function LandingPage() {
             </div>
             <div className="absolute -bottom-8 -left-12 bg-white p-4 rounded-xl shadow-lg w-64 animate-fade-in" style={{ animationDelay: '0.5s' }}>
                 <div className="flex items-center space-x-3">
+                    <CheckCircle className="text-green-500 h-8 w-8" />
                     <div>
                         <p className="font-bold">Real-time Check-in</p>
                         <p className="text-sm text-gray-500">Attendance is updated live as students check in.</p>
@@ -75,6 +76,7 @@ export default function LandingPage() {
             </div>
              <div className="absolute -top-8 -right-12 bg-white p-4 rounded-xl shadow-lg w-64 animate-fade-in" style={{ animationDelay: '0.7s' }}>
                 <div className="flex items-center space-x-3">
+                    <QrCode className="text-gray-700 h-8 w-8" />
                   <div>
                     <p className="font-bold">Share QR Code</p>
                     <p className="text-sm text-gray-500">Students scan a unique code to check in instantly.</p>
