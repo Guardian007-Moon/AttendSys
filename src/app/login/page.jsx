@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState } from 'react';
@@ -23,7 +24,7 @@ export default function LoginPage() {
   return (
     <>
       <Head>
-        <title>Teacher Login | QTrack</title>
+        <title>Teacher Login | AttendSys</title>
       </Head>
       <style jsx global>{`
         :root {

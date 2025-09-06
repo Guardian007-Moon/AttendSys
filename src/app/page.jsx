@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { PlayCircle, ArrowRight, CheckSquare, BarChart2 } from 'lucide-react';
+import { PlayCircle, ArrowRight, QrCode, BarChart2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function LandingPage() {
@@ -11,11 +11,11 @@ export default function LandingPage() {
     <div className="min-h-screen bg-pastel-beige text-gray-800 font-sans">
       <div className="bg-white">
         <header className="container mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="text-2xl font-bold text-black">QTrack</div>
+          <div className="text-2xl font-bold text-black">AttendSys</div>
           <nav className="hidden md:flex items-center space-x-8">
             <Link href="/courses" className="hover:text-primary">Dashboard</Link>
             <Link href="#" className="hover:text-primary">Features</Link>
-            <Link href="#" className="hovertext-primary">Contact</Link>
+            <Link href="#" className="hover:text-primary">Contact</Link>
           </nav>
           <div className="flex items-center space-x-4">
             <Link href="/login" passHref>
@@ -67,23 +67,18 @@ export default function LandingPage() {
             </div>
             <div className="absolute -bottom-8 -left-12 bg-white p-4 rounded-xl shadow-lg w-64 animate-fade-in" style={{ animationDelay: '0.5s' }}>
                 <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-green-100 rounded-full">
-                      <CheckSquare className="text-green-600" size={24}/>
-                    </div>
                     <div>
                         <p className="font-bold">Real-time Check-in</p>
-                        <p className="text-sm text-gray-500">24/25 students present</p>
+                        <p className="text-sm text-gray-500">Attendance is updated live as students check in.</p>
                     </div>
                 </div>
-                <div className="h-1.5 bg-gray-200 rounded-full mt-3">
-                  <div className="h-1.5 bg-green-500 rounded-full w-[96%]"></div>
-                </div>
-                 <p className="text-xs text-gray-400 mt-1.5">Attendance updated live</p>
             </div>
              <div className="absolute -top-8 -right-12 bg-white p-4 rounded-xl shadow-lg w-56 animate-fade-in" style={{ animationDelay: '0.7s' }}>
-                <p className="font-bold mb-2">Weekly Analytics</p>
-                <BarChart2 className="w-full text-blue-500" />
-                 <p className="text-xs text-gray-400 mt-2">View trends and generate reports</p>
+                <p className="font-bold mb-2">Share QR Code</p>
+                <div className="flex justify-center">
+                    <QrCode className="w-24 h-24 text-gray-700" />
+                </div>
+                 <p className="text-xs text-gray-400 mt-2 text-center">Students scan to check in instantly.</p>
             </div>
           </div>
         </div>
