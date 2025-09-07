@@ -26,12 +26,6 @@ export default function LearnMorePage() {
     <div className="min-h-screen bg-pastel-beige font-sans">
         <header className="container mx-auto px-6 py-4 flex justify-between items-center bg-white">
           <div className="text-2xl font-bold text-black">AttendSys</div>
-           <Link href="/" passHref>
-              <Button variant="outline" className="rounded-full">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Home
-              </Button>
-            </Link>
         </header>
         
         <main className="container mx-auto px-6 py-12">
@@ -92,9 +86,9 @@ export default function LearnMorePage() {
             <div className="text-center mt-20">
                 <h2 className="text-3xl font-bold text-black">Ready to Simplify Attendance?</h2>
                 <p className="text-gray-600 mt-3 mb-6">Join hundreds of educators who are saving time and reducing classroom admin.</p>
-                 <Link href="/signup" passHref>
+                 <Link href="/" passHref>
                     <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-10 py-6 text-lg">
-                        Get Started for Free
+                        Get Started
                     </Button>
                 </Link>
             </div>
