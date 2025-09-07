@@ -36,6 +36,12 @@ export default function LandingPage() {
             <p className="text-lg text-gray-600 mb-8">
               Save time, reduce paperwork, and get real-time insights into student attendance with our easy-to-use system. Perfect for modern educators.
             </p>
+            <div className="flex justify-center md:justify-start items-center space-x-4">
+               <Button variant="outline" className="rounded-full px-8 py-6 text-lg">
+                  Learn more
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+            </div>
           </div>
           
           <div className="relative">
