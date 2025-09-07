@@ -56,6 +56,9 @@ body {
 
     --pastel-beige: 45 40% 95%;
     --pastel-mint: 150 40% 95%;
+    --pastel-lavender: 240 60% 95%;
+    --pastel-green: 130 40% 95%;
+    --pastel-yellow: 50 80% 95%;
   }
 
   .dark {
