@@ -257,7 +257,7 @@ export default function Courses() {
       id: `C${Date.now()}`, 
       studentCount: 0,
       code: newCourse.code || `CRS${Date.now().toString().slice(-4)}`,
-      bannerUrl: newCourse.bannerUrl || `https://picsum.photos/seed/${Math.random()}/600/200`
+      bannerUrl: newCourse.bannerUrl || `https://placehold.co/600x200/a3e635/1e293b?text=Course`
     };
     courseStore = [...courseStore, newCourseWithId];
     setCourses(courseStore);
@@ -528,7 +528,7 @@ export default function Courses() {
                         >
                             <div className="relative">
                             <Image
-                                    src={course.bannerUrl || 'https://picsum.photos/600/200'}
+                                    src={course.bannerUrl || 'https://placehold.co/600x200/a3e635/1e293b?text=Course'}
                                     width={600}
                                     height={200}
                                     alt={`${course.name} banner`}
