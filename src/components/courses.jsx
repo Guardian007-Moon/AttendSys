@@ -329,10 +329,11 @@ export default function Courses() {
   }
 
   const handleAddCourse = newCourse => {
-    const banner = newCourse.bannerUrl || `https://picsum.photos/600/200?random=${Math.floor(Math.random() * 1000)}`;
+    const newCourseId = `C${Date.now()}`;
+    const banner = newCourse.bannerUrl || `https://picsum.photos/seed/${newCourseId}/600/200`;
     const newCourseWithId = { 
       ...newCourse, 
-      id: `C${Date.now()}`, 
+      id: newCourseId, 
       studentCount: 0,
       bannerUrl: banner,
       code: newCourse.code || `CRS${Date.now().toString().slice(-4)}`,
