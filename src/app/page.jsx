@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { PlayCircle, ArrowRight, QrCode, CheckCircle } from 'lucide-react';
+import { PlayCircle, ArrowRight, QrCode, CheckCircle, Sheet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function LandingPage() {
@@ -18,7 +18,7 @@ export default function LandingPage() {
               <Button variant="ghost" className="hidden md:block text-black font-medium hover:bg-blue-600 hover:text-white">Login</Button>
             </Link>
             <Link href="/signup" passHref>
-              <Button className="bg-black text-white px-6 py-2 rounded-full font-medium hover:bg-blue-600">Sign up</Button>
+              <Button className="bg-black text-white px-6 py-2 rounded-full font-medium hover:bg-blue-600 hover:text-white">Sign up</Button>
             </Link>
           </div>
         </header>
@@ -33,9 +33,9 @@ export default function LandingPage() {
               Smarter Attendance Tracking ✨
             </span>
             <h1 
-              className="text-5xl md:text-6xl font-extrabold text-black leading-tight mb-6"
+              className="text-5xl md:text-6xl font-extrabold text-black leading-tight mb-6 flex items-center justify-center md:justify-start"
             >
-              The Simple, Modern Way to Track Attendance 🚀
+              The Simple, Modern Way to Track Attendance <Sheet className="ml-4 h-12 w-12" />
             </h1>
             <p 
               className="text-lg text-gray-600 mb-8"
@@ -46,7 +46,7 @@ export default function LandingPage() {
               className="flex justify-center md:justify-start items-center space-x-4"
             >
                <Link href="/learn-more" passHref>
-                 <Button className="bg-black text-white rounded-full px-8 py-6 text-lg hover:bg-blue-600">
+                 <Button className="bg-black text-white rounded-full px-8 py-6 text-lg hover:bg-blue-600 hover:text-white">
                     Learn more
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
