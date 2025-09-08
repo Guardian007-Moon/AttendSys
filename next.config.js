@@ -44,6 +44,12 @@ const nextConfig = {
         hostname: 'files.structurae.net',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'static.fandomspot.com',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
