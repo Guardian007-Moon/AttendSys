@@ -664,25 +664,18 @@ export default function Courses() {
         open={isDeleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
       >
-        <AlertDialogContent className="card rounded-xl border-0 p-6 max-w-md">
+        <AlertDialogContent>
           <AlertDialogHeader>
-            <div className="bg-red-50 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
-              <Trash2 className="h-6 w-6 text-red-500" />
-            </div>
-            <AlertDialogTitle className="text-lg font-semibold text-foreground">
-              Delete Course
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-muted-foreground">
-              This action cannot be undone. This will permanently delete the course "{courses.find(c => c.id === courseToDeleteId)?.name}" and all its attendance records.
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              course "{courses.find(c => c.id === courseToDeleteId)?.name}".
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="flex gap-3 mt-6">
-            <AlertDialogCancel className="btn-secondary rounded-lg flex-1">Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleDeleteCourse}
-              className="btn bg-red-500 hover:bg-red-600 text-white rounded-lg flex-1"
-            >
-              Delete Course
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteCourse}>
+              Continue
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -690,7 +683,3 @@ export default function Courses() {
     </div>
   );
 }
-
-    
-
-    
