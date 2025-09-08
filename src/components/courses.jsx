@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -318,27 +319,29 @@ export default function Courses() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50/80 to-green-50/80 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Teacher Profile Section */}
-        <Card className="mb-8 card card-hover rounded-xl border-0 overflow-hidden animate-fade-in bg-pastel-beige">
-            <CardContent className="p-5 flex items-center gap-6">
-                <Image
-                src={profile.imageUrl || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&h=200&auto=format&fit=crop"}
-                width={80}
-                height={80}
-                alt="Teacher Profile Picture"
-                className="rounded-full border-4 border-white shadow-md object-cover"
-                data-ai-hint="teacher profile"
-                />
-                <div className="flex-1">
-                <h2 className="text-2xl font-bold">Welcome Back, {profile.name}!</h2>
-                <p className="text-muted-foreground mt-1">
-                    {profile.summary}
-                </p>
-                </div>
-                <Button variant="ghost" size="icon" onClick={() => setProfileDialogOpen(true)}>
-                    <Edit className="h-5 w-5" />
-                </Button>
-            </CardContent>
-        </Card>
+        <div className="bg-pastel-beige p-1 rounded-xl mb-8">
+            <Card className="card card-hover rounded-xl border-0 overflow-hidden animate-fade-in bg-card">
+                <CardContent className="p-5 flex items-center gap-6">
+                    <Image
+                    src={profile.imageUrl || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&h=200&auto=format&fit=crop"}
+                    width={80}
+                    height={80}
+                    alt="Teacher Profile Picture"
+                    className="rounded-full border-4 border-white shadow-md object-cover"
+                    data-ai-hint="teacher profile"
+                    />
+                    <div className="flex-1">
+                    <h2 className="text-2xl font-bold">Welcome Back, {profile.name}!</h2>
+                    <p className="text-muted-foreground mt-1">
+                        {profile.summary}
+                    </p>
+                    </div>
+                    <Button variant="ghost" size="icon" onClick={() => setProfileDialogOpen(true)}>
+                        <Edit className="h-5 w-5" />
+                    </Button>
+                </CardContent>
+            </Card>
+        </div>
       
         <header className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="animate-fade-in">
