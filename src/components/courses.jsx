@@ -35,6 +35,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import CourseBannerImage from './CourseBannerImage';
 
 
 const getInitialCourses = () => {
@@ -78,16 +79,6 @@ const Sorter = ({ onCheckedChange, checked, children }) => (
 );
 
 const CourseCard = ({ course, onEdit, onDelete, index }) => {
-    const [imageSrc, setImageSrc] = useState(course.bannerUrl || `https://placehold.co/600x200/e2e8f0/475569?text=${encodeURIComponent(course.name)}`);
-    
-    const handleImageError = () => {
-        setImageSrc(`https://placehold.co/600x200/e2e8f0/475569?text=${encodeURIComponent(course.name)}`);
-    };
-    
-    useEffect(() => {
-        setImageSrc(course.bannerUrl || `https://placehold.co/600x200/e2e8f0/475569?text=${encodeURIComponent(course.name)}`);
-    }, [course.bannerUrl, course.name]);
-
     return (
         <div className="flex-shrink-0 w-full sm:w-[calc(50%-1rem)] md:w-[calc(33.333%-1rem)] lg:w-[calc(25%-1.125rem)]">
             <Link href={`/courses/${course.id}`} className="block h-full">
@@ -96,14 +87,13 @@ const CourseCard = ({ course, onEdit, onDelete, index }) => {
                     style={{ animationDelay: `${index * 0.05}s` }}
                 >
                     <div className="relative">
-                        <Image
-                            src={imageSrc}
+                        <CourseBannerImage
+                            src={course.bannerUrl}
                             width={600}
                             height={200}
                             alt={`${course.name} banner`}
                             className="w-full h-32 object-cover"
                             data-ai-hint="course banner"
-                            onError={handleImageError}
                         />
                         <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/80 to-transparent" />
                     </div>
@@ -344,7 +334,6 @@ export default function Courses() {
       id: `C${Date.now()}`, 
       studentCount: 0,
       code: newCourse.code || `CRS${Date.now().toString().slice(-4)}`,
-      bannerUrl: newCourse.bannerUrl || `https://placehold.co/600x200/a3e635/1e293b?text=${encodeURIComponent(newCourse.name)}`
     };
     courseStore = [...courseStore, newCourseWithId];
     setCourses(courseStore);
@@ -698,5 +687,7 @@ export default function Courses() {
     </div>
   );
 }
+
+    
 
     
