@@ -47,7 +47,7 @@ export default function LearnMorePage() {
                         className="rounded-3xl object-cover h-full shadow-lg"
                         data-ai-hint="person laptop"
                     />
-                    <div className="absolute -bottom-8 -right-8 bg-white p-4 rounded-xl shadow-lg w-72 animate-fade-in" style={{ animationDelay: '1.2s' }}>
+                    <div className="absolute -bottom-8 -right-8 bg-white p-4 rounded-xl shadow-lg w-72 animate-fade-in" style={{ animationDelay: '1s' }}>
                         <div className="flex items-center space-x-3">
                             <UserCheck className="text-blue-500 h-8 w-8" />
                             <div>
