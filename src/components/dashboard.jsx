@@ -372,7 +372,7 @@ export default function Dashboard({ courseId }) {
             >
               Delete Session
             </AlertDialogAction>
-            <AlertDialogCancel className="flex-1 bg-white hover:bg-gray-100 text-gray-700 py-3 px-4 rounded-lg font-medium border border-gray-300 transition-colors duration-200">
+            <AlertDialogCancel className="flex-1 bg-white hover:bg-green-500 hover:text-white text-gray-700 py-3 px-4 rounded-lg font-medium border border-gray-300 transition-colors duration-200">
               Cancel
             </AlertDialogCancel>
           </div>
