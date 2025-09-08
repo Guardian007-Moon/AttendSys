@@ -25,12 +25,20 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { initialCourseStudents, loadAttendance, saveAttendance } from '@/lib/mock-data';
+import { initialCourseStudents, loadAttendance, saveAttendance, initialSessions } from '@/lib/mock-data';
 
 const getInitialSessions = (courseId) => {
   if (typeof window === 'undefined') return [];
   const storedSessions = localStorage.getItem(`sessions_${courseId}`);
-  return storedSessions ? JSON.parse(storedSessions) : [];
+  if (storedSessions) {
+    return JSON.parse(storedSessions);
+  }
+  // If no sessions in local storage, check our initial mock data
+  if (initialSessions[courseId]) {
+    localStorage.setItem(`sessions_${courseId}`, JSON.stringify(initialSessions[courseId]));
+    return initialSessions[courseId];
+  }
+  return [];
 };
 
 const getInitialStudents = (courseId) => {

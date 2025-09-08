@@ -1,4 +1,5 @@
 
+
 export const initialCourses = [
   {
     id: 'CS101',
@@ -54,6 +55,15 @@ export const initialCourses = [
     schedule: 'Tue/Thu 14:00-15:30',
     code: 'CHM350',
   },
+  {
+    id: 'ADS401',
+    name: 'Applied Data Science',
+    description: 'A practical approach to data science with real-world case studies.',
+    year: '4',
+    bannerUrl: 'https://picsum.photos/seed/ADS401/600/200',
+    schedule: 'Tue/Thu 10:00-11:30',
+    code: 'ADS401',
+  },
 ];
 
 export const initialCourseStudents = {
@@ -97,9 +107,64 @@ export const initialCourseStudents = {
     { id: 'S019', name: 'Evelyn Martinez', status: 'Absent' },
     { id: 'S020', name: 'Logan Hernandez', status: 'Absent' },
   ],
+  ADS401: [
+    { id: 'S021', name: 'Mia Anderson', status: 'Absent' },
+    { id: 'S022', name: 'James Thomas', status: 'Absent' },
+    { id: 'S023', name: 'Evelyn White', status: 'Absent' },
+    { id: 'S024', name: 'Lucas Martin', status: 'Absent' },
+    { id: 'S025', name: 'Chloe Thompson', status: 'Absent' },
+  ]
 };
 
 const ATTENDANCE_STORAGE_KEY = 'sessionAttendance';
+const SESSIONS_STORAGE_PREFIX = 'sessions_';
+
+// Helper to get a date in the past
+const getDateInPast = (days) => {
+    const date = new Date();
+    date.setDate(date.getDate() - days);
+    return date.toISOString().split('T')[0];
+};
+
+export const initialSessions = {
+    ADS401: [
+        { id: 'SESS_ADS01', name: 'Week 1: Introduction', date: getDateInPast(21), startTime: '10:00', endTime: '11:30', checkinTimeLimit: 15, maxDistance: 100 },
+        { id: 'SESS_ADS02', name: 'Week 2: Data Wrangling', date: getDateInPast(14), startTime: '10:00', endTime: '11:30', checkinTimeLimit: 15, maxDistance: 100 },
+        { id: 'SESS_ADS03', name: 'Week 3: Visualization', date: getDateInPast(7), startTime: '10:00', endTime: '11:30', checkinTimeLimit: 15, maxDistance: 100 },
+        { id: 'SESS_ADS04', name: 'Week 4: Mid-term Review', date: getDateInPast(1), startTime: '10:00', endTime: '11:30', checkinTimeLimit: 15, maxDistance: 100 },
+    ]
+};
+
+export const initialAttendance = {
+    SESS_ADS01: {
+        S021: { status: 'Present', time: '10:02:15 AM', distance: 15 },
+        S022: { status: 'Present', time: '10:05:30 AM', distance: 25 },
+        S023: { status: 'Late', time: '10:17:00 AM', distance: 10 },
+        S024: { status: 'Present', time: '10:01:05 AM', distance: 30 },
+        S025: { status: 'Absent' },
+    },
+    SESS_ADS02: {
+        S021: { status: 'Present', time: '10:01:10 AM', distance: 18 },
+        S022: { status: 'Present', time: '10:03:20 AM', distance: 22 },
+        S023: { status: 'Present', time: '10:08:45 AM', distance: 12 },
+        S024: { status: 'Late', time: '10:20:00 AM', distance: 35 },
+        S025: { status: 'Present', time: '10:04:55 AM', distance: 14 },
+    },
+    SESS_ADS03: {
+        S021: { status: 'Present', time: '09:59:50 AM', distance: 16 },
+        S022: { status: 'Absent' },
+        S023: { status: 'Present', time: '10:03:30 AM', distance: 11 },
+        S024: { status: 'Present', time: '10:06:15 AM', distance: 33 },
+        S025: { status: 'Present', time: '10:02:40 AM', distance: 19 },
+    },
+    SESS_ADS04: {
+        S021: { status: 'Present', time: '10:00:05 AM', distance: 20 },
+        S022: { status: 'Present', time: '10:04:15 AM', distance: 21 },
+        S023: { status: 'Late', time: '10:16:30 AM', distance: 9 },
+        S024: { status: 'Late', time: '10:18:00 AM', distance: 40 },
+        S025: { status: 'Present', time: '10:05:00 AM', distance: 15 },
+    }
+};
 
 // This is now the single source of truth for loading from localStorage
 export const loadAttendance = () => {
@@ -107,7 +172,12 @@ export const loadAttendance = () => {
         return {};
     }
     const storedAttendance = localStorage.getItem(ATTENDANCE_STORAGE_KEY);
-    return storedAttendance ? JSON.parse(storedAttendance) : {};
+    // If no attendance data is found, seed it with the initial example data
+    if (!storedAttendance) {
+        saveAttendance(initialAttendance);
+        return initialAttendance;
+    }
+    return JSON.parse(storedAttendance);
 };
 
 // This is now the single source of truth for saving to localStorage
@@ -125,6 +195,11 @@ export const loadStudentsByCourse = (courseId) => {
 export const loadSession = (courseId, sessionId) => {
     if (typeof window === 'undefined') return null;
     const storedSessions = localStorage.getItem(`sessions_${courseId}`);
+    // If no sessions are stored for this course, seed them with initial data
+    if (!storedSessions && initialSessions[courseId]) {
+        localStorage.setItem(`sessions_${courseId}`, JSON.stringify(initialSessions[courseId]));
+        return initialSessions[courseId].find(s => s.id === sessionId) || null;
+    }
     if (!storedSessions) return null;
     const sessions = JSON.parse(storedSessions);
     return sessions.find(s => s.id === sessionId) || null;
@@ -138,5 +213,3 @@ export const saveSession = (courseId, updatedSession) => {
     sessions = sessions.map(s => s.id === updatedSession.id ? updatedSession : s);
     localStorage.setItem(`sessions_${courseId}`, JSON.stringify(sessions));
 }
-
-    
