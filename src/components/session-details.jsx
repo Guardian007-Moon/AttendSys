@@ -5,7 +5,6 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import QRCode from "react-qr-code";
 import AttendanceCard from './attendance-card';
-import CourseBannerImage from './CourseBannerImage';
 import { ArrowLeft, Book, QrCode, Copy, CheckCircle, MapPin, Loader2, Calendar, Clock, Users, Wifi, WifiOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -24,20 +23,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 
-const getCourseById = (courseId) => {
-    if (typeof window === 'undefined') {
-        return initialCourses.find(c => c.id === courseId);
-    }
-    const storedCoursesRaw = localStorage.getItem('courses');
-    const storedCourses = storedCoursesRaw ? JSON.parse(storedCoursesRaw) : initialCourses;
-    return storedCourses.find(c => c.id === courseId);
-}
-
 export default function SessionDetails({ courseId, sessionId }) {
   const { toast } = useToast();
   
   const [students, setStudents] = useState([]);
-  const [course, setCourse] = useState(null);
   const [isClient, setIsClient] = useState(false);
   const [isQrDialogOpen, setQrDialogOpen] = useState(false);
   const [checkinUrl, setCheckinUrl] = useState('');
@@ -49,8 +38,6 @@ export default function SessionDetails({ courseId, sessionId }) {
 
   useEffect(() => {
     setIsClient(true);
-    const currentCourse = getCourseById(courseId);
-    setCourse(currentCourse);
     const currentSession = loadSession(courseId, sessionId);
     setSession(currentSession);
 
@@ -170,18 +157,6 @@ export default function SessionDetails({ courseId, sessionId }) {
 
   return (
     <>
-      {course && (
-        <div className="mb-6 rounded-lg overflow-hidden shadow-lg">
-            <CourseBannerImage
-                src={course.bannerUrl}
-                width={1200}
-                height={250}
-                alt={`${course.name} banner`}
-                className="w-full h-48 object-cover"
-                data-ai-hint="course banner"
-            />
-        </div>
-      )}
       <header className="mb-8">
         <Link href={`/courses/${courseId}`} passHref>
           <Button variant="outline" className="mb-4 rounded-lg gap-2">
