@@ -15,10 +15,10 @@ export default function LandingPage() {
           
           <div className="flex items-center space-x-4">
             <Link href="/login" passHref>
-              <Button variant="ghost" className="hidden md:block text-black font-medium hover:bg-gray-100">Login</Button>
+              <Button variant="ghost" className="hidden md:block text-black font-medium hover:bg-blue-600 hover:text-white">Login</Button>
             </Link>
             <Link href="/signup" passHref>
-              <Button className="bg-black text-white px-6 py-2 rounded-full font-medium hover:bg-gray-800">Sign up</Button>
+              <Button className="bg-black text-white px-6 py-2 rounded-full font-medium hover:bg-blue-600">Sign up</Button>
             </Link>
           </div>
         </header>
@@ -46,7 +46,7 @@ export default function LandingPage() {
               className="flex justify-center md:justify-start items-center space-x-4"
             >
                <Link href="/learn-more" passHref>
-                 <Button className="bg-black text-white rounded-full px-8 py-6 text-lg hover:bg-gray-800">
+                 <Button className="bg-black text-white rounded-full px-8 py-6 text-lg hover:bg-blue-600">
                     Learn more
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
