@@ -29,7 +29,7 @@ export default function LearnMorePage() {
         </header>
         
         <main className="container mx-auto px-6 py-12">
-            <div className="text-center mb-12 animate-fade-in">
+            <div className="text-center mb-12 animate-fade-in" style={{ animationDelay: '0.2s' }}>
                  <h1 className="text-5xl md:text-6xl font-extrabold text-blue-600 leading-tight">
                     How It Works
                 </h1>
@@ -38,7 +38,7 @@ export default function LearnMorePage() {
                 </p>
             </div>
             <div className="grid md:grid-cols-2 gap-16 items-center">
-                 <div className="relative h-full animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                 <div className="relative h-full animate-fade-in" style={{ animationDelay: '1.2s' }}>
                     <Image
                         src="https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=1200&auto=format&fit=crop"
                         width={800}
@@ -47,7 +47,7 @@ export default function LearnMorePage() {
                         className="rounded-3xl object-cover h-full shadow-lg"
                         data-ai-hint="person laptop"
                     />
-                    <div className="absolute -bottom-8 -right-8 bg-white p-4 rounded-xl shadow-lg w-72 animate-fade-in" style={{ animationDelay: '1s' }}>
+                    <div className="absolute -bottom-8 -right-8 bg-white p-4 rounded-xl shadow-lg w-72 animate-fade-in" style={{ animationDelay: '1.2s' }}>
                         <div className="flex items-center space-x-3">
                             <UserCheck className="text-blue-500 h-8 w-8" />
                             <div>
@@ -64,26 +64,26 @@ export default function LearnMorePage() {
                       title="Step 1: Create a Session"
                       description="From your dashboard, create a new class session. Set the date, time, and how close students need to be to check in."
                       colorClass="bg-pastel-lavender"
-                      delay={0.4}
+                      delay={0.2}
                     />
                     <StepCard 
                       icon={<QrCode size={32} />}
                       title="Step 2: Share the QR Code"
                       description="A unique QR code is generated for each session. Display it on screen or share the link with your students."
                       colorClass="bg-pastel-green"
-                      delay={0.6}
+                      delay={0.2}
                     />
                     <StepCard 
                       icon={<UserCheck size={32} />}
                       title="Step 3: Track in Real-Time"
                       description="As students scan the code and check in, your attendance dashboard updates instantly. See who's present, late, or absent at a glance."
                       colorClass="bg-pastel-yellow"
-                      delay={0.8}
+                      delay={0.2}
                     />
                 </div>
             </div>
 
-            <div className="text-center mt-20 animate-fade-in" style={{ animationDelay: '1s' }}>
+            <div className="text-center mt-20 animate-fade-in" style={{ animationDelay: '0.2s' }}>
                 <h2 className="text-3xl font-bold text-black">Ready to Simplify Attendance?</h2>
                 <p className="text-gray-600 mt-3 mb-6">Join hundreds of educators who are saving time and reducing classroom admin.</p>
                  <Link href="/" passHref>
