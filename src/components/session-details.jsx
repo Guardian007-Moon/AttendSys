@@ -253,7 +253,7 @@ export default function SessionDetails({ courseId, sessionId }) {
               <Badge variant="outline" className="text-amber-600 border-amber-300">{lateCount}</Badge>
             </div>
           </CardContent>
-        </Card>
+        </card>
 
         <Card className="border-0 shadow-sm bg-gradient-to-br from-red-50 to-red-100">
           <CardContent className="p-4">
@@ -367,4 +367,6 @@ export default function SessionDetails({ courseId, sessionId }) {
     </>
   );
 }
+    
+
     
