@@ -49,10 +49,10 @@ import { Label } from '@/components/ui/label';
 
 // Mock function to simulate generating and downloading a CSV report.
 const downloadReport = (data) => {
-  const headers = ['Student Name', 'Present', 'Late', 'Absent', 'Total Sessions'];
+  const headers = ['Student Name', 'Present', 'Late', 'Present (always)', 'Absent', 'Total Sessions'];
   const csvRows = [
     headers.join(','),
-    ...data.map(row => [row.name, row.present, row.late, row.absent, row.total].join(',')),
+    ...data.map(row => [row.name, row.present, row.late, row.presentAlways, row.absent, row.total].join(',')),
   ];
   
   const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
@@ -95,6 +95,7 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
       name: student.name,
       present: present,
       late: late,
+      presentAlways: attended,
       absent: absent,
       total: sessions.length,
     };
@@ -179,6 +180,7 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
                 <TableHead>Student Name</TableHead>
                 <TableHead className="text-center">Present</TableHead>
                 <TableHead className="text-center">Late</TableHead>
+                <TableHead className="text-center">Present (always)</TableHead>
                 <TableHead className="text-center">Absent</TableHead>
                 <TableHead className="text-center">Total Sessions</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
@@ -187,7 +189,7 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
             <TableBody>
               {students.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan="6" className="h-24 text-center">
+                  <TableCell colSpan="7" className="h-24 text-center">
                     No students in this course yet. Click "Add Student" to get started.
                   </TableCell>
                 </TableRow>
@@ -197,6 +199,7 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
                     <TableCell className="font-medium">{student.name}</TableCell>
                     <TableCell className="text-center text-green-600 font-semibold">{student.present}</TableCell>
                     <TableCell className="text-center text-yellow-500 font-semibold">{student.late}</TableCell>
+                    <TableCell className="text-center font-bold">{student.presentAlways}</TableCell>
                     <TableCell className="text-center text-red-600 font-semibold">{student.absent}</TableCell>
                     <TableCell className="text-center">{student.total}</TableCell>
                     <TableCell className="text-right">
@@ -268,7 +271,7 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <DialogTitle>Are you absolutely sure?</DialogTitle>
             <AlertDialogDescription>
               This action cannot be undone. This will permanently delete this student and all their attendance data.
             </AlertDialogDescription>
