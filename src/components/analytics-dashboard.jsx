@@ -1,10 +1,11 @@
+
 'use client';
 
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { loadAttendance } from '@/lib/mock-data';
 import { useMemo } from 'react';
-import { TrendingUp, PieChart as PieChartIcon } from 'lucide-react';
+import { TrendingUp, PieChart as PieChartIcon, Users } from 'lucide-react';
 
 const COLORS = {
   Present: '#22c55e', // green-500
@@ -22,13 +23,15 @@ export default function AnalyticsDashboard({ students, sessions }) {
       const sessionAttendance = allAttendance[session.id] || {};
       const present = Object.values(sessionAttendance).filter(a => a.status === 'Present').length;
       const late = Object.values(sessionAttendance).filter(a => a.status === 'Late').length;
-      const totalAttended = present + late;
-      const attendancePercentage = (totalAttended / students.length) * 100;
+      const attended = present + late;
+      const absent = students.length - attended;
       
       return {
         name: session.name,
         date: new Date(session.date).toLocaleDateString(),
-        attendance: parseFloat(attendancePercentage.toFixed(2)),
+        Present: present,
+        Late: late,
+        Absent: absent,
       };
     }).sort((a,b) => new Date(a.date) - new Date(b.date));
   }, [sessions, students]);
@@ -86,7 +89,7 @@ export default function AnalyticsDashboard({ students, sessions }) {
               <CardTitle className="font-headline">Attendance Trend</CardTitle>
           </div>
           <CardDescription>
-            Shows the attendance percentage for each session over time.
+            Shows the number of students with each attendance status for every session.
           </CardDescription>
         </CardHeader>
         <CardContent className="h-[400px]">
@@ -94,7 +97,7 @@ export default function AnalyticsDashboard({ students, sessions }) {
             <LineChart data={attendanceData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" angle={-20} textAnchor="end" height={60} />
-              <YAxis domain={[0, 100]} label={{ value: 'Attendance %', angle: -90, position: 'insideLeft' }} />
+              <YAxis label={{ value: 'Number of Students', angle: -90, position: 'insideLeft' }} />
               <Tooltip
                 contentStyle={{
                   backgroundColor: 'hsl(var(--background))',
@@ -102,7 +105,9 @@ export default function AnalyticsDashboard({ students, sessions }) {
                 }}
               />
               <Legend />
-              <Line type="monotone" dataKey="attendance" stroke={COLORS.Present} strokeWidth={2} name="Attendance %" />
+              <Line type="monotone" dataKey="Present" stroke={COLORS.Present} strokeWidth={2} />
+              <Line type="monotone" dataKey="Late" stroke={COLORS.Late} strokeWidth={2} />
+              <Line type="monotone" dataKey="Absent" stroke={COLORS.Absent} strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>
@@ -143,6 +148,53 @@ export default function AnalyticsDashboard({ students, sessions }) {
               />
               <Legend />
             </PieChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      <Card className="col-span-1 lg:col-span-1 shadow-lg">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <Users className="h-6 w-6 text-primary" />
+            <CardTitle className="font-headline">Student Performance</CardTitle>
+          </div>
+          <CardDescription>
+            Individual student attendance summary across all sessions.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="h-[400px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart 
+                data={students.map(student => {
+                    const studentAttendance = { name: student.name, Present: 0, Late: 0, Absent: 0 };
+                    sessions.forEach(session => {
+                        const allAtt = loadAttendance();
+                        const record = allAtt[session.id] && allAtt[session.id][student.id];
+                        if (record) {
+                            studentAttendance[record.status]++;
+                        } else {
+                            studentAttendance.Absent++;
+                        }
+                    });
+                    return studentAttendance;
+                })}
+                layout="vertical"
+                margin={{ top: 5, right: 20, left: 40, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis type="number" />
+              <YAxis type="category" dataKey="name" width={100} />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--background))',
+                  borderColor: 'hsl(var(--border))',
+                }}
+              />
+              <Legend />
+              <Bar dataKey="Present" stackId="a" fill={COLORS.Present} />
+              <Bar dataKey="Late" stackId="a" fill={COLORS.Late} />
+              <Bar dataKey="Absent" stackId="a" fill={COLORS.Absent} />
+            </BarChart>
           </ResponsiveContainer>
         </CardContent>
       </Card>
