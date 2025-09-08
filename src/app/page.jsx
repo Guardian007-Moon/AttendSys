@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { PlayCircle, ArrowRight, QrCode, CheckCircle } from 'lucide-react';
+import { PlayCircle, ArrowRight, QrCode, CheckCircle, Sheet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function LandingPage() {
@@ -57,12 +57,12 @@ export default function LandingPage() {
           <div className="relative animate-fade-in">
             <div className="bg-pastel-mint rounded-3xl w-full aspect-square flex items-center justify-center p-8">
                <Image
-                  src="https://images.unsplash.com/photo-1591123120675-6f7f1aae0e5b?q=80&w=800&auto=format&fit=crop"
+                  src="https://s3.ams.com.kh/education/2024/09/photo_2022-02-04_08-54-18.jpg"
                   width={700}
                   height={700}
                   alt="Teacher using a tablet in a classroom"
                   className="rounded-2xl object-cover w-full h-full shadow-lg"
-                  data-ai-hint="teacher tablet"
+                  data-ai-hint="teacher classroom"
                 />
             </div>
             <div 
