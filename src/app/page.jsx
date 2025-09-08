@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -35,7 +34,7 @@ export default function LandingPage() {
             <h1 
               className="text-5xl md:text-6xl font-extrabold text-black leading-tight mb-6 flex items-center justify-center md:justify-start"
             >
-              The Simple, Modern Way to Track Attendance <Sheet className="ml-4 h-12 w-12" />
+              The Simple, Modern Way to Track Attendance <Sheet />
             </h1>
             <p 
               className="text-lg text-gray-600 mb-8"
