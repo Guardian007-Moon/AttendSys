@@ -104,7 +104,7 @@ export default function AnalyticsDashboard({ students, sessions }) {
                   borderColor: 'hsl(var(--border))',
                 }}
               />
-              <Legend />
+              <Legend verticalAlign="top" align="right" />
               <Line type="monotone" dataKey="Present" stroke={COLORS.Present} strokeWidth={2} />
               <Line type="monotone" dataKey="Late" stroke={COLORS.Late} strokeWidth={2} />
               <Line type="monotone" dataKey="Absent" stroke={COLORS.Absent} strokeWidth={2} />
@@ -146,7 +146,7 @@ export default function AnalyticsDashboard({ students, sessions }) {
                   borderColor: 'hsl(var(--border))',
                 }}
               />
-              <Legend />
+              <Legend verticalAlign="top" align="right" />
             </PieChart>
           </ResponsiveContainer>
         </CardContent>
@@ -179,7 +179,7 @@ export default function AnalyticsDashboard({ students, sessions }) {
                     return studentAttendance;
                 })}
                 layout="vertical"
-                margin={{ top: 5, right: 20, left: 40, bottom: 5 }}
+                margin={{ top: 20, right: 20, left: 40, bottom: 5 }}
             >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis type="number" />
@@ -190,7 +190,7 @@ export default function AnalyticsDashboard({ students, sessions }) {
                   borderColor: 'hsl(var(--border))',
                 }}
               />
-              <Legend />
+              <Legend verticalAlign="top" align="right" />
               <Bar dataKey="Present" stackId="a" fill={COLORS.Present} />
               <Bar dataKey="Late" stackId="a" fill={COLORS.Late} />
               <Bar dataKey="Absent" stackId="a" fill={COLORS.Absent} />
