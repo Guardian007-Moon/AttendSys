@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { PlayCircle, ArrowRight, QrCode, CheckCircle, Sheet } from 'lucide-react';
+import { PlayCircle, ArrowRight, QrCode, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function LandingPage() {
@@ -34,7 +34,7 @@ export default function LandingPage() {
             <h1 
               className="text-5xl md:text-6xl font-extrabold text-black leading-tight mb-6 flex items-center justify-center md:justify-start"
             >
-              The Simple, Modern Way to Track Attendance <Sheet />
+              The Simple, Modern Way to Track Attendance 📝
             </h1>
             <p 
               className="text-lg text-gray-600 mb-8"
