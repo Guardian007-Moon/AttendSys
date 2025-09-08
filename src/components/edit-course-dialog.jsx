@@ -30,13 +30,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { X, Image, BookOpen, Calendar, Hash, FileText, Save } from 'lucide-react';
+import { X, Image, BookOpen, Calendar, Hash, FileText, Save, Clock } from 'lucide-react';
 
 const courseSchema = z.object({
   name: z.string().min(1, 'Course name is required.'),
   code: z.string().optional(),
   description: z.string().optional(),
   year: z.string({ required_error: 'Please select a year.' }),
+  schedule: z.string().optional(),
   bannerUrl: z.string().url({ message: 'Please enter a valid URL.' }).optional().or(z.literal('')),
 });
 
@@ -55,6 +56,7 @@ export default function EditCourseDialog({
       code: '',
       description: '',
       year: '',
+      schedule: '',
       bannerUrl: '',
     },
   });
@@ -161,6 +163,27 @@ export default function EditCourseDialog({
                   )}
                 />
               </div>
+
+               <FormField
+                control={form.control}
+                name="schedule"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2 text-sm font-medium">
+                      <Clock className="h-4 w-4 text-blue-500" />
+                      Schedule
+                    </FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="e.g., 'Mon/Wed 10:00-11:00'" 
+                        className="rounded-lg py-2.5 px-3.5 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs text-red-500" />
+                  </FormItem>
+                )}
+              />
               
               <FormField
                 control={form.control}
