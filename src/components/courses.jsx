@@ -258,7 +258,7 @@ export default function Courses() {
       id: `C${Date.now()}`, 
       studentCount: 0,
       code: newCourse.code || `CRS${Date.now().toString().slice(-4)}`,
-      bannerUrl: newCourse.bannerUrl || `https://placehold.co/600x200/a3e635/1e293b?text=Course`
+      bannerUrl: newCourse.bannerUrl || `https://placehold.co/600x200/a3e635/1e293b?text=${encodeURIComponent(newCourse.name)}`
     };
     courseStore = [...courseStore, newCourseWithId];
     setCourses(courseStore);
@@ -319,8 +319,8 @@ export default function Courses() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50/80 to-green-50/80 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Teacher Profile Section */}
-        <div className="bg-pastel-beige p-1 rounded-xl mb-8">
-            <Card className="card card-hover rounded-xl border-0 overflow-hidden animate-fade-in bg-card">
+        <div className="bg-pastel-beige p-4 rounded-xl mb-8">
+            <Card className="card card-hover rounded-xl border-0 overflow-hidden animate-fade-in">
                 <CardContent className="p-5 flex items-center gap-6">
                     <Image
                     src={profile.imageUrl || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&h=200&auto=format&fit=crop"}
@@ -531,7 +531,7 @@ export default function Courses() {
                         >
                             <div className="relative">
                             <Image
-                                    src={course.bannerUrl || 'https://placehold.co/600x200/a3e635/1e293b?text=Course'}
+                                    src={course.bannerUrl || `https://placehold.co/600x200/e2e8f0/475569?text=${encodeURIComponent(course.name)}`}
                                     width={600}
                                     height={200}
                                     alt={`${course.name} banner`}
@@ -667,3 +667,5 @@ export default function Courses() {
     </div>
   );
 }
+
+    
