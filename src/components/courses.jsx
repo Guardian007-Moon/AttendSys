@@ -447,7 +447,7 @@ export default function Courses() {
               <div className="p-2 bg-primary/10 rounded-xl">
                 <Book className="h-7 w-7 text-primary" />
               </div>
-              <h1 className="text-3xl font-bold font-headline text-gradient">
+              <h1 className="text-4xl font-bold font-headline text-foreground">
                 My Courses
               </h1>
             </div>
@@ -701,5 +701,3 @@ export default function Courses() {
     </div>
   );
 }
-
-    
