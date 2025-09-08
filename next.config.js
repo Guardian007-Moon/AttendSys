@@ -38,6 +38,12 @@ const nextConfig = {
         hostname: 's3.ams.com.kh',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'files.structurae.net',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
