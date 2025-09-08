@@ -33,7 +33,7 @@ import {
 } from '@/components/ui/select';
 
 const courseSchema = z.object({
-  name: z.string().min(5, 'Course name must be at least 5 characters.'),
+  name: z.string().min(1, 'Course name is required.'),
   code: z.string().optional(),
   description: z.string().optional(),
   year: z.string({ required_error: 'Please select a year.' }),
