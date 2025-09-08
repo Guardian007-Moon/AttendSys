@@ -26,28 +26,24 @@ export default function LandingPage() {
 
       <main className="container mx-auto px-6 py-16 md:py-24">
         <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div className="text-center md:text-left">
+          <div className="text-center md:text-left animate-fade-in">
             <span 
-              className="inline-block bg-pastel-mint text-black px-4 py-2 rounded-full text-sm font-medium mb-4 animate-fade-in"
-              style={{ animationDelay: '0.2s' }}
+              className="inline-block bg-pastel-mint text-black px-4 py-2 rounded-full text-sm font-medium mb-4"
             >
               Smarter Attendance Tracking ✨
             </span>
             <h1 
-              className="text-5xl md:text-6xl font-extrabold text-black leading-tight mb-6 animate-fade-in"
-              style={{ animationDelay: '0.3s' }}
+              className="text-5xl md:text-6xl font-extrabold text-black leading-tight mb-6"
             >
               The Simple, Modern Way to Track Attendance 🚀
             </h1>
             <p 
-              className="text-lg text-gray-600 mb-8 animate-fade-in"
-              style={{ animationDelay: '0.4s' }}
+              className="text-lg text-gray-600 mb-8"
             >
               Save time, reduce paperwork, and get real-time insights into student attendance with our easy-to-use system. Perfect for modern educators.
             </p>
             <div 
-              className="flex justify-center md:justify-start items-center space-x-4 animate-fade-in"
-              style={{ animationDelay: '0.5s' }}
+              className="flex justify-center md:justify-start items-center space-x-4"
             >
                <Link href="/learn-more" passHref>
                  <Button className="bg-black text-white rounded-full px-8 py-6 text-lg hover:bg-gray-800">
@@ -58,7 +54,7 @@ export default function LandingPage() {
             </div>
           </div>
           
-          <div className="relative animate-fade-in" style={{ animationDelay: '0.6s' }}>
+          <div className="relative animate-fade-in">
             <div className="bg-pastel-mint rounded-3xl w-full aspect-square flex items-center justify-center p-8">
                <Image
                   src="https://images.unsplash.com/photo-1591123120675-6f7f1aae0e5b?q=80&w=800&auto=format&fit=crop"
@@ -71,7 +67,6 @@ export default function LandingPage() {
             </div>
             <div 
               className="absolute -bottom-8 -left-12 bg-white p-4 rounded-xl shadow-lg w-64 animate-fade-in" 
-              style={{ animationDelay: '0.8s' }}
             >
                 <div className="flex items-center space-x-3">
                     <CheckCircle className="text-green-500 h-8 w-8" />
@@ -83,7 +78,6 @@ export default function LandingPage() {
             </div>
              <div 
               className="absolute -top-8 -right-12 bg-white p-4 rounded-xl shadow-lg w-64 animate-fade-in" 
-              style={{ animationDelay: '1s' }}
             >
                 <div className="flex items-center space-x-3">
                     <QrCode className="text-gray-700 h-8 w-8" />
