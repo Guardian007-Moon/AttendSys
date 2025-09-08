@@ -38,7 +38,7 @@ export default function LearnMorePage() {
                 </p>
             </div>
             <div className="grid md:grid-cols-2 gap-16 items-center">
-                 <div className="relative h-full animate-fade-in" style={{ animationDelay: '1.2s' }}>
+                 <div className="relative h-full animate-fade-in" style={{ animationDelay: '2s' }}>
                     <Image
                         src="https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=1200&auto=format&fit=crop"
                         width={800}
@@ -47,7 +47,7 @@ export default function LearnMorePage() {
                         className="rounded-3xl object-cover h-full shadow-lg"
                         data-ai-hint="person laptop"
                     />
-                    <div className="absolute -bottom-8 -right-8 bg-white p-4 rounded-xl shadow-lg w-72 animate-fade-in" style={{ animationDelay: '1.2s' }}>
+                    <div className="absolute -bottom-8 -right-8 bg-white p-4 rounded-xl shadow-lg w-72 animate-fade-in" style={{ animationDelay: '2s' }}>
                         <div className="flex items-center space-x-3">
                             <UserCheck className="text-blue-500 h-8 w-8" />
                             <div>
