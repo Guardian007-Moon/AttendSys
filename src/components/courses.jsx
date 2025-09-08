@@ -318,7 +318,7 @@ export default function Courses() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50/80 to-green-50/80 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Teacher Profile Section */}
-        <Card className="mb-8 card card-hover rounded-xl border-0 overflow-hidden animate-fade-in">
+        <Card className="mb-8 card card-hover rounded-xl border-0 overflow-hidden animate-fade-in bg-pastel-beige">
             <CardContent className="p-5 flex items-center gap-6">
                 <Image
                 src={profile.imageUrl || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&h=200&auto=format&fit=crop"}
