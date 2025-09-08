@@ -38,14 +38,22 @@ import { cn } from '@/lib/utils';
 
 
 const getInitialCourses = () => {
-  if (typeof window === 'undefined') return initialCourses;
-  const storedCourses = localStorage.getItem('courses');
-  const courses = storedCourses ? JSON.parse(storedCourses) : initialCourses;
-  // Attach student counts
-  return courses.map(course => ({
-    ...course,
-    studentCount: (allStudents[course.id] || []).length
-  }));
+    if (typeof window === 'undefined') return initialCourses;
+    
+    const storedCoursesRaw = localStorage.getItem('courses');
+    const storedCourses = storedCoursesRaw ? JSON.parse(storedCoursesRaw) : [];
+    const storedCourseIds = new Set(storedCourses.map(c => c.id));
+
+    // Filter out initial courses that are already in local storage
+    const newInitialCourses = initialCourses.filter(c => !storedCourseIds.has(c.id));
+    
+    const courses = [...storedCourses, ...newInitialCourses];
+
+    // Attach student counts
+    return courses.map(course => ({
+        ...course,
+        studentCount: (allStudents[course.id] || []).length
+    }));
 };
 
 const getInitialProfile = () => {
@@ -88,6 +96,7 @@ export default function Courses() {
   useEffect(() => {
     courseStore = getInitialCourses();
     setCourses(courseStore);
+    updateLocalStorage(courseStore); // Save the potentially merged list back to storage
     setProfile(getInitialProfile());
   }, []);
   
