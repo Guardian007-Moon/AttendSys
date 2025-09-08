@@ -316,33 +316,35 @@ export default function Courses() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50/80 to-green-50/80 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Teacher Profile Section */}
-        <div className="bg-pastel-beige p-4 rounded-xl mb-8">
-            <Card className="card card-hover rounded-xl border-0 overflow-hidden animate-fade-in">
-                <CardContent className="p-5 flex items-center gap-6">
-                    <Image
-                    src={profile.imageUrl || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&h=200&auto=format&fit=crop"}
-                    width={80}
-                    height={80}
-                    alt="Teacher Profile Picture"
-                    className="rounded-full border-4 border-white shadow-md object-cover"
-                    data-ai-hint="teacher profile"
-                    />
-                    <div className="flex-1">
-                    <h2 className="text-2xl font-bold">Welcome Back, {profile.name}!</h2>
-                    <p className="text-muted-foreground mt-1">
-                        {profile.summary}
-                    </p>
-                    </div>
-                    <Button variant="ghost" size="icon" onClick={() => setProfileDialogOpen(true)}>
-                        <Edit className="h-5 w-5" />
-                    </Button>
-                </CardContent>
-            </Card>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50/80 to-green-50/80">
+      {/* Teacher Profile Section */}
+      <div className="bg-pastel-beige py-6">
+          <div className="max-w-7xl mx-auto px-6">
+              <Card className="card card-hover rounded-xl border-0 overflow-hidden animate-fade-in">
+                  <CardContent className="p-5 flex items-center gap-6">
+                      <Image
+                      src={profile.imageUrl || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&h=200&auto=format&fit=crop"}
+                      width={80}
+                      height={80}
+                      alt="Teacher Profile Picture"
+                      className="rounded-full border-4 border-white shadow-md object-cover"
+                      data-ai-hint="teacher profile"
+                      />
+                      <div className="flex-1">
+                      <h2 className="text-2xl font-bold">Welcome Back, {profile.name}!</h2>
+                      <p className="text-muted-foreground mt-1">
+                          {profile.summary}
+                      </p>
+                      </div>
+                      <Button variant="ghost" size="icon" onClick={() => setProfileDialogOpen(true)}>
+                          <Edit className="h-5 w-5" />
+                      </Button>
+                  </CardContent>
+              </Card>
+          </div>
+      </div>
       
+      <div className="max-w-7xl mx-auto p-6">
         <header className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="animate-fade-in">
             <div className="flex items-center gap-3 mb-2">
@@ -523,7 +525,7 @@ export default function Courses() {
                 </div>
                 <div className="flex overflow-x-auto gap-6 pb-4 -mx-6 px-6">
                   {coursesInYear.map((course, index) => (
-                    <div key={course.id} className="flex-shrink-0 w-full md:w-[calc(50%-1.5rem)] lg:w-[calc(33.333%-1.5rem)]">
+                    <div key={course.id} className="flex-shrink-0 w-full sm:w-[calc(50%-1rem)] md:w-[calc(33.333%-1rem)] lg:w-[calc(25%-1.125rem)]">
                         <Link href={`/courses/${course.id}`} className="block h-full">
                         <Card 
                             className="card card-hover overflow-hidden border-0 rounded-xl h-full flex flex-col"
@@ -667,5 +669,3 @@ export default function Courses() {
     </div>
   );
 }
-
-    
