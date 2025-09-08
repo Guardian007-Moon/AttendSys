@@ -1,15 +1,15 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle, ArrowLeft, Book, PlusCircle } from 'lucide-react';
+import { CheckCircle, ArrowLeft, Book, PlusCircle, Calendar, Users, BarChart3, Clock, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ClassSessionList from './class-session-list';
 import CreateClassSessionDialog from './create-class-session-dialog';
 import EditClassSessionDialog from './edit-class-session-dialog';
 import StudentAttendanceDashboard from './student-attendance-dashboard';
+import AnalyticsDashboard from './analytics-dashboard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   AlertDialog,
@@ -21,6 +21,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { initialCourseStudents, loadAttendance, saveAttendance } from '@/lib/mock-data';
 
 const getInitialSessions = (courseId) => {
@@ -72,6 +75,7 @@ export default function Dashboard({ courseId }) {
         title: "Class Session Created",
         description: `The session "${newSession.name}" has been successfully created.`,
         action: <CheckCircle className="text-green-500" />,
+        className: "border-l-4 border-l-green-500"
     });
   };
 
@@ -136,6 +140,7 @@ export default function Dashboard({ courseId }) {
         title: "Class Session Updated",
         description: `The session "${updatedSession.name}" has been successfully updated.`,
         action: <CheckCircle className="text-green-500" />,
+        className: "border-l-4 border-l-green-500"
     });
   };
 
@@ -160,39 +165,142 @@ export default function Dashboard({ courseId }) {
     updateStudentsLocalStorage(studentStore);
   };
 
+  // Calculate statistics
+  const totalSessions = sessions.length;
+  const upcomingSessions = sessions.filter(session => new Date(session.date) >= new Date()).length;
+  const totalStudents = students.length;
+  const averageAttendance = sessions.length > 0 ? Math.round((sessions.reduce((acc, session) => {
+    const attendance = loadAttendance()[session.id] || {};
+    return acc + (Object.keys(attendance).filter(id => attendance[id].status !== 'Absent').length / students.length) * 100;
+  }, 0) / sessions.length)) : 0;
+
   return (
     <>
       <header className="mb-8">
         <Link href="/courses" passHref>
-          <Button variant="outline" className="mb-4">
-            <ArrowLeft />
+          <Button variant="outline" className="mb-4 rounded-lg gap-2">
+            <ArrowLeft className="h-4 w-4" />
             Back to Courses
           </Button>
         </Link>
-        <div className="flex items-center justify-between">
-            <div>
-                <div className="flex items-center gap-3">
-                    <Book className="h-8 w-8 text-primary" />
-                    <h1 className="text-3xl font-bold font-headline text-primary">
-                        Course: {courseId}
-                    </h1>
-                </div>
-                <p className="text-muted-foreground mt-1">
-                    Manage class sessions and track attendance for this course.
-                </p>
+        
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="bg-primary/10 p-2 rounded-xl">
+                <Book className="h-6 w-6 text-primary" />
+              </div>
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+                {courseId} Dashboard
+              </h1>
             </div>
-            <Button onClick={() => setCreateDialogOpen(true)}>
-                <PlusCircle />
-                Create Session
-            </Button>
+            <p className="text-muted-foreground ml-11">
+              Manage class sessions and track attendance for this course
+            </p>
+          </div>
+          
+          <Button 
+            onClick={() => setCreateDialogOpen(true)} 
+            className="bg-primary hover:bg-primary/90 shadow-md rounded-lg gap-2"
+          >
+            <PlusCircle className="h-4 w-4" />
+            Create Session
+          </Button>
         </div>
       </header>
-       <Tabs defaultValue="sessions">
-        <TabsList className="mb-4">
-          <TabsTrigger value="sessions">Class Sessions</TabsTrigger>
-          <TabsTrigger value="attendance">Student Roster</TabsTrigger>
+
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <Card className="border-0 shadow-sm bg-gradient-to-br from-blue-50 to-blue-100">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Total Sessions</p>
+                <p className="text-2xl font-bold">{totalSessions}</p>
+              </div>
+              <Calendar className="h-8 w-8 text-blue-500 opacity-60" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-0 shadow-sm bg-gradient-to-br from-green-50 to-green-100">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Upcoming Sessions</p>
+                <p className="text-2xl font-bold text-green-600">{upcomingSessions}</p>
+              </div>
+              <Clock className="h-8 w-8 text-green-500 opacity-60" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-0 shadow-sm bg-gradient-to-br from-purple-50 to-purple-100">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Total Students</p>
+                <p className="text-2xl font-bold text-purple-600">{totalStudents}</p>
+              </div>
+              <Users className="h-8 w-8 text-purple-500 opacity-60" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-0 shadow-sm bg-gradient-to-br from-amber-50 to-amber-100">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Avg. Attendance</p>
+                <p className="text-2xl font-bold text-amber-600">{averageAttendance}%</p>
+              </div>
+              <BarChart3 className="h-8 w-8 text-amber-500 opacity-60" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Attendance Progress */}
+      {sessions.length > 0 && (
+        <Card className="mb-6 border-0 shadow-sm">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <BarChart3 className="h-5 w-5 text-primary" />
+              Overall Attendance Rate
+            </CardTitle>
+            <CardDescription>
+              Average attendance across all sessions
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Progress value={averageAttendance} className="h-2" />
+            <div className="flex justify-between text-sm text-muted-foreground mt-2">
+              <span>0%</span>
+              <span>{averageAttendance}%</span>
+              <span>100%</span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Tabs Navigation */}
+      <Tabs defaultValue="sessions" className="mb-6">
+        <TabsList className="bg-muted/50 p-1 rounded-lg">
+          <TabsTrigger value="sessions" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm">
+            <Calendar className="h-4 w-4 mr-2" />
+            Class Sessions
+          </TabsTrigger>
+          <TabsTrigger value="attendance" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm">
+            <Users className="h-4 w-4 mr-2" />
+            Student Roster
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm">
+            <TrendingUp className="h-4 w-4 mr-2" />
+            Analytics
+          </TabsTrigger>
         </TabsList>
-        <TabsContent value="sessions">
+        
+        <TabsContent value="sessions" className="mt-6">
           <ClassSessionList
             sessions={sessions}
             courseId={courseId}
@@ -200,7 +308,8 @@ export default function Dashboard({ courseId }) {
             onDelete={handleOpenDeleteDialog}
           />
         </TabsContent>
-        <TabsContent value="attendance">
+        
+        <TabsContent value="attendance" className="mt-6">
           <StudentAttendanceDashboard 
             students={students} 
             sessions={sessions}
@@ -208,12 +317,22 @@ export default function Dashboard({ courseId }) {
             courseId={courseId}
           />
         </TabsContent>
+
+        <TabsContent value="analytics" className="mt-6">
+          <AnalyticsDashboard 
+            students={students} 
+            sessions={sessions}
+          />
+        </TabsContent>
       </Tabs>
+
+      {/* Dialogs */}
       <CreateClassSessionDialog
         isOpen={isCreateDialogOpen}
         onOpenChange={setCreateDialogOpen}
         onSessionCreate={handleAddSession}
       />
+      
       {selectedSession && (
         <EditClassSessionDialog
           isOpen={isEditDialogOpen}
@@ -222,24 +341,40 @@ export default function Dashboard({ courseId }) {
           session={selectedSession}
         />
       )}
+      
       <AlertDialog
         open={isDeleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
       >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete this
-              class session.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteSession}>
-              Continue
+        <AlertDialogContent className="bg-white rounded-2xl border-0 p-0 overflow-hidden max-w-md shadow-xl">
+          <div className="p-6 text-center">
+            <div className="mx-auto bg-red-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mb-5">
+              <div className="bg-red-500 p-2 rounded-full">
+                <Calendar className="h-6 w-6 text-white" />
+              </div>
+            </div>
+            
+            <AlertDialogHeader className="text-center">
+              <AlertDialogTitle className="text-xl font-bold text-gray-900 mb-2">
+                Delete Session
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-gray-600 text-base">
+                Are you sure you want to delete this session? This action cannot be undone and will remove all attendance records for this session.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+          </div>
+
+          <div className="bg-gray-50 px-6 py-4 flex flex-col sm:flex-row-reverse gap-3">
+            <AlertDialogAction 
+              onClick={handleDeleteSession}
+              className="flex-1 bg-red-500 hover:bg-red-600 text-white py-3 px-4 rounded-lg font-medium transition-colors duration-200"
+            >
+              Delete Session
             </AlertDialogAction>
-          </AlertDialogFooter>
+            <AlertDialogCancel className="flex-1 bg-white hover:bg-gray-100 text-gray-700 py-3 px-4 rounded-lg font-medium border border-gray-300 transition-colors duration-200">
+              Cancel
+            </AlertDialogCancel>
+          </div>
         </AlertDialogContent>
       </AlertDialog>
     </>
