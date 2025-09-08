@@ -518,70 +518,72 @@ export default function Courses() {
                   <GraduationCap className="h-6 w-6 text-primary/80" />
                   <h2 className="text-xl font-bold text-foreground">{year === 'Uncategorized' ? 'Uncategorized' : `Year ${year}`}</h2>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="flex overflow-x-auto gap-6 pb-4 -mx-6 px-6">
                   {coursesInYear.map((course, index) => (
-                    <Link href={`/courses/${course.id}`} key={course.id} className="block">
-                      <Card 
-                        className="card card-hover overflow-hidden border-0 rounded-xl h-full flex flex-col"
-                        style={{ animationDelay: `${index * 0.05}s` }}
-                      >
-                        <div className="relative">
-                           <Image
-                                src={course.bannerUrl || 'https://picsum.photos/600/200'}
-                                width={600}
-                                height={200}
-                                alt={`${course.name} banner`}
-                                className="w-full h-32 object-cover"
-                                data-ai-hint="course banner"
-                            />
-                            <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/80 to-transparent" />
-                        </div>
-                        <CardHeader className="pt-4">
-                          <div className="flex justify-between items-start">
-                            <div className="flex-1">
-                              <CardTitle className="text-xl font-semibold">{course.name}</CardTitle>
-                              <CardDescription className="mt-1">{course.code}</CardDescription>
+                    <div key={course.id} className="flex-shrink-0 w-full md:w-[calc(50%-1.5rem)] lg:w-[calc(33.333%-1.5rem)]">
+                        <Link href={`/courses/${course.id}`} className="block h-full">
+                        <Card 
+                            className="card card-hover overflow-hidden border-0 rounded-xl h-full flex flex-col"
+                            style={{ animationDelay: `${index * 0.05}s` }}
+                        >
+                            <div className="relative">
+                            <Image
+                                    src={course.bannerUrl || 'https://picsum.photos/600/200'}
+                                    width={600}
+                                    height={200}
+                                    alt={`${course.name} banner`}
+                                    className="w-full h-32 object-cover"
+                                    data-ai-hint="course banner"
+                                />
+                                <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/80 to-transparent" />
                             </div>
-                          </div>
-                        </CardHeader>
-                        <CardContent className="p-5 pt-2 flex-grow flex flex-col">
-                          <p className="text-sm text-muted-foreground mb-4 line-clamp-2 h-10 flex-grow">
-                            {course.description || "No description available."}
-                          </p>
-                          
-                          <div className="flex items-center text-sm text-muted-foreground mb-4">
-                            <Calendar className="h-4 w-4 mr-2 text-primary" />
-                            <span>{course.schedule || "Schedule not set"}</span>
-                          </div>
-                          
-                          <div className="flex justify-between items-center text-sm border-t pt-4">
-                            <div className="flex items-center text-muted-foreground">
-                              <Users className="h-4 w-4 mr-2 text-primary" />
-                              <span>{course.studentCount || 0} students</span>
+                            <CardHeader className="pt-4">
+                            <div className="flex justify-between items-start">
+                                <div className="flex-1">
+                                <CardTitle className="text-xl font-semibold">{course.name}</CardTitle>
+                                <CardDescription className="mt-1">{course.code}</CardDescription>
+                                </div>
+                            </div>
+                            </CardHeader>
+                            <CardContent className="p-5 pt-2 flex-grow flex flex-col">
+                            <p className="text-sm text-muted-foreground mb-4 line-clamp-2 h-10 flex-grow">
+                                {course.description || "No description available."}
+                            </p>
+                            
+                            <div className="flex items-center text-sm text-muted-foreground mb-4">
+                                <Calendar className="h-4 w-4 mr-2 text-primary" />
+                                <span>{course.schedule || "Schedule not set"}</span>
                             </div>
                             
-                            <div className="flex gap-2">
-                              <Button 
-                                variant="ghost" 
-                                size="icon"
-                                onClick={(e) => handleOpenEditDialog(e, course)}
-                                className="h-9 w-9 rounded-lg hover:bg-primary/10"
-                              >
-                                <Edit3 size={16} className="text-primary" />
-                              </Button>
-                              <Button 
-                                variant="ghost" 
-                                size="icon"
-                                onClick={(e) => handleOpenDeleteDialog(e, course.id)}
-                                className="h-9 w-9 rounded-lg hover:bg-red-50"
-                              >
-                                <Trash2 size={16} className="text-red-500" />
-                              </Button>
+                            <div className="flex justify-between items-center text-sm border-t pt-4">
+                                <div className="flex items-center text-muted-foreground">
+                                <Users className="h-4 w-4 mr-2 text-primary" />
+                                <span>{course.studentCount || 0} students</span>
+                                </div>
+                                
+                                <div className="flex gap-2">
+                                <Button 
+                                    variant="ghost" 
+                                    size="icon"
+                                    onClick={(e) => handleOpenEditDialog(e, course)}
+                                    className="h-9 w-9 rounded-lg hover:bg-primary/10"
+                                >
+                                    <Edit3 size={16} className="text-primary" />
+                                </Button>
+                                <Button 
+                                    variant="ghost" 
+                                    size="icon"
+                                    onClick={(e) => handleOpenDeleteDialog(e, course.id)}
+                                    className="h-9 w-9 rounded-lg hover:bg-red-50"
+                                >
+                                    <Trash2 size={16} className="text-red-500" />
+                                </Button>
+                                </div>
                             </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </Link>
+                            </CardContent>
+                        </Card>
+                        </Link>
+                    </div>
                   ))}
                 </div>
               </div>
