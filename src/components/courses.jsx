@@ -37,6 +37,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import CourseBannerImage from './CourseBannerImage';
 import { useToast } from '@/hooks/use-toast';
+import { ToastAction } from "@/components/ui/toast"
 
 
 const getInitialCourses = () => {
@@ -385,19 +386,42 @@ export default function Courses() {
 
   const handleDeleteCourse = () => {
     if (courseToDeleteId) {
-      const courseName = courses.find(c => c.id === courseToDeleteId)?.name || 'the course';
-      courseStore = courseStore.filter(c => c.id !== courseToDeleteId);
-      setCourses(courseStore);
-      updateLocalStorage(courseStore);
-      setCourseToDeleteId(null);
-      toast({
-          title: "Course Deleted",
-          description: `Successfully deleted "${courseName}".`,
-          variant: "destructive"
-      });
+        const courseToDelete = courseStore.find(c => c.id === courseToDeleteId);
+        if (!courseToDelete) return;
+
+        const originalCourses = [...courseStore];
+        const courseName = courseToDelete.name;
+
+        // Optimistically update UI
+        courseStore = courseStore.filter(c => c.id !== courseToDeleteId);
+        setCourses(courseStore);
+        updateLocalStorage(courseStore);
+        setCourseToDeleteId(null);
+        
+        const handleUndo = () => {
+            courseStore = originalCourses;
+            setCourses(courseStore);
+            updateLocalStorage(courseStore);
+            toast({
+                title: "Undo Successful",
+                description: `The course "${courseName}" has been restored.`,
+            });
+        };
+
+        toast({
+            title: "Course Deleted",
+            description: `Successfully deleted "${courseName}".`,
+            variant: "destructive",
+            action: (
+                <ToastAction altText="Undo" onClick={handleUndo}>
+                    Undo
+                </ToastAction>
+            ),
+        });
     }
     setDeleteDialogOpen(false);
-  };
+};
+
 
   const getSortLabel = (option) => {
     switch(`${option.key}-${option.order}`) {
@@ -701,3 +725,5 @@ export default function Courses() {
     </div>
   );
 }
+
+    
