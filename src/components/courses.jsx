@@ -4,7 +4,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Book, PlusCircle, Search, Filter, Calendar, Users, Clock, Edit3, Trash2, ArrowUp, ArrowDown, ChevronsUpDown, BarChart3, TrendingUp, Award, Target, CheckSquare, Edit, GraduationCap, X, Check } from 'lucide-react';
+import { Book, PlusCircle, Search, Filter, Calendar, Users, Clock, Edit3, Trash2, ArrowUp, ArrowDown, ChevronsUpDown, BarChart3, TrendingUp, Award, Target, CheckSquare, Edit, GraduationCap, X, Check, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import CreateCourseDialog from './create-course-dialog';
 import EditCourseDialog from './edit-course-dialog';
@@ -36,6 +36,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import CourseBannerImage from './CourseBannerImage';
+import { useToast } from '@/hooks/use-toast';
 
 
 const getInitialCourses = () => {
@@ -159,6 +160,7 @@ export default function Courses() {
   const [isProfileDialogOpen, setProfileDialogOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [courseToDeleteId, setCourseToDeleteId] = useState(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     courseStore = getInitialCourses();
@@ -341,6 +343,11 @@ export default function Courses() {
     courseStore = [...courseStore, newCourseWithId];
     setCourses(courseStore);
     updateLocalStorage(courseStore);
+    toast({
+        title: "Course Created",
+        description: `The course "${newCourseWithId.name}" has been successfully created.`,
+        action: <CheckCircle className="text-green-500" />,
+    });
   };
 
   const handleOpenEditDialog = (e, course) => {
@@ -357,6 +364,11 @@ export default function Courses() {
     setCourses(courseStore);
     updateLocalStorage(courseStore);
     setSelectedCourse(null);
+    toast({
+        title: "Course Updated",
+        description: `The course "${updatedCourse.name}" has been successfully updated.`,
+        action: <CheckCircle className="text-green-500" />,
+    });
   };
 
   const handleUpdateProfile = (updatedProfile) => {
@@ -373,10 +385,16 @@ export default function Courses() {
 
   const handleDeleteCourse = () => {
     if (courseToDeleteId) {
+      const courseName = courses.find(c => c.id === courseToDeleteId)?.name || 'the course';
       courseStore = courseStore.filter(c => c.id !== courseToDeleteId);
       setCourses(courseStore);
       updateLocalStorage(courseStore);
       setCourseToDeleteId(null);
+      toast({
+          title: "Course Deleted",
+          description: `Successfully deleted "${courseName}".`,
+          variant: "destructive"
+      });
     }
     setDeleteDialogOpen(false);
   };
@@ -683,3 +701,5 @@ export default function Courses() {
     </div>
   );
 }
+
+    
