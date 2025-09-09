@@ -93,6 +93,20 @@ export default function LandingPage() {
           </div>
         </div>
       </main>
+
+      <div className="bg-sky-100 mt-12 py-12">
+        <div className="container mx-auto px-6 text-center animate-fade-in">
+          <Image
+            src="https://itc.edu.kh/wp-content/uploads/2022/08/ams_itc2.png"
+            width={800}
+            height={150}
+            alt="Partner logos"
+            className="mx-auto"
+            data-ai-hint="partner logos"
+          />
+        </div>
+      </div>
+      
       <style jsx>{`
         body {
           background-color: hsl(var(--pastel-beige));

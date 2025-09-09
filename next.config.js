@@ -50,6 +50,12 @@ const nextConfig = {
         hostname: 'static.fandomspot.com',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'itc.edu.kh',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
