@@ -16,14 +16,20 @@ const COLORS = {
 const CustomTick = ({ x, y, payload }) => {
   if (payload && payload.value) {
     const label = payload.value;
-    const maxChars = 10; // Character limit before font size starts to scale
-    const baseFontSize = 12; // Base font size for labels
-    const minFontSize = 8; // Minimum font size
+    const shortThreshold = 8;
+    const longThreshold = 12;
+    const baseFontSize = 12;
+    const minFontSize = 8;
+    const maxFontSize = 14;
 
     let fontSize = baseFontSize;
-    if (label.length > maxChars) {
+
+    if (label.length > longThreshold) {
       // Scale font size down for longer labels
-      fontSize = Math.max(minFontSize, baseFontSize - (label.length - maxChars) * 0.5);
+      fontSize = Math.max(minFontSize, baseFontSize - (label.length - longThreshold) * 0.5);
+    } else if (label.length < shortThreshold) {
+      // Scale font size up for shorter labels
+      fontSize = Math.min(maxFontSize, baseFontSize + (shortThreshold - label.length) * 0.5);
     }
     
     // Simple logic to split into two lines if very long
