@@ -372,7 +372,7 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <DialogTitle>Are you absolutely sure?</DialogTitle>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
               This action cannot be undone. This will permanently delete this student and all their attendance data.
             </AlertDialogDescription>
