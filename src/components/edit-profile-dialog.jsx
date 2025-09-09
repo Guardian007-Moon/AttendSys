@@ -54,7 +54,13 @@ export default function EditProfileDialog({
   }, [profile, form]);
 
   const onSubmit = (values) => {
-    onProfileUpdate(values);
+    const profileToUpdate = { ...values };
+    // If the imageUrl is empty, we don't want to save an empty string.
+    // The parent component will handle setting a default.
+    if (!profileToUpdate.imageUrl) {
+        profileToUpdate.imageUrl = '';
+    }
+    onProfileUpdate(profileToUpdate);
     onOpenChange(false);
   };
 
@@ -105,7 +111,7 @@ export default function EditProfileDialog({
                 <FormItem>
                   <FormLabel>Profile Image URL</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRrUOSIITmnZ4p1hDWqtHa9tf_eyhK51Q2aFA&s" {...field} />
+                    <Input placeholder="https://... (leave blank for default)" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -127,5 +133,3 @@ export default function EditProfileDialog({
     </Dialog>
   );
 }
-
-    

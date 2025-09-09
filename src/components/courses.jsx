@@ -393,8 +393,12 @@ export default function Courses() {
   };
 
   const handleUpdateProfile = (updatedProfile) => {
-    setProfile(updatedProfile);
-    updateProfileLocalStorage(updatedProfile);
+    const profileToSave = { ...updatedProfile };
+    if (!profileToSave.imageUrl) {
+        profileToSave.imageUrl = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSf_hA0y1cQ_H8FCo_H2yX49J1H2kRGAE0ORQ&s';
+    }
+    setProfile(profileToSave);
+    updateProfileLocalStorage(profileToSave);
   };
 
   const handleOpenDeleteDialog = (e, courseId) => {
@@ -462,13 +466,13 @@ export default function Courses() {
           <div className="max-w-7xl mx-auto px-6">
               <Card className="card card-hover rounded-xl border-0 overflow-hidden animate-fade-in">
                   <CardContent className="p-5 flex items-center gap-6">
-                      <Image
-                      src={profile.imageUrl || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSf_hA0y1cQ_H8FCo_H2yX49J1H2kRGAE0ORQ&s"}
-                      width={80}
-                      height={80}
-                      alt="Teacher Profile Picture"
-                      className="rounded-full border-4 border-white shadow-md object-cover"
-                      data-ai-hint="teacher profile"
+                      <CourseBannerImage
+                        src={profile.imageUrl}
+                        width={80}
+                        height={80}
+                        alt="Teacher Profile Picture"
+                        className="rounded-full border-4 border-white shadow-md object-cover"
+                        data-ai-hint="teacher profile"
                       />
                       <div className="flex-1">
                       <h2 className="text-2xl font-bold">Welcome Back, professor {profile.name}!</h2>
