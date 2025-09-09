@@ -5,7 +5,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Book, PlusCircle, Search, Filter, Calendar, Users, Clock, Edit3, Trash2, ArrowUp, ArrowDown, ChevronsUpDown, BarChart3, TrendingUp, Award, Target, CheckSquare, Edit, GraduationCap, X, Check, CheckCircle, RefreshCw } from 'lucide-react';
+import { Book, PlusCircle, Search, Filter, Calendar, Users, Clock, Edit3, Trash2, ArrowUp, ArrowDown, ChevronsUpDown, BarChart3, TrendingUp, Award, Target, CheckSquare, Edit, GraduationCap, X, Check, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import CreateCourseDialog from './create-course-dialog';
 import EditCourseDialog from './edit-course-dialog';
@@ -396,17 +396,6 @@ export default function Courses() {
     setProfile(updatedProfile);
     updateProfileLocalStorage(updatedProfile);
   };
-  
-  const handleResetProfile = () => {
-    if (typeof window !== 'undefined') {
-        localStorage.removeItem('teacherProfile');
-        setProfile(getInitialProfile());
-        toast({
-            title: "Profile Reset",
-            description: "Your profile has been reset to the default values.",
-        });
-    }
-  };
 
   const handleOpenDeleteDialog = (e, courseId) => {
     e.stopPropagation();
@@ -490,9 +479,6 @@ export default function Courses() {
                       <div>
                         <Button variant="ghost" size="icon" onClick={() => setProfileDialogOpen(true)}>
                             <Edit className="h-5 w-5" />
-                        </Button>
-                         <Button variant="ghost" size="icon" onClick={handleResetProfile}>
-                            <RefreshCw className="h-5 w-5" />
                         </Button>
                       </div>
                   </CardContent>
