@@ -1,4 +1,3 @@
-
 'use client';
 
 import { createContext, useState, useContext } from 'react';
@@ -6,8 +5,8 @@ import { createContext, useState, useContext } from 'react';
 const PageTransitionContext = createContext();
 
 export const PageTransitionProvider = ({ children }) => {
-  // Start with transitioning as false. The controller will manage this state.
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  // Start with transitioning as true. The controller will hide it once the page is ready.
+  const [isTransitioning, setIsTransitioning] = useState(true);
 
   return (
     <PageTransitionContext.Provider value={{ isTransitioning, setIsTransitioning }}>

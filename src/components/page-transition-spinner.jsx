@@ -1,4 +1,3 @@
-
 'use client';
 
 import { usePageTransition } from '@/context/PageTransitionContext';
@@ -8,31 +7,15 @@ import { useState, useEffect } from 'react';
 
 function Spinner() {
   const { isTransitioning } = usePageTransition();
-  const [shouldRender, setShouldRender] = useState(false);
 
-  // This effect ensures the spinner doesn't cause a hydration mismatch
-  // and correctly handles the fade-out animation.
-  useEffect(() => {
-    let timeout;
-    if (isTransitioning) {
-      setShouldRender(true);
-    } else {
-      // Delay hiding to allow for the fade-out animation to complete
-      timeout = setTimeout(() => setShouldRender(false), 500);
-    }
-    return () => clearTimeout(timeout);
-  }, [isTransitioning]);
-
-  // Don't render anything on the server or if it shouldn't be visible.
-  if (!shouldRender) {
+  if (!isTransitioning) {
     return null;
   }
-
+  
   return (
     <div
       className={cn(
-        'fixed inset-0 z-[999] flex flex-col items-center justify-center bg-background/95 backdrop-blur-sm transition-opacity duration-500 ease-in-out',
-        // We control visibility with the isTransitioning state
+        'fixed inset-0 z-[999] flex flex-col items-center justify-center bg-background/95 backdrop-blur-sm transition-opacity duration-300 ease-in-out',
         isTransitioning ? 'opacity-100' : 'opacity-0 pointer-events-none'
       )}
     >
