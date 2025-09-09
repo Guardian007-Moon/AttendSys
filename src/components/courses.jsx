@@ -471,7 +471,7 @@ export default function Courses() {
                       data-ai-hint="teacher profile"
                       />
                       <div className="flex-1">
-                      <h2 className="text-2xl font-bold">Welcome Back, {profile.name} professor!</h2>
+                      <h2 className="text-2xl font-bold">Welcome Back, professor {profile.name}!</h2>
                       <p className="text-muted-foreground mt-1">
                           {profile.summary}
                       </p>
