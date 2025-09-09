@@ -443,7 +443,7 @@ export default function Courses() {
               <Card className="card card-hover rounded-xl border-0 overflow-hidden animate-fade-in">
                   <CardContent className="p-5 flex items-center gap-6">
                       <Image
-                      src={profile.imageUrl || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&h=200&auto=format&fit=crop"}
+                      src={profile.imageUrl || "https://static.fandomspot.com/images/07/8067/00-featured-glenn-radars-akashic-records-of-a-bastard-instructor.jpg"}
                       width={80}
                       height={80}
                       alt="Teacher Profile Picture"
@@ -729,4 +729,5 @@ export default function Courses() {
     
 
     
+
 
