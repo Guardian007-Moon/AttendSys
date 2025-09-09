@@ -6,15 +6,18 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { School, User, Lock, CheckCircle, Activity, FileText, Smartphone, Loader2 } from 'lucide-react';
 import Head from 'next/head';
+import { usePageTransition } from '@/context/PageTransitionContext';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { setIsTransitioning } = usePageTransition();
   const [isLoading, setIsLoading] = useState(false);
   const [username, setUsername] = useState('');
 
   const handleSubmit = (event) => {
     event.preventDefault();
     setIsLoading(true);
+    setIsTransitioning(true); // Start transition before navigation
 
     if (typeof window !== 'undefined') {
         localStorage.setItem('loggedInUsername', username);
