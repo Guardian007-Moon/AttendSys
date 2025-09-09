@@ -5,7 +5,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { loadAttendance } from '@/lib/mock-data';
 import { useMemo } from 'react';
-import { TrendingUp, PieChart as PieChartIcon, Users } from 'lucide-react';
+import { TrendingUp, PieChart as PieChartIcon, Users, UserSquare } from 'lucide-react';
 
 const COLORS = {
   Present: '#22c55e', // green-500
@@ -110,6 +110,43 @@ export default function AnalyticsDashboard({ students, sessions }) {
     { name: 'Late', value: overallAttendance.Late },
     { name: 'Absent', value: overallAttendance.Absent },
   ].filter(item => item.value > 0);
+  
+  const sexComparisonData = useMemo(() => {
+    if (!sessions.length || !students.length) return [];
+    const allAttendance = loadAttendance();
+
+    const sexData = {
+        Male: { Present: 0, Late: 0, Absent: 0 },
+        Female: { Present: 0, Late: 0, Absent: 0 }
+    };
+
+    students.forEach(student => {
+        let presentCount = 0;
+        let lateCount = 0;
+
+        sessions.forEach(session => {
+            const record = allAttendance[session.id] && allAttendance[session.id][student.id];
+            if (record) {
+                if(record.status === 'Present') presentCount++;
+                if(record.status === 'Late') lateCount++;
+            }
+        });
+        
+        const attended = presentCount + lateCount;
+        const absentCount = sessions.length - attended;
+
+        if (student.sex && sexData[student.sex]) {
+            sexData[student.sex].Present += presentCount;
+            sexData[student.sex].Late += lateCount;
+            sexData[student.sex].Absent += absentCount;
+        }
+    });
+
+    return [
+        { name: 'Male', ...sexData.Male },
+        { name: 'Female', ...sexData.Female }
+    ];
+  }, [sessions, students]);
 
   if (!sessions.length || !students.length) {
     return (
@@ -199,6 +236,37 @@ export default function AnalyticsDashboard({ students, sessions }) {
       </Card>
 
       <Card className="col-span-1 lg:col-span-1 shadow-lg">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <UserSquare className="h-6 w-6 text-primary" />
+            <CardTitle className="font-headline">Sex-Based Attendance</CardTitle>
+          </div>
+          <CardDescription>
+            Comparison of attendance records by student sex.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="h-[400px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={sexComparisonData} margin={{ top: 20, right: 20, left: 0, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--background))',
+                  borderColor: 'hsl(var(--border))',
+                }}
+              />
+              <Legend verticalAlign="top" align="right" />
+              <Bar dataKey="Present" fill={COLORS.Present} />
+              <Bar dataKey="Late" fill={COLORS.Late} />
+              <Bar dataKey="Absent" fill={COLORS.Absent} />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+       <Card className="col-span-1 lg:col-span-2 shadow-lg">
         <CardHeader>
           <div className="flex items-center gap-3">
             <Users className="h-6 w-6 text-primary" />
