@@ -1,7 +1,7 @@
 
 'use client';
-import { useState } from 'react';
-import { Download, PlusCircle, MoreVertical, Pencil, Trash2, Users } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Download, PlusCircle, MoreVertical, Pencil, Trash2, Users, Upload } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -53,6 +53,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
+import * as XLSX from 'xlsx';
 
 // Mock function to simulate generating and downloading a CSV report.
 const downloadReport = (data) => {
@@ -75,6 +77,8 @@ const downloadReport = (data) => {
 
 
 export default function StudentAttendanceDashboard({ students, sessions, onStudentUpdate, courseId }) {
+  const { toast } = useToast();
+  const fileInputRef = useRef(null);
   const [isStudentDialogOpen, setStudentDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [studentToDeleteId, setStudentToDeleteId] = useState(null);
@@ -113,6 +117,64 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
   const handleDownload = () => {
     downloadReport(attendanceData);
   }
+
+  const handleImportClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileImport = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const json = XLSX.utils.sheet_to_json(worksheet);
+
+        if (json.length === 0) {
+            toast({ variant: 'destructive', title: 'Import Failed', description: 'The selected file is empty.' });
+            return;
+        }
+        
+        const requiredHeaders = ['Name', 'Sex'];
+        const fileHeaders = Object.keys(json[0]);
+        const hasHeaders = requiredHeaders.every(h => fileHeaders.includes(h));
+
+        if (!hasHeaders) {
+            toast({ variant: 'destructive', title: 'Import Failed', description: `File must contain columns: ${requiredHeaders.join(', ')}.` });
+            return;
+        }
+
+        const newStudents = json.map((row, index) => ({
+          id: `S${Date.now()}_${index}`,
+          name: row.Name,
+          sex: row.Sex,
+          status: 'Absent'
+        })).filter(s => s.name && s.sex);
+
+        if (newStudents.length > 0) {
+            const existingStudentNames = new Set(students.map(s => s.name.toLowerCase()));
+            const uniqueNewStudents = newStudents.filter(s => !existingStudentNames.has(s.name.toLowerCase()));
+            
+            onStudentUpdate([...students, ...uniqueNewStudents]);
+            toast({ title: 'Import Successful', description: `${uniqueNewStudents.length} new students have been added.` });
+        } else {
+            toast({ variant: 'destructive', title: 'Import Failed', description: 'No valid student data found in the file.' });
+        }
+      } catch (error) {
+        console.error("Import error:", error);
+        toast({ variant: 'destructive', title: 'Import Failed', description: 'There was an error processing your file.' });
+      } finally {
+        // Reset file input
+        event.target.value = '';
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  };
 
   const openAddStudentDialog = () => {
     setEditingStudent(null);
@@ -174,6 +236,17 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
             </CardDescription>
         </div>
         <div className="flex gap-2">
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleFileImport}
+              className="hidden" 
+              accept=".xlsx, .xls, .csv"
+            />
+            <Button onClick={handleImportClick} variant="outline">
+              <Upload className="mr-2 h-4 w-4" />
+              Import from File
+            </Button>
             <Button onClick={openAddStudentDialog}>
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Add Student
@@ -300,9 +373,9 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
         <AlertDialogContent>
           <AlertDialogHeader>
             <DialogTitle>Are you absolutely sure?</DialogTitle>
-            <DialogDescription>
+            <AlertDialogDescription>
               This action cannot be undone. This will permanently delete this student and all their attendance data.
-            </DialogDescription>
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
