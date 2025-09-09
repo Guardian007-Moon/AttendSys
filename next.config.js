@@ -56,6 +56,12 @@ const nextConfig = {
         hostname: 'itc.edu.kh',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.pinimg.com',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
