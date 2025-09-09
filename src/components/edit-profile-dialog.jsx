@@ -75,7 +75,7 @@ export default function EditProfileDialog({
                 <FormItem>
                   <FormLabel>Full Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., 'Dr. Jane Doe'" {...field} />
+                    <Input placeholder="e.g., 'Professor Smith'" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -126,5 +126,8 @@ export default function EditProfileDialog({
     </Dialog>
   );
 }
+
+    
+
 
     

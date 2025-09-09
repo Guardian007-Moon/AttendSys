@@ -61,10 +61,10 @@ const getInitialCourses = () => {
 
 const getInitialProfile = () => {
     if (typeof window === 'undefined') {
-        return { name: 'Professor', summary: "You could write some introduction about yourself, your wisdoms for today or things to do. Have a productive day!", imageUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&h=200&auto=format&fit=crop' };
+        return { name: 'Professor', summary: "You could write some introduction about yourself, your wisdoms for today or things to do. Have a productive day!", imageUrl: 'https://static.fandomspot.com/images/07/8067/00-featured-glenn-radars-akashic-records-of-a-bastard-instructor.jpg' };
     }
     const storedProfile = localStorage.getItem('teacherProfile');
-    return storedProfile ? JSON.parse(storedProfile) : { name: 'Professor', summary: "You could write some introduction about yourself, your wisdoms for today or things to do. Have a productive day!", imageUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&h=200&auto=format&fit=crop' };
+    return storedProfile ? JSON.parse(storedProfile) : { name: 'Professor', summary: "You could write some introduction about yourself, your wisdoms for today or things to do. Have a productive day!", imageUrl: 'https://static.fandomspot.com/images/07/8067/00-featured-glenn-radars-akashic-records-of-a-bastard-instructor.jpg' };
 }
 
 let courseStore = [];
@@ -731,3 +731,6 @@ export default function Courses() {
     
 
 
+
+
+    
