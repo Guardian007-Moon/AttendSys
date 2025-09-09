@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { PlayCircle, ArrowRight, QrCode, CheckCircle } from 'lucide-react';
+import { PlayCircle, ArrowRight, QrCode, CheckCircle, School } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function LandingPage() {
@@ -11,7 +11,10 @@ export default function LandingPage() {
     <div className="min-h-screen bg-pastel-beige text-gray-800 font-sans">
       <div className="bg-white animate-fade-in">
         <header className="container mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="text-2xl font-bold text-black">AttendSys</div>
+          <div className="flex items-center space-x-2 text-2xl font-bold text-black">
+            <School className="h-8 w-8 text-blue-600" />
+            <span>AttendSys</span>
+          </div>
           
           <div className="flex items-center space-x-4">
             <Link href="/login" passHref>
