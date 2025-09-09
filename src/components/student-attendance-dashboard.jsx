@@ -46,13 +46,20 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 // Mock function to simulate generating and downloading a CSV report.
 const downloadReport = (data) => {
-  const headers = ['Student Name', 'Present', 'Late', 'Present (always)', 'Absent', 'Total Sessions'];
+  const headers = ['Student Name', 'Sex', 'Present', 'Late', 'Present (always)', 'Absent', 'Total Sessions'];
   const csvRows = [
     headers.join(','),
-    ...data.map(row => [row.name, row.present, row.late, row.presentAlways, row.absent, row.total].join(',')),
+    ...data.map(row => [row.name, row.sex, row.present, row.late, row.presentAlways, row.absent, row.total].join(',')),
   ];
   
   const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
@@ -73,6 +80,7 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
   const [studentToDeleteId, setStudentToDeleteId] = useState(null);
   const [editingStudent, setEditingStudent] = useState(null);
   const [studentName, setStudentName] = useState('');
+  const [studentSex, setStudentSex] = useState('');
 
   const sessionAttendance = loadAttendance();
   const attendanceData = students.map(student => {
@@ -93,6 +101,7 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
     return {
       id: student.id,
       name: student.name,
+      sex: student.sex,
       present: present,
       late: late,
       presentAlways: attended,
@@ -108,29 +117,32 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
   const openAddStudentDialog = () => {
     setEditingStudent(null);
     setStudentName('');
+    setStudentSex('');
     setStudentDialogOpen(true);
   };
 
   const openEditStudentDialog = (student) => {
     setEditingStudent(student);
     setStudentName(student.name);
+    setStudentSex(student.sex);
     setStudentDialogOpen(true);
   };
 
   const handleSaveStudent = () => {
-    if (!studentName.trim()) return;
+    if (!studentName.trim() || !studentSex) return;
 
     if (editingStudent) {
       const updatedStudents = students.map(s =>
-        s.id === editingStudent.id ? { ...s, name: studentName } : s
+        s.id === editingStudent.id ? { ...s, name: studentName, sex: studentSex } : s
       );
       onStudentUpdate(updatedStudents);
     } else {
-      const newStudent = { id: `S${Date.now()}`, name: studentName, status: 'Absent' };
+      const newStudent = { id: `S${Date.now()}`, name: studentName, sex: studentSex, status: 'Absent' };
       onStudentUpdate([...students, newStudent]);
     }
     setStudentDialogOpen(false);
     setStudentName('');
+    setStudentSex('');
     setEditingStudent(null);
   };
 
@@ -178,6 +190,7 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
             <TableHeader className="sticky top-0 bg-card">
               <TableRow>
                 <TableHead>Student Name</TableHead>
+                <TableHead>Sex</TableHead>
                 <TableHead className="text-center">Present</TableHead>
                 <TableHead className="text-center">Late</TableHead>
                 <TableHead className="text-center">Present (always)</TableHead>
@@ -189,7 +202,7 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
             <TableBody>
               {students.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan="7" className="h-24 text-center">
+                  <TableCell colSpan="8" className="h-24 text-center">
                     No students in this course yet. Click "Add Student" to get started.
                   </TableCell>
                 </TableRow>
@@ -197,6 +210,7 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
                 attendanceData.map(student => (
                   <TableRow key={student.id}>
                     <TableCell className="font-medium">{student.name}</TableCell>
+                    <TableCell>{student.sex}</TableCell>
                     <TableCell className="text-center text-green-600 font-semibold">{student.present}</TableCell>
                     <TableCell className="text-center text-yellow-500 font-semibold">{student.late}</TableCell>
                     <TableCell className="text-center font-bold">{student.presentAlways}</TableCell>
@@ -238,17 +252,31 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
           <DialogHeader>
             <DialogTitle>{editingStudent ? 'Edit Student' : 'Add New Student'}</DialogTitle>
             <DialogDescription>
-              Enter the student's full name.
+              Enter the student's full name and select their sex.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-2 py-4">
-              <Label htmlFor="student-name">Student Name</Label>
-              <Input 
-                id="student-name"
-                value={studentName}
-                onChange={(e) => setStudentName(e.target.value)}
-                placeholder="e.g., 'John Doe'"
-              />
+          <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="student-name">Student Name</Label>
+                <Input 
+                  id="student-name"
+                  value={studentName}
+                  onChange={(e) => setStudentName(e.target.value)}
+                  placeholder="e.g., 'John Doe'"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="student-sex">Sex</Label>
+                 <Select onValueChange={setStudentSex} value={studentSex}>
+                    <SelectTrigger id="student-sex">
+                      <SelectValue placeholder="Select sex" />
+                    </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Male">Male</SelectItem>
+                    <SelectItem value="Female">Female</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
           </div>
           <DialogFooter>
             <Button
@@ -272,9 +300,9 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
         <AlertDialogContent>
           <AlertDialogHeader>
             <DialogTitle>Are you absolutely sure?</DialogTitle>
-            <AlertDialogDescription>
+            <DialogDescription>
               This action cannot be undone. This will permanently delete this student and all their attendance data.
-            </AlertDialogDescription>
+            </DialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
