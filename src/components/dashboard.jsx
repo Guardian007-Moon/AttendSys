@@ -26,6 +26,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { initialCourses, initialCourseStudents, loadAttendance, saveAttendance, initialSessions } from '@/lib/mock-data';
+import { ToastAction } from "@/components/ui/toast"
 
 const getInitialSessions = (courseId) => {
   if (typeof window === 'undefined') return [];
@@ -168,21 +169,41 @@ export default function Dashboard({ courseId }) {
 
   const handleDeleteSession = () => {
     if (sessionToDeleteId) {
-      const sessionToDelete = sessionStore.find(s => s.id === sessionToDeleteId);
-      const sessionName = sessionToDelete ? sessionToDelete.name : 'the session';
+        const originalSessions = [...sessionStore];
+        const sessionToDelete = sessionStore.find(s => s.id === sessionToDeleteId);
+        if (!sessionToDelete) return;
 
-      sessionStore = sessionStore.filter(s => s.id !== sessionToDeleteId);
-      setSessions(sessionStore);
-      updateSessionsLocalStorage(sessionStore);
-      setSessionToDeleteId(null);
-      toast({
-        variant: "destructive",
-        title: "Class Session Deleted",
-        description: `The session "${sessionName}" has been permanently deleted.`,
-      });
+        const sessionName = sessionToDelete.name;
+
+        // Optimistically update UI
+        sessionStore = sessionStore.filter(s => s.id !== sessionToDeleteId);
+        setSessions(sessionStore);
+        updateSessionsLocalStorage(sessionStore);
+        setSessionToDeleteId(null);
+
+        const handleUndo = () => {
+            sessionStore = originalSessions;
+            setSessions(sessionStore);
+            updateSessionsLocalStorage(sessionStore);
+            toast({
+                title: "Undo Successful",
+                description: `The session "${sessionName}" has been restored.`,
+            });
+        };
+
+        toast({
+            variant: "destructive",
+            title: "Class Session Deleted",
+            description: `The session "${sessionName}" has been deleted.`,
+            action: (
+                <ToastAction altText="Undo" onClick={handleUndo}>
+                    Undo
+                </ToastAction>
+            ),
+        });
     }
     setDeleteDialogOpen(false);
-  };
+};
 
   const handleStudentUpdate = (updatedStudents) => {
     studentStore = updatedStudents;
@@ -196,7 +217,9 @@ export default function Dashboard({ courseId }) {
   const totalStudents = students.length;
   const averageAttendance = sessions.length > 0 ? Math.round((sessions.reduce((acc, session) => {
     const attendance = loadAttendance()[session.id] || {};
-    return acc + (Object.keys(attendance).filter(id => attendance[id].status !== 'Absent').length / students.length) * 100;
+    const presentCount = Object.keys(attendance).filter(id => attendance[id].status !== 'Absent').length;
+    const studentCount = students.length > 0 ? students.length : 1;
+    return acc + (presentCount / studentCount) * 100;
   }, 0) / sessions.length)) : 0;
 
   return (
@@ -396,7 +419,7 @@ export default function Dashboard({ courseId }) {
             >
               Delete Session
             </AlertDialogAction>
-            <AlertDialogCancel className="flex-1 bg-white hover:bg-gray-100 text-gray-700 py-3 px-4 rounded-lg font-medium border border-gray-300 transition-colors duration-200">
+            <AlertDialogCancel className="flex-1 bg-white hover:bg-green-100 text-gray-700 py-3 px-4 rounded-lg font-medium border border-gray-300 transition-colors duration-200">
               Cancel
             </AlertDialogCancel>
           </div>
