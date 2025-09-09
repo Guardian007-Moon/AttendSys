@@ -12,7 +12,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -26,6 +26,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useToast } from "@/hooks/use-toast"
 import { Label } from '@/components/ui/label';
+import { Upload } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const profileSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters.'),
@@ -174,11 +176,17 @@ export default function EditProfileDialog({
                <FormItem>
                   <FormControl>
                     <Input 
+                      id="picture"
                       type="file" 
                       accept="image/png, image/jpeg, image/gif"
                       onChange={handleFileChange}
+                      className="hidden"
                     />
                   </FormControl>
+                  <Label htmlFor="picture" className={cn(buttonVariants({ variant: "outline" }), "cursor-pointer")}>
+                     <Upload className="mr-2 h-4 w-4" />
+                     Choose File
+                  </Label>
                   <FormMessage />
                 </FormItem>
             )}
