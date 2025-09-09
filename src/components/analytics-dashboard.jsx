@@ -11,6 +11,7 @@ const COLORS = {
   Present: '#22c55e', // green-500
   Late: '#f59e0b',    // amber-500
   Absent: '#ef4444',  // red-500
+  Total: '#3b82f6', // blue-500
 };
 
 const CustomTick = ({ x, y, payload }) => {
@@ -116,9 +117,16 @@ export default function AnalyticsDashboard({ students, sessions }) {
     const allAttendance = loadAttendance();
 
     const sexData = {
-        Male: { Present: 0, Late: 0, Absent: 0 },
-        Female: { Present: 0, Late: 0, Absent: 0 }
+        Male: { Present: 0, Late: 0, Absent: 0, Total: 0 },
+        Female: { Present: 0, Late: 0, Absent: 0, Total: 0 }
     };
+    
+    const totalMales = students.filter(s => s.sex === 'Male').length;
+    const totalFemales = students.filter(s => s.sex === 'Female').length;
+    
+    sexData.Male.Total = totalMales;
+    sexData.Female.Total = totalFemales;
+
 
     students.forEach(student => {
         let presentCount = 0;
@@ -258,6 +266,7 @@ export default function AnalyticsDashboard({ students, sessions }) {
                 }}
               />
               <Legend verticalAlign="top" align="right" />
+              <Bar dataKey="Total" name="Total Students" fill={COLORS.Total} />
               <Bar dataKey="Present" fill={COLORS.Present} />
               <Bar dataKey="Late" fill={COLORS.Late} />
               <Bar dataKey="Absent" fill={COLORS.Absent} />
