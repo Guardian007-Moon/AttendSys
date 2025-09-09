@@ -1,7 +1,7 @@
 
 'use client';
 import { useState, useRef } from 'react';
-import { Download, PlusCircle, MoreVertical, Pencil, Trash2, Users, Upload } from 'lucide-react';
+import { Download, PlusCircle, MoreVertical, Pencil, Trash2, Users, Upload, User, UserSquare, Hash } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -84,6 +84,7 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
   const [studentToDeleteId, setStudentToDeleteId] = useState(null);
   const [editingStudent, setEditingStudent] = useState(null);
   const [studentName, setStudentName] = useState('');
+  const [studentId, setStudentId] = useState('');
   const [studentSex, setStudentSex] = useState('');
 
   const sessionAttendance = loadAttendance();
@@ -140,7 +141,7 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
             return;
         }
         
-        const requiredHeaders = ['Name', 'Sex'];
+        const requiredHeaders = ['Name', 'Sex', 'ID'];
         const fileHeaders = Object.keys(json[0]);
         const hasHeaders = requiredHeaders.every(h => fileHeaders.includes(h));
 
@@ -150,15 +151,15 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
         }
 
         const newStudents = json.map((row, index) => ({
-          id: `S${Date.now()}_${index}`,
+          id: row.ID || `S_IMPORT_${Date.now()}_${index}`,
           name: row.Name,
           sex: row.Sex,
           status: 'Absent'
-        })).filter(s => s.name && s.sex);
+        })).filter(s => s.name && s.sex && s.id);
 
         if (newStudents.length > 0) {
-            const existingStudentNames = new Set(students.map(s => s.name.toLowerCase()));
-            const uniqueNewStudents = newStudents.filter(s => !existingStudentNames.has(s.name.toLowerCase()));
+            const existingStudentIds = new Set(students.map(s => s.id.toLowerCase()));
+            const uniqueNewStudents = newStudents.filter(s => !existingStudentIds.has(s.id.toLowerCase()));
             
             onStudentUpdate([...students, ...uniqueNewStudents]);
             toast({ title: 'Import Successful', description: `${uniqueNewStudents.length} new students have been added.` });
@@ -179,6 +180,7 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
   const openAddStudentDialog = () => {
     setEditingStudent(null);
     setStudentName('');
+    setStudentId('');
     setStudentSex('');
     setStudentDialogOpen(true);
   };
@@ -186,26 +188,36 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
   const openEditStudentDialog = (student) => {
     setEditingStudent(student);
     setStudentName(student.name);
+    setStudentId(student.id);
     setStudentSex(student.sex);
     setStudentDialogOpen(true);
   };
 
   const handleSaveStudent = () => {
-    if (!studentName.trim() || !studentSex) return;
+    if (!studentName.trim() || !studentSex || !studentId.trim()) {
+        toast({ variant: 'destructive', title: 'Validation Error', description: 'Please fill out all fields.' });
+        return;
+    }
+
+    const isIdDuplicate = students.some(
+        (s) => s.id.toLowerCase() === studentId.trim().toLowerCase() && s.id !== editingStudent?.id
+    );
+
+    if (isIdDuplicate) {
+        toast({ variant: 'destructive', title: 'Validation Error', description: 'This student ID is already in use.' });
+        return;
+    }
 
     if (editingStudent) {
       const updatedStudents = students.map(s =>
-        s.id === editingStudent.id ? { ...s, name: studentName, sex: studentSex } : s
+        s.id === editingStudent.id ? { ...s, name: studentName, id: studentId, sex: studentSex } : s
       );
       onStudentUpdate(updatedStudents);
     } else {
-      const newStudent = { id: `S${Date.now()}`, name: studentName, sex: studentSex, status: 'Absent' };
+      const newStudent = { id: studentId, name: studentName, sex: studentSex, status: 'Absent' };
       onStudentUpdate([...students, newStudent]);
     }
     setStudentDialogOpen(false);
-    setStudentName('');
-    setStudentSex('');
-    setEditingStudent(null);
   };
 
   const openDeleteDialog = (studentId) => {
@@ -323,51 +335,63 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
       </CardContent>
 
       <Dialog open={isStudentDialogOpen} onOpenChange={setStudentDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{editingStudent ? 'Edit Student' : 'Add New Student'}</DialogTitle>
-            <DialogDescription>
-              Enter the student's full name and select their sex.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="student-name">Student Name</Label>
-                <Input 
-                  id="student-name"
-                  value={studentName}
-                  onChange={(e) => setStudentName(e.target.value)}
-                  placeholder="e.g., 'John Doe'"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="student-sex">Sex</Label>
-                 <Select onValueChange={setStudentSex} value={studentSex}>
-                    <SelectTrigger id="student-sex">
-                      <SelectValue placeholder="Select sex" />
-                    </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Male">Male</SelectItem>
-                    <SelectItem value="Female">Female</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-          </div>
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setStudentDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button type="button" onClick={handleSaveStudent}>
-              {editingStudent ? 'Save Changes' : 'Add Student'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
+          <DialogContent className="sm:max-w-md bg-transparent border-0 shadow-none p-0">
+              <Card className="w-full">
+                  <DialogHeader className="p-6 pb-4">
+                      <DialogTitle className="text-xl flex items-center gap-2">
+                          <User className="h-5 w-5 text-primary" />
+                          {editingStudent ? 'Edit Student' : 'Add New Student'}
+                      </DialogTitle>
+                      <DialogDescription>
+                          {editingStudent ? 'Update the student\'s details below.' : 'Enter the details for the new student.'}
+                      </DialogDescription>
+                  </DialogHeader>
+                  <CardContent className="space-y-5 px-6">
+                      <div className="relative">
+                          <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                          <Input 
+                              id="student-id"
+                              value={studentId}
+                              onChange={(e) => setStudentId(e.target.value)}
+                              placeholder="Student ID"
+                              className="pl-10"
+                          />
+                      </div>
+                      <div className="relative">
+                          <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                          <Input 
+                              id="student-name"
+                              value={studentName}
+                              onChange={(e) => setStudentName(e.target.value)}
+                              placeholder="Full Name"
+                              className="pl-10"
+                          />
+                      </div>
+                      <div className="relative">
+                           <UserSquare className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                           <Select onValueChange={setStudentSex} value={studentSex}>
+                              <SelectTrigger id="student-sex" className="pl-10">
+                                <SelectValue placeholder="Select sex" />
+                              </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Male">Male</SelectItem>
+                              <SelectItem value="Female">Female</SelectItem>
+                            </SelectContent>
+                          </Select>
+                      </div>
+                  </CardContent>
+                  <DialogFooter className="px-6 py-4 bg-muted/50 rounded-b-lg">
+                      <Button variant="outline" onClick={() => setStudentDialogOpen(false)}>
+                          Cancel
+                      </Button>
+                      <Button onClick={handleSaveStudent}>
+                          {editingStudent ? 'Save Changes' : 'Add Student'}
+                      </Button>
+                  </DialogFooter>
+              </Card>
+          </DialogContent>
       </Dialog>
-      
+
       <AlertDialog
         open={isDeleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
