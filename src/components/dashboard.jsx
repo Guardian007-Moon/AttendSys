@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import PageTransitionLink from './PageTransitionLink';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle, ArrowLeft, Book, PlusCircle, Calendar, Users, BarChart3, Clock, TrendingUp } from 'lucide-react';
+import { CheckCircle, ArrowLeft, Book, PlusCircle, Calendar, Users, BarChart3, Clock, TrendingUp, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ClassSessionList from './class-session-list';
 import CreateClassSessionDialog from './create-class-session-dialog';
@@ -168,10 +168,18 @@ export default function Dashboard({ courseId }) {
 
   const handleDeleteSession = () => {
     if (sessionToDeleteId) {
+      const sessionToDelete = sessionStore.find(s => s.id === sessionToDeleteId);
+      const sessionName = sessionToDelete ? sessionToDelete.name : 'the session';
+
       sessionStore = sessionStore.filter(s => s.id !== sessionToDeleteId);
       setSessions(sessionStore);
       updateSessionsLocalStorage(sessionStore);
       setSessionToDeleteId(null);
+      toast({
+        variant: "destructive",
+        title: "Class Session Deleted",
+        description: `The session "${sessionName}" has been permanently deleted.`,
+      });
     }
     setDeleteDialogOpen(false);
   };
@@ -208,11 +216,11 @@ export default function Dashboard({ courseId }) {
                 <Book className="h-6 w-6 text-primary" />
               </div>
               <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-                Course: {course ? course.name : 'Loading...'}
+                {course ? course.name : 'Loading...'}
               </h1>
             </div>
             <p className="text-muted-foreground ml-11">
-              Code: {course ? course.code : `Course ID: ${courseId}`}
+              {course ? course.code : `Course ID: ${courseId}`}
             </p>
           </div>
           
@@ -367,7 +375,7 @@ export default function Dashboard({ courseId }) {
           <div className="p-6 text-center">
             <div className="mx-auto bg-red-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mb-5">
               <div className="bg-red-500 p-2 rounded-full">
-                <Calendar className="h-6 w-6 text-white" />
+                <Trash2 className="h-6 w-6 text-white" />
               </div>
             </div>
             
@@ -388,7 +396,7 @@ export default function Dashboard({ courseId }) {
             >
               Delete Session
             </AlertDialogAction>
-            <AlertDialogCancel className="flex-1 bg-white hover:bg-green-500 hover:text-white text-gray-700 py-3 px-4 rounded-lg font-medium border border-gray-300 transition-colors duration-200">
+            <AlertDialogCancel className="flex-1 bg-white hover:bg-gray-100 text-gray-700 py-3 px-4 rounded-lg font-medium border border-gray-300 transition-colors duration-200">
               Cancel
             </AlertDialogCancel>
           </div>
