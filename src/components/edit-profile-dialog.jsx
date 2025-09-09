@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect } from 'react';
@@ -104,7 +105,7 @@ export default function EditProfileDialog({
                 <FormItem>
                   <FormLabel>Profile Image URL</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://example.com/your-image.jpg" {...field} />
+                    <Input placeholder="https://static.fandomspot.com/images/07/8067/00-featured-glenn-radars-akashic-records-of-a-bastard-instructor.jpg" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -126,8 +127,3 @@ export default function EditProfileDialog({
     </Dialog>
   );
 }
-
-    
-
-
-    
