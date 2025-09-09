@@ -25,11 +25,11 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased">
         <PageTransitionProvider>
-          <Suspense fallback={<PageTransitionSpinner />}>
-            <PageTransitionController />
-          </Suspense>
+          {/* The controller is now a direct child of the provider */}
+          <PageTransitionController>
+            {children}
+          </PageTransitionController>
           <PageTransitionSpinner />
-          {children}
           <Toaster />
         </PageTransitionProvider>
       </body>
