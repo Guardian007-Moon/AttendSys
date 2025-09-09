@@ -166,17 +166,17 @@ export default function SessionDetails({ courseId, sessionId }) {
         </PageTransitionLink>
         
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
+           <div>
+            <div className="flex items-center gap-3 mb-1">
               <div className="bg-primary/10 p-2 rounded-xl">
                 <Calendar className="h-6 w-6 text-primary" />
               </div>
               <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-                Session: {sessionId}
+                Session: {session ? session.name : 'Loading...'}
               </h1>
             </div>
             <p className="text-muted-foreground ml-11">
-              Track and manage student attendance for this session
+              Code: {session ? session.id : `Session ID: ${sessionId}`}
             </p>
           </div>
           

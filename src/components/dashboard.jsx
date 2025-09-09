@@ -208,11 +208,11 @@ export default function Dashboard({ courseId }) {
                 <Book className="h-6 w-6 text-primary" />
               </div>
               <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-                {course ? course.name : 'Loading...'}
+                Course: {course ? course.name : 'Loading...'}
               </h1>
             </div>
             <p className="text-muted-foreground ml-11">
-              {course ? course.code : `Course ID: ${courseId}`}
+              Code: {course ? course.code : `Course ID: ${courseId}`}
             </p>
           </div>
           
