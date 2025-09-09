@@ -8,6 +8,23 @@ import { useState, useEffect } from 'react';
 
 function Spinner() {
   const { isTransitioning } = usePageTransition();
+  const [shouldRender, setShouldRender] = useState(isTransitioning);
+
+  useEffect(() => {
+    let timeout;
+    if (isTransitioning) {
+      setShouldRender(true);
+    } else {
+      // Delay hiding to allow for fade-out animation
+      timeout = setTimeout(() => setShouldRender(false), 500);
+    }
+    return () => clearTimeout(timeout);
+  }, [isTransitioning]);
+
+
+  if (!shouldRender) {
+    return null;
+  }
 
   return (
     <div
