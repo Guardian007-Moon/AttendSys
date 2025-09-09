@@ -26,7 +26,7 @@ export default function LoginPage() {
     // Simulate network delay then navigate
     setTimeout(() => {
       router.push('/courses');
-    }, 1000);
+    }, 500); // Reduced delay to make transition feel faster
   };
 
   return (

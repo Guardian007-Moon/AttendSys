@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -9,6 +10,8 @@ const PageTransitionLink = ({ href, children, ...props }) => {
   const pathname = usePathname();
 
   const handleClick = (e) => {
+    if (props.onClick) props.onClick(e);
+    
     // If the link is to the current page, don't trigger the transition
     if (href === pathname) return;
 

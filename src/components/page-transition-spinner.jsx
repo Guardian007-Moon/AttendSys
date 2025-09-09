@@ -1,17 +1,23 @@
+
 'use client';
 
 import { usePageTransition } from '@/context/PageTransitionContext';
 import { School } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
+import { usePathname, useSearchParams } from 'next/navigation';
 
 function Spinner() {
-  const { isTransitioning } = usePageTransition();
+  const { isTransitioning, setIsTransitioning } = usePageTransition();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  if (!isTransitioning) {
-    return null;
-  }
-  
+  useEffect(() => {
+    // Hide the spinner whenever the path changes, which means the new page is ready.
+    setIsTransitioning(false);
+  }, [pathname, searchParams, setIsTransitioning]);
+
+
   return (
     <div
       className={cn(
@@ -36,7 +42,7 @@ function Spinner() {
   );
 }
 
-// Wrapper to prevent SSR issues with the spinner
+// Wrapper to prevent SSR issues and hydration errors.
 export default function PageTransitionSpinner() {
   const [isClient, setIsClient] = useState(false);
 

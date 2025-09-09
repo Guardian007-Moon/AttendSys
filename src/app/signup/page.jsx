@@ -29,7 +29,7 @@ export default function SignupPage() {
       // In a real app, you would handle the signup logic here.
       // For this prototype, we'll just redirect to the courses page.
       router.push('/courses');
-    }, 1000);
+    }, 500); // Reduced delay
   };
 
   return (

@@ -3,7 +3,6 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 import { PageTransitionProvider } from '@/context/PageTransitionContext';
 import PageTransitionSpinner from '@/components/page-transition-spinner';
-import PageTransitionController from '@/components/page-transition-controller';
 import { Suspense } from 'react';
 
 export const metadata = {
@@ -26,9 +25,7 @@ export default function RootLayout({
       <body className="font-sans antialiased">
         <PageTransitionProvider>
             <Suspense fallback={<PageTransitionSpinner />}>
-                <PageTransitionController>
-                    {children}
-                </PageTransitionController>
+                {children}
             </Suspense>
             <PageTransitionSpinner />
             <Toaster />
