@@ -35,6 +35,12 @@ const nextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'encrypted-tbn2.gstatic.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
         hostname: 's3.ams.com.kh',
         port: '',
         pathname: '/**',
