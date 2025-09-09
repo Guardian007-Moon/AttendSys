@@ -10,10 +10,15 @@ import Head from 'next/head';
 export default function SignupPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [username, setUsername] = useState('');
 
   const handleSubmit = (event) => {
     event.preventDefault();
     setIsLoading(true);
+
+    if (typeof window !== 'undefined') {
+        localStorage.setItem('loggedInUsername', username);
+    }
 
     // Simulate network delay then navigate
     setTimeout(() => {
@@ -250,7 +255,15 @@ export default function SignupPage() {
             <form onSubmit={handleSubmit}>
               <div className="input-group">
                 <label htmlFor="fullname">Full Name</label>
-                <input type="text" id="fullname" placeholder="e.g., Professor Smith" required disabled={isLoading}/>
+                <input 
+                    type="text" 
+                    id="fullname" 
+                    placeholder="e.g., Professor Smith" 
+                    required 
+                    disabled={isLoading}
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                />
                 <User className="icon" />
               </div>
               <div className="input-group">
