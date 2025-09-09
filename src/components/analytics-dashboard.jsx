@@ -5,13 +5,14 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { loadAttendance } from '@/lib/mock-data';
 import { useMemo } from 'react';
-import { TrendingUp, PieChart as PieChartIcon, Users, UserSquare } from 'lucide-react';
+import { TrendingUp, PieChart as PieChartIcon, Users, UserSquare, Ratio } from 'lucide-react';
 
 const COLORS = {
   Present: '#22c55e', // green-500
   Late: '#f59e0b',    // amber-500
   Absent: '#ef4444',  // red-500
-  Total: '#3b82f6', // blue-500
+  Male: '#3b82f6',   // blue-500
+  Female: '#ec4899', // pink-500
 };
 
 const CustomTick = ({ x, y, payload }) => {
@@ -106,7 +107,7 @@ export default function AnalyticsDashboard({ students, sessions }) {
     };
   }, [sessions, students]);
 
-  const pieData = [
+  const overallPieData = [
     { name: 'Present', value: overallAttendance.Present },
     { name: 'Late', value: overallAttendance.Late },
     { name: 'Absent', value: overallAttendance.Absent },
@@ -117,16 +118,9 @@ export default function AnalyticsDashboard({ students, sessions }) {
     const allAttendance = loadAttendance();
 
     const sexData = {
-        Male: { Present: 0, Late: 0, Absent: 0, Total: 0 },
-        Female: { Present: 0, Late: 0, Absent: 0, Total: 0 }
+        Male: { Present: 0, Late: 0, Absent: 0 },
+        Female: { Present: 0, Late: 0, Absent: 0 }
     };
-    
-    const totalMales = students.filter(s => s.sex === 'Male').length;
-    const totalFemales = students.filter(s => s.sex === 'Female').length;
-    
-    sexData.Male.Total = totalMales;
-    sexData.Female.Total = totalFemales;
-
 
     students.forEach(student => {
         let presentCount = 0;
@@ -156,6 +150,16 @@ export default function AnalyticsDashboard({ students, sessions }) {
     ];
   }, [sessions, students]);
 
+  const sexDistributionData = useMemo(() => {
+      if (!students.length) return [];
+      const totalMales = students.filter(s => s.sex === 'Male').length;
+      const totalFemales = students.filter(s => s.sex === 'Female').length;
+      return [
+          { name: 'Male', value: totalMales },
+          { name: 'Female', value: totalFemales },
+      ].filter(item => item.value > 0);
+  }, [students]);
+
   if (!sessions.length || !students.length) {
     return (
       <Card>
@@ -172,8 +176,8 @@ export default function AnalyticsDashboard({ students, sessions }) {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <Card className="col-span-1 lg:col-span-2 shadow-lg">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <Card className="col-span-1 lg:col-span-3 shadow-lg">
         <CardHeader>
           <div className="flex items-center gap-3">
               <TrendingUp className="h-6 w-6 text-primary" />
@@ -218,7 +222,7 @@ export default function AnalyticsDashboard({ students, sessions }) {
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
-                data={pieData}
+                data={overallPieData}
                 cx="50%"
                 cy="50%"
                 labelLine={false}
@@ -227,7 +231,7 @@ export default function AnalyticsDashboard({ students, sessions }) {
                 fill="#8884d8"
                 dataKey="value"
               >
-                {pieData.map((entry, index) => (
+                {overallPieData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[entry.name]} />
                 ))}
               </Pie>
@@ -266,7 +270,6 @@ export default function AnalyticsDashboard({ students, sessions }) {
                 }}
               />
               <Legend verticalAlign="top" align="right" />
-              <Bar dataKey="Total" name="Total Students" fill={COLORS.Total} />
               <Bar dataKey="Present" fill={COLORS.Present} />
               <Bar dataKey="Late" fill={COLORS.Late} />
               <Bar dataKey="Absent" fill={COLORS.Absent} />
@@ -275,7 +278,46 @@ export default function AnalyticsDashboard({ students, sessions }) {
         </CardContent>
       </Card>
 
-       <Card className="col-span-1 lg:col-span-2 shadow-lg">
+      <Card className="col-span-1 lg:col-span-1 shadow-lg">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+              <Ratio className="h-6 w-6 text-primary" />
+              <CardTitle className="font-headline">Student Sex Ratio</CardTitle>
+          </div>
+          <CardDescription>
+            Distribution of students by sex in this course.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="h-[400px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={sexDistributionData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, percent, value }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
+                outerRadius={120}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {sexDistributionData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[entry.name]} />
+                ))}
+              </Pie>
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--background))',
+                  borderColor: 'hsl(var(--border))',
+                }}
+              />
+              <Legend verticalAlign="top" align="right" />
+            </PieChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+       <Card className="col-span-1 lg:col-span-3 shadow-lg">
         <CardHeader>
           <div className="flex items-center gap-3">
             <Users className="h-6 w-6 text-primary" />
