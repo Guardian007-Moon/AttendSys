@@ -1,5 +1,5 @@
 
-import Link from 'next/link';
+import PageTransitionLink from './PageTransitionLink';
 import {
   Card,
   CardContent,
@@ -64,12 +64,12 @@ export default function CourseList({ courses, onEdit, onDelete }) {
           </CardHeader>
           <CardContent className="flex-grow" />
           <CardFooter>
-            <Link href={`/courses/${course.id}`} passHref className="w-full">
+            <PageTransitionLink href={`/courses/${course.id}`} passHref className="w-full">
               <Button variant="outline" className="w-full">
                 View
                 <ArrowRight />
               </Button>
-            </Link>
+            </PageTransitionLink>
           </CardFooter>
         </Card>
       ))}

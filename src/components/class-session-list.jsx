@@ -1,5 +1,5 @@
 
-import Link from 'next/link';
+import PageTransitionLink from './PageTransitionLink';
 import { Clock, Eye, MoreVertical, Pencil, Trash2 } from 'lucide-react';
 import {
   Card,
@@ -119,11 +119,11 @@ export default function ClassSessionList({ sessions, courseId, onEdit, onDelete 
                             </div>
                             <div className="flex items-center gap-2">
                                 <Badge className={cn(status.className)}>{status.text}</Badge>
-                                <Link href={`/courses/${courseId}/sessions/${session.id}`} passHref>
+                                <PageTransitionLink href={`/courses/${courseId}/sessions/${session.id}`} passHref>
                                     <Button variant="outline" size="icon">
                                         <Eye className="h-4 w-4" />
                                     </Button>
-                                </Link>
+                                </PageTransitionLink>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button variant="ghost" size="icon">

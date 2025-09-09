@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import Link from 'next/link';
+import PageTransitionLink from './PageTransitionLink';
 import QRCode from "react-qr-code";
 import AttendanceCard from './attendance-card';
 import { ArrowLeft, Book, QrCode, Copy, CheckCircle, MapPin, Loader2, Calendar, Clock, Users, Wifi, WifiOff } from 'lucide-react';
@@ -158,12 +158,12 @@ export default function SessionDetails({ courseId, sessionId }) {
   return (
     <>
       <header className="mb-8">
-        <Link href={`/courses/${courseId}`} passHref>
+        <PageTransitionLink href={`/courses/${courseId}`} passHref>
           <Button variant="outline" className="mb-4 rounded-lg gap-2">
             <ArrowLeft className="h-4 w-4" />
             Back to Course
           </Button>
-        </Link>
+        </PageTransitionLink>
         
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
@@ -342,6 +342,3 @@ export default function SessionDetails({ courseId, sessionId }) {
     </>
   );
 }
-    
-
-    

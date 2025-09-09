@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import PageTransitionLink from '@/components/PageTransitionLink';
 import { School, User, Lock, Mail, CheckCircle, Activity, FileText, Smartphone, Loader2 } from 'lucide-react';
 import Head from 'next/head';
 
@@ -284,7 +284,7 @@ export default function SignupPage() {
             </form>
 
             <div className="login-link">
-              Already have an account? <Link href="/login">Sign In</Link>
+              Already have an account? <PageTransitionLink href="/login">Sign In</PageTransitionLink>
             </div>
             
           </div>

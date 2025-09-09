@@ -3,7 +3,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import Link from 'next/link';
+import PageTransitionLink from './PageTransitionLink';
 import Image from 'next/image';
 import { Book, PlusCircle, Search, Filter, Calendar, Users, Clock, Edit3, Trash2, ArrowUp, ArrowDown, ChevronsUpDown, BarChart3, TrendingUp, Award, Target, CheckSquare, Edit, GraduationCap, X, Check, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -62,7 +62,7 @@ const getInitialCourses = () => {
 
 const getInitialProfile = () => {
     if (typeof window === 'undefined') {
-        return { name: 'Professor', summary: "You could write some introduction about yourself, your wisdoms for today or things to do. Have a productive day!", imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRrUOSIITmnZ4p1hDWqtHa9tf_eyhK51Q2aFA&s' };
+        return { name: 'Professor', summary: "You could write some introduction about yourself, your wisdoms for today or things to do. Have a productive day!", imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSf_hA0y1cQ_H8FCo_H2yX49J1H2kRGAE0ORQ&s' };
     }
     const loggedInUsername = localStorage.getItem('loggedInUsername');
     const storedProfileRaw = localStorage.getItem('teacherProfile');
@@ -72,7 +72,7 @@ const getInitialProfile = () => {
         : { 
               name: 'Professor', 
               summary: "You could write some introduction about yourself, your wisdoms for today or things to do. Have a productive day!", 
-              imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRrUOSIITmnZ4p1hDWqtHa9tf_eyhK51Q2aFA&s' 
+              imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSf_hA0y1cQ_H8FCo_H2yX49J1H2kRGAE0ORQ&s' 
           };
 
     if (loggedInUsername) {
@@ -103,7 +103,7 @@ const Sorter = ({ onCheckedChange, checked, children }) => (
 const CourseCard = ({ course, onEdit, onDelete, index }) => {
     return (
         <div className="flex-shrink-0 w-full sm:w-[calc(50%-1rem)] md:w-[calc(33.333%-1rem)] lg:w-[calc(25%-1.125rem)]">
-            <Link href={`/courses/${course.id}`} className="block h-full">
+            <PageTransitionLink href={`/courses/${course.id}`} className="block h-full">
                 <Card 
                     className="card card-hover overflow-hidden border-0 rounded-xl h-full flex flex-col"
                     style={{ animationDelay: `${index * 0.05}s` }}
@@ -161,7 +161,7 @@ const CourseCard = ({ course, onEdit, onDelete, index }) => {
                         </div>
                     </CardContent>
                 </Card>
-            </Link>
+            </PageTransitionLink>
         </div>
     );
 };
@@ -463,7 +463,7 @@ export default function Courses() {
               <Card className="card card-hover rounded-xl border-0 overflow-hidden animate-fade-in">
                   <CardContent className="p-5 flex items-center gap-6">
                       <Image
-                      src={profile.imageUrl || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRrUOSIITmnZ4p1hDWqtHa9tf_eyhK51Q2aFA&s"}
+                      src={profile.imageUrl || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSf_hA0y1cQ_H8FCo_H2yX49J1H2kRGAE0ORQ&s"}
                       width={80}
                       height={80}
                       alt="Teacher Profile Picture"
@@ -747,5 +747,3 @@ export default function Courses() {
     </div>
   );
 }
-
-    

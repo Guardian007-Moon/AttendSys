@@ -1,7 +1,7 @@
 
 'use client';
 
-import Link from 'next/link';
+import PageTransitionLink from '@/components/PageTransitionLink';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, PlusCircle, QrCode, UserCheck, School } from 'lucide-react';
@@ -87,11 +87,11 @@ export default function LearnMorePage() {
             <div className="text-center animate-fade-in container mx-auto px-6">
                 <h2 className="text-3xl font-bold text-black">Ready to Simplify Attendance?</h2>
                 <p className="text-gray-600 mt-3 mb-6">Join hundreds of educators who are saving time and reducing classroom admin.</p>
-                 <Link href="/" passHref>
+                 <PageTransitionLink href="/" passHref>
                     <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-10 py-6 text-lg">
                         Get Started
                     </Button>
-                </Link>
+                </PageTransitionLink>
             </div>
         </div>
 

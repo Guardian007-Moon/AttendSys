@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import PageTransitionLink from './PageTransitionLink';
 import { useToast } from '@/hooks/use-toast';
 import { CheckCircle, ArrowLeft, Book, PlusCircle, Calendar, Users, BarChart3, Clock, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -186,12 +186,12 @@ export default function Dashboard({ courseId }) {
   return (
     <>
       <header className="mb-8">
-        <Link href="/courses" passHref>
+        <PageTransitionLink href="/courses" passHref>
           <Button variant="outline" className="mb-4 rounded-lg gap-2">
             <ArrowLeft className="h-4 w-4" />
             Back to Courses
           </Button>
-        </Link>
+        </PageTransitionLink>
         
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
