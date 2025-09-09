@@ -62,7 +62,7 @@ const getInitialCourses = () => {
 
 const getInitialProfile = () => {
     if (typeof window === 'undefined') {
-        return { name: 'Professor', summary: "You could write some introduction about yourself, your wisdoms for today or things to do. Have a productive day!", imageUrl: 'https://static.fandomspot.com/images/07/8067/00-featured-glenn-radars-akashic-records-of-a-bastard-instructor.jpg' };
+        return { name: 'Professor', summary: "You could write some introduction about yourself, your wisdoms for today or things to do. Have a productive day!", imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGu_9Y_Hn_2aK_2-i1G_aJ-jR_s-t_q-Yng&s' };
     }
     const loggedInUsername = localStorage.getItem('loggedInUsername');
     const storedProfileRaw = localStorage.getItem('teacherProfile');
@@ -72,17 +72,20 @@ const getInitialProfile = () => {
         : { 
               name: 'Professor', 
               summary: "You could write some introduction about yourself, your wisdoms for today or things to do. Have a productive day!", 
-              imageUrl: 'https://static.fandomspot.com/images/07/8067/00-featured-glenn-radars-akashic-records-of-a-bastard-instructor.jpg' 
+              imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGu_9Y_Hn_2aK_2-i1G_aJ-jR_s-t_q-Yng&s' 
           };
 
     if (loggedInUsername) {
+        // If a new user logs in, we update the name but keep the other potentially customized profile fields.
+        // If there's no existing profile, this just adds the name to the default profile.
         profile.name = loggedInUsername;
         localStorage.setItem('teacherProfile', JSON.stringify(profile));
-        localStorage.removeItem('loggedInUsername');
+        localStorage.removeItem('loggedInUsername'); // Clear the temporary username
     }
 
     return profile;
 }
+
 
 let courseStore = [];
 
@@ -471,7 +474,7 @@ export default function Courses() {
               <Card className="card card-hover rounded-xl border-0 overflow-hidden animate-fade-in">
                   <CardContent className="p-5 flex items-center gap-6">
                       <Image
-                      src={profile.imageUrl || "https://static.fandomspot.com/images/07/8067/00-featured-glenn-radars-akashic-records-of-a-bastard-instructor.jpg"}
+                      src={profile.imageUrl || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGu_9Y_Hn_2aK_2-i1G_aJ-jR_s-t_q-Yng&s"}
                       width={80}
                       height={80}
                       alt="Teacher Profile Picture"
