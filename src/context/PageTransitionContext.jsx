@@ -5,8 +5,7 @@ import { createContext, useState, useContext } from 'react';
 const PageTransitionContext = createContext();
 
 export const PageTransitionProvider = ({ children }) => {
-  // Start with transitioning as true. The controller will hide it once the page is ready.
-  const [isTransitioning, setIsTransitioning] = useState(true);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   return (
     <PageTransitionContext.Provider value={{ isTransitioning, setIsTransitioning }}>
