@@ -25,7 +25,7 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased">
         <PageTransitionProvider>
-          <Suspense fallback={null}>
+          <Suspense fallback={<PageTransitionSpinner />}>
             <PageTransitionController />
           </Suspense>
           <PageTransitionSpinner />
