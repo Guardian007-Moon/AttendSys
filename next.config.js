@@ -80,6 +80,12 @@ const nextConfig = {
         hostname: 'static.wikia.nocookie.net',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.stoichandbook.co',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
