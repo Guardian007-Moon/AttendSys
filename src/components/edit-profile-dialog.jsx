@@ -89,7 +89,7 @@ export default function EditProfileDialog({
                   <FormLabel>Portfolio Summary</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="e.g., 'A passionate educator with 10 years of experience...'"
+                      placeholder="You could write some introduction about yourself, your wisdoms for today or things to do. Have a productive day!"
                       {...field}
                     />
                   </FormControl>
@@ -126,3 +126,5 @@ export default function EditProfileDialog({
     </Dialog>
   );
 }
+
+    

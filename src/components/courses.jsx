@@ -61,10 +61,10 @@ const getInitialCourses = () => {
 
 const getInitialProfile = () => {
     if (typeof window === 'undefined') {
-        return { name: 'Professor', summary: "Here's your dashboard to manage courses, track attendance, and gain insights into student engagement. Have a productive day!", imageUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&h=200&auto=format&fit=crop' };
+        return { name: 'Professor', summary: "You could write some introduction about yourself, your wisdoms for today or things to do. Have a productive day!", imageUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&h=200&auto=format&fit=crop' };
     }
     const storedProfile = localStorage.getItem('teacherProfile');
-    return storedProfile ? JSON.parse(storedProfile) : { name: 'Professor', summary: "Here's your dashboard to manage courses, track attendance, and gain insights into student engagement. Have a productive day!", imageUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&h=200&auto=format&fit=crop' };
+    return storedProfile ? JSON.parse(storedProfile) : { name: 'Professor', summary: "You could write some introduction about yourself, your wisdoms for today or things to do. Have a productive day!", imageUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&h=200&auto=format&fit=crop' };
 }
 
 let courseStore = [];
@@ -451,7 +451,7 @@ export default function Courses() {
                       data-ai-hint="teacher profile"
                       />
                       <div className="flex-1">
-                      <h2 className="text-2xl font-bold">Welcome Back, {profile.name}!</h2>
+                      <h2 className="text-2xl font-bold">Welcome Back, {profile.name} professor!</h2>
                       <p className="text-muted-foreground mt-1">
                           {profile.summary}
                       </p>
@@ -725,5 +725,7 @@ export default function Courses() {
     </div>
   );
 }
+
+    
 
     
