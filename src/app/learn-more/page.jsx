@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, PlusCircle, QrCode, UserCheck } from 'lucide-react';
+import { ArrowLeft, PlusCircle, QrCode, UserCheck, School } from 'lucide-react';
 
 const StepCard = ({ icon, title, description, colorClass, delay }) => (
   <div 
@@ -24,7 +24,10 @@ export default function LearnMorePage() {
   return (
     <div className="min-h-screen bg-pastel-beige font-sans">
         <header className="container mx-auto px-6 py-4 flex justify-between items-center bg-white">
-          <div className="text-2xl font-bold text-black">AttendSys</div>
+          <div className="flex items-center space-x-2 text-2xl font-bold text-black">
+            <School className="h-8 w-8 text-blue-600" />
+            <span>AttendSys</span>
+          </div>
         </header>
         
         <main className="container mx-auto px-6 py-12">
