@@ -1,9 +1,11 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import Image from 'next/image';
 import {
   Dialog,
   DialogContent,
@@ -43,6 +45,7 @@ export default function EditProfileDialog({
 }) {
   const { toast } = useToast()
   const [uploadType, setUploadType] = useState('url');
+  const [imagePreview, setImagePreview] = useState('');
   
   const form = useForm({
     resolver: zodResolver(profileSchema),
@@ -56,6 +59,7 @@ export default function EditProfileDialog({
   useEffect(() => {
     if (profile) {
       form.reset(profile);
+      setImagePreview(profile.imageUrl || '');
       // Determine initial upload type
       if (profile.imageUrl && profile.imageUrl.startsWith('data:image')) {
         setUploadType('upload');
@@ -63,7 +67,7 @@ export default function EditProfileDialog({
         setUploadType('url');
       }
     }
-  }, [profile, form]);
+  }, [profile, form, isOpen]);
 
   const handleFileChange = (event) => {
     const file = event.target.files?.[0];
@@ -78,7 +82,9 @@ export default function EditProfileDialog({
       }
       const reader = new FileReader();
       reader.onloadend = () => {
-        form.setValue('imageUrl', reader.result);
+        const result = reader.result;
+        form.setValue('imageUrl', result);
+        setImagePreview(result);
       };
       reader.onerror = () => {
          toast({
@@ -99,6 +105,15 @@ export default function EditProfileDialog({
     onProfileUpdate(profileToUpdate);
     onOpenChange(false);
   };
+  
+  const watchedImageUrl = form.watch('imageUrl');
+
+  useEffect(() => {
+    if (uploadType === 'url' && !watchedImageUrl?.startsWith('data:')) {
+      setImagePreview(watchedImageUrl);
+    }
+  }, [watchedImageUrl, uploadType]);
+
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -189,6 +204,19 @@ export default function EditProfileDialog({
                   </Label>
                   <FormMessage />
                 </FormItem>
+            )}
+
+            {imagePreview && (
+              <div className="mt-4 flex flex-col items-center">
+                 <Label className="mb-2">Image Preview</Label>
+                 <Image
+                    src={imagePreview}
+                    alt="Profile preview"
+                    width={128}
+                    height={128}
+                    className="rounded-full object-cover border-4 border-muted"
+                 />
+              </div>
             )}
 
             <DialogFooter>
