@@ -68,7 +68,7 @@ const getInitialCourses = () => {
 
 const getInitialProfile = () => {
     if (typeof window === 'undefined') {
-        return { name: 'Professor', summary: "You could write some introduction about yourself, your wisdoms for today or things to do. Have a productive day!", imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSf_hA0y1cQ_H8FCo_H2yX49J1H2kRGAE0ORQ&s' };
+        return { name: 'Professor', summary: "You could write some introduction about yourself, your wisdoms for today or things to do. Have a productive day!", imageUrl: 'https://picsum.photos/seed/teacher/200/200' };
     }
     const loggedInUsername = localStorage.getItem('loggedInUsername');
     const storedProfileRaw = localStorage.getItem('teacherProfile');
@@ -78,7 +78,7 @@ const getInitialProfile = () => {
         : { 
               name: 'Professor', 
               summary: "You could write some introduction about yourself, your wisdoms for today or things to do. Have a productive day!", 
-              imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSf_hA0y1cQ_H8FCo_H2yX49J1H2kRGAE0ORQ&s' 
+              imageUrl: 'https://picsum.photos/seed/teacher/200/200'
           };
 
     if (loggedInUsername) {
@@ -403,7 +403,7 @@ export default function Courses() {
   const handleUpdateProfile = (updatedProfile) => {
     const profileToSave = { ...updatedProfile };
     if (!profileToSave.imageUrl) {
-        profileToSave.imageUrl = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSf_hA0y1cQ_H8FCo_H2yX49J1H2kRGAE0ORQ&s';
+        profileToSave.imageUrl = 'https://picsum.photos/seed/teacher/200/200';
     }
     setProfile(profileToSave);
     updateProfileLocalStorage(profileToSave);
@@ -480,8 +480,8 @@ export default function Courses() {
               <Card className="card card-hover rounded-xl border-0 overflow-hidden animate-fade-in">
                   <CardContent className="p-5 flex items-center gap-6">
                       <button onClick={() => openImagePreview(profile.imageUrl)} className="focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-full">
-                        <CourseBannerImage
-                            src={profile.imageUrl}
+                        <Image
+                            src={profile.imageUrl || 'https://picsum.photos/seed/teacher/200/200'}
                             width={80}
                             height={80}
                             alt="Teacher Profile Picture"
