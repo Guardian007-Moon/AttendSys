@@ -6,7 +6,7 @@ import { createContext, useState, useContext } from 'react';
 const PageTransitionContext = createContext();
 
 export const PageTransitionProvider = ({ children }) => {
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(true);
 
   return (
     <PageTransitionContext.Provider value={{ isTransitioning, setIsTransitioning }}>
