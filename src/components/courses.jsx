@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -64,7 +65,26 @@ const getInitialProfile = () => {
         return { name: 'Professor', summary: "You could write some introduction about yourself, your wisdoms for today or things to do. Have a productive day!", imageUrl: 'https://static.fandomspot.com/images/07/8067/00-featured-glenn-radars-akashic-records-of-a-bastard-instructor.jpg' };
     }
     const storedProfile = localStorage.getItem('teacherProfile');
-    return storedProfile ? JSON.parse(storedProfile) : { name: 'Professor', summary: "You could write some introduction about yourself, your wisdoms for today or things to do. Have a productive day!", imageUrl: 'https://static.fandomspot.com/images/07/8067/00-featured-glenn-radars-akashic-records-of-a-bastard-instructor.jpg' };
+    const loggedInUsername = localStorage.getItem('loggedInUsername');
+
+    if (storedProfile) {
+        const profile = JSON.parse(storedProfile);
+        if (loggedInUsername && profile.name === 'Professor') {
+             profile.name = loggedInUsername;
+             localStorage.setItem('teacherProfile', JSON.stringify(profile));
+             localStorage.removeItem('loggedInUsername');
+        }
+        return profile;
+    }
+
+    const defaultName = loggedInUsername || 'Professor';
+    if(loggedInUsername) localStorage.removeItem('loggedInUsername');
+    
+    return { 
+        name: defaultName, 
+        summary: "You could write some introduction about yourself, your wisdoms for today or things to do. Have a productive day!", 
+        imageUrl: 'https://static.fandomspot.com/images/07/8067/00-featured-glenn-radars-akashic-records-of-a-bastard-instructor.jpg' 
+    };
 }
 
 let courseStore = [];
@@ -748,6 +768,8 @@ export default function Courses() {
 
 
 
+
+    
 
     
 
