@@ -105,7 +105,7 @@ export default function EditProfileDialog({
                 <FormItem>
                   <FormLabel>Profile Image URL</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGu_9Y_Hn_2aK_2-i1G_aJ-jR_s-t_q-Yng&s" {...field} />
+                    <Input placeholder="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRrUOSIITmnZ4p1hDWqtHa9tf_eyhK51Q2aFA&s" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

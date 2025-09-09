@@ -62,7 +62,7 @@ const getInitialCourses = () => {
 
 const getInitialProfile = () => {
     if (typeof window === 'undefined') {
-        return { name: 'Professor', summary: "You could write some introduction about yourself, your wisdoms for today or things to do. Have a productive day!", imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGu_9Y_Hn_2aK_2-i1G_aJ-jR_s-t_q-Yng&s' };
+        return { name: 'Professor', summary: "You could write some introduction about yourself, your wisdoms for today or things to do. Have a productive day!", imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRrUOSIITmnZ4p1hDWqtHa9tf_eyhK51Q2aFA&s' };
     }
     const loggedInUsername = localStorage.getItem('loggedInUsername');
     const storedProfileRaw = localStorage.getItem('teacherProfile');
@@ -72,7 +72,7 @@ const getInitialProfile = () => {
         : { 
               name: 'Professor', 
               summary: "You could write some introduction about yourself, your wisdoms for today or things to do. Have a productive day!", 
-              imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGu_9Y_Hn_2aK_2-i1G_aJ-jR_s-t_q-Yng&s' 
+              imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRrUOSIITmnZ4p1hDWqtHa9tf_eyhK51Q2aFA&s' 
           };
 
     if (loggedInUsername) {
@@ -474,7 +474,7 @@ export default function Courses() {
               <Card className="card card-hover rounded-xl border-0 overflow-hidden animate-fade-in">
                   <CardContent className="p-5 flex items-center gap-6">
                       <Image
-                      src={profile.imageUrl || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGu_9Y_Hn_2aK_2-i1G_aJ-jR_s-t_q-Yng&s"}
+                      src={profile.imageUrl || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRrUOSIITmnZ4p1hDWqtHa9tf_eyhK51Q2aFA&s"}
                       width={80}
                       height={80}
                       alt="Teacher Profile Picture"
