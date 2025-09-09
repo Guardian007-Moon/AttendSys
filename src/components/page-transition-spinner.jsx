@@ -4,8 +4,9 @@
 import { usePageTransition } from '@/context/PageTransitionContext';
 import { School } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useState, useEffect } from 'react';
 
-export default function PageTransitionSpinner() {
+function Spinner() {
   const { isTransitioning } = usePageTransition();
 
   return (
@@ -30,4 +31,14 @@ export default function PageTransitionSpinner() {
       </p>
     </div>
   );
+}
+
+export default function PageTransitionSpinner() {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  return isClient ? <Spinner /> : null;
 }
