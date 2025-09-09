@@ -20,6 +20,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { initialCourses, initialCourseStudents as allStudents, loadAttendance } from '@/lib/mock-data';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -179,6 +185,8 @@ export default function Courses() {
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isProfileDialogOpen, setProfileDialogOpen] = useState(false);
+  const [isImagePreviewOpen, setImagePreviewOpen] = useState(false);
+  const [previewImageUrl, setPreviewImageUrl] = useState('');
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [courseToDeleteId, setCourseToDeleteId] = useState(null);
   const { toast } = useToast();
@@ -459,6 +467,11 @@ export default function Courses() {
     }
   };
 
+  const openImagePreview = (imageUrl) => {
+    setPreviewImageUrl(imageUrl);
+    setImagePreviewOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50/80 to-green-50/80">
       {/* Teacher Profile Section */}
@@ -466,14 +479,16 @@ export default function Courses() {
           <div className="max-w-7xl mx-auto px-6">
               <Card className="card card-hover rounded-xl border-0 overflow-hidden animate-fade-in">
                   <CardContent className="p-5 flex items-center gap-6">
-                      <CourseBannerImage
-                        src={profile.imageUrl}
-                        width={80}
-                        height={80}
-                        alt="Teacher Profile Picture"
-                        className="rounded-full border-4 border-white shadow-md object-cover"
-                        data-ai-hint="teacher profile"
-                      />
+                      <button onClick={() => openImagePreview(profile.imageUrl)} className="focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-full">
+                        <CourseBannerImage
+                            src={profile.imageUrl}
+                            width={80}
+                            height={80}
+                            alt="Teacher Profile Picture"
+                            className="rounded-full border-4 border-white shadow-md object-cover"
+                            data-ai-hint="teacher profile"
+                        />
+                      </button>
                       <div className="flex-1">
                       <h2 className="text-2xl font-bold">Welcome Back, professor {profile.name}!</h2>
                       <p className="text-muted-foreground mt-1">
@@ -748,6 +763,20 @@ export default function Courses() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={isImagePreviewOpen} onOpenChange={setImagePreviewOpen}>
+        <DialogContent className="max-w-xl p-0">
+          <Image
+            src={previewImageUrl}
+            width={800}
+            height={800}
+            alt="Teacher profile preview"
+            className="rounded-lg object-contain"
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
+
+    
