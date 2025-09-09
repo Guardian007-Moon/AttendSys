@@ -766,6 +766,9 @@ export default function Courses() {
 
       <Dialog open={isImagePreviewOpen} onOpenChange={setImagePreviewOpen}>
         <DialogContent className="max-w-xl p-0">
+           <DialogHeader className="sr-only">
+            <DialogTitle>Teacher profile preview</DialogTitle>
+          </DialogHeader>
           <Image
             src={previewImageUrl}
             width={800}
