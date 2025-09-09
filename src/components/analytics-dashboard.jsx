@@ -13,6 +13,35 @@ const COLORS = {
   Absent: '#ef4444',  // red-500
 };
 
+const CustomTick = ({ x, y, payload }) => {
+  if (payload && payload.value) {
+    const words = payload.value.split(' ');
+    // Simple logic to split into two lines if more than 2 words.
+    // A more complex logic could be implemented for more dynamic splitting.
+    if (words.length > 2) {
+      const line1 = words.slice(0, Math.ceil(words.length / 2)).join(' ');
+      const line2 = words.slice(Math.ceil(words.length / 2)).join(' ');
+      return (
+        <g transform={`translate(${x},${y})`}>
+          <text x={0} y={0} dy={16} textAnchor="end" fill="#666" transform="rotate(-35)">
+            <tspan x="0" dy="1.2em">{line1}</tspan>
+            <tspan x="0" dy="1.2em">{line2}</tspan>
+          </text>
+        </g>
+      );
+    }
+    return (
+       <g transform={`translate(${x},${y})`}>
+        <text x={0} y={0} dy={16} textAnchor="end" fill="#666" transform="rotate(-35)">
+          {payload.value}
+        </text>
+      </g>
+    );
+  }
+  return null;
+};
+
+
 export default function AnalyticsDashboard({ students, sessions }) {
   const attendanceData = useMemo(() => {
     if (!sessions.length || !students.length) return [];
@@ -96,7 +125,7 @@ export default function AnalyticsDashboard({ students, sessions }) {
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={attendanceData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" angle={-20} textAnchor="end" height={60} />
+              <XAxis dataKey="name" tick={<CustomTick />} height={80} interval={0} />
               <YAxis label={{ value: 'Number of Students', angle: -90, position: 'insideLeft' }} />
               <Tooltip
                 contentStyle={{
