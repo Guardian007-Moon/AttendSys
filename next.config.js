@@ -74,6 +74,12 @@ const nextConfig = {
         hostname: 'www.instagram.com',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'static.wikia.nocookie.net',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
