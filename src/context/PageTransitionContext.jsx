@@ -6,7 +6,7 @@ import { createContext, useState, useContext } from 'react';
 const PageTransitionContext = createContext();
 
 export const PageTransitionProvider = ({ children }) => {
-  // Start with transitioning as false. It will be set to true on link clicks.
+  // Start with transitioning as false. The controller will manage this state.
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   return (
