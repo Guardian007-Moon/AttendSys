@@ -58,10 +58,10 @@ import * as XLSX from 'xlsx';
 
 // Mock function to simulate generating and downloading a CSV report.
 const downloadReport = (data) => {
-  const headers = ['Student Name', 'Sex', 'Present', 'Late', 'Present (always)', 'Absent', 'Total Sessions'];
+  const headers = ['ID', 'Student Name', 'Sex', 'Present', 'Late', 'Present (always)', 'Absent', 'Total Sessions'];
   const csvRows = [
     headers.join(','),
-    ...data.map(row => [row.name, row.sex, row.present, row.late, row.presentAlways, row.absent, row.total].join(',')),
+    ...data.map(row => [row.id, row.name, row.sex, row.present, row.late, row.presentAlways, row.absent, row.total].join(',')),
   ];
   
   const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
@@ -263,6 +263,7 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
             <TableHeader className="sticky top-0 bg-card">
               <TableRow>
                 <TableHead>Student Name</TableHead>
+                <TableHead>ID</TableHead>
                 <TableHead>Sex</TableHead>
                 <TableHead className="text-center">Present</TableHead>
                 <TableHead className="text-center">Late</TableHead>
@@ -275,7 +276,7 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
             <TableBody>
               {students.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan="8" className="h-24 text-center">
+                  <TableCell colSpan="9" className="h-24 text-center">
                     No students in this course yet. Click "Add Student" to get started.
                   </TableCell>
                 </TableRow>
@@ -283,6 +284,7 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
                 attendanceData.map(student => (
                   <TableRow key={student.id}>
                     <TableCell className="font-medium">{student.name}</TableCell>
+                    <TableCell>{student.id}</TableCell>
                     <TableCell>{student.sex}</TableCell>
                     <TableCell className="text-center text-green-600 font-semibold">{student.present}</TableCell>
                     <TableCell className="text-center text-yellow-500 font-semibold">{student.late}</TableCell>
