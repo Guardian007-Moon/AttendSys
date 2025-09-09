@@ -25,7 +25,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { initialCourseStudents, loadAttendance, saveAttendance, initialSessions } from '@/lib/mock-data';
+import { initialCourses, initialCourseStudents, loadAttendance, saveAttendance, initialSessions } from '@/lib/mock-data';
 
 const getInitialSessions = (courseId) => {
   if (typeof window === 'undefined') return [];
@@ -53,6 +53,7 @@ let studentStore = [];
 export default function Dashboard({ courseId }) {
   const [sessions, setSessions] = useState([]);
   const [students, setStudents] = useState([]);
+  const [course, setCourse] = useState(null);
   const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -61,6 +62,13 @@ export default function Dashboard({ courseId }) {
   const { toast } = useToast();
   
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+        const allCoursesRaw = localStorage.getItem('courses');
+        const allCourses = allCoursesRaw ? JSON.parse(allCoursesRaw) : initialCourses;
+        const currentCourse = allCourses.find(c => c.id === courseId);
+        setCourse(currentCourse);
+    }
+
     sessionStore = getInitialSessions(courseId);
     setSessions(sessionStore);
     studentStore = getInitialStudents(courseId);
@@ -195,16 +203,16 @@ export default function Dashboard({ courseId }) {
         
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center gap-3 mb-1">
               <div className="bg-primary/10 p-2 rounded-xl">
                 <Book className="h-6 w-6 text-primary" />
               </div>
               <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-                {courseId} Dashboard
+                {course ? course.name : 'Loading...'}
               </h1>
             </div>
             <p className="text-muted-foreground ml-11">
-              Manage class sessions and track attendance for this course
+              {course ? course.code : `Course ID: ${courseId}`}
             </p>
           </div>
           
