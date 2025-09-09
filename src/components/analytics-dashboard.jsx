@@ -15,25 +15,36 @@ const COLORS = {
 
 const CustomTick = ({ x, y, payload }) => {
   if (payload && payload.value) {
-    const words = payload.value.split(' ');
-    // Simple logic to split into two lines if more than 2 words.
-    // A more complex logic could be implemented for more dynamic splitting.
-    if (words.length > 2) {
-      const line1 = words.slice(0, Math.ceil(words.length / 2)).join(' ');
-      const line2 = words.slice(Math.ceil(words.length / 2)).join(' ');
-      return (
-        <g transform={`translate(${x},${y})`}>
-          <text x={0} y={0} dy={16} textAnchor="end" fill="#666" transform="rotate(-35)">
-            <tspan x="0" dy="1.2em">{line1}</tspan>
-            <tspan x="0" dy="1.2em">{line2}</tspan>
-          </text>
-        </g>
-      );
+    const label = payload.value;
+    const maxChars = 10; // Character limit before font size starts to scale
+    const baseFontSize = 12; // Base font size for labels
+    const minFontSize = 8; // Minimum font size
+
+    let fontSize = baseFontSize;
+    if (label.length > maxChars) {
+      // Scale font size down for longer labels
+      fontSize = Math.max(minFontSize, baseFontSize - (label.length - maxChars) * 0.5);
     }
+    
+    // Simple logic to split into two lines if very long
+    if (label.length > 15) {
+        const words = label.split(' ');
+        const line1 = words.slice(0, Math.ceil(words.length / 2)).join(' ');
+        const line2 = words.slice(Math.ceil(words.length / 2)).join(' ');
+        return (
+            <g transform={`translate(${x},${y})`}>
+            <text x={0} y={0} dy={16} textAnchor="end" fill="#666" transform="rotate(-35)" fontSize={fontSize}>
+                <tspan x="0" dy="1.2em">{line1}</tspan>
+                <tspan x="0" dy="1.2em">{line2}</tspan>
+            </text>
+            </g>
+        );
+    }
+
     return (
        <g transform={`translate(${x},${y})`}>
-        <text x={0} y={0} dy={16} textAnchor="end" fill="#666" transform="rotate(-35)">
-          {payload.value}
+        <text x={0} y={0} dy={16} textAnchor="end" fill="#666" transform="rotate(-35)" fontSize={fontSize}>
+          {label}
         </text>
       </g>
     );
