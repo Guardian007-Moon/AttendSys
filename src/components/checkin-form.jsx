@@ -153,7 +153,6 @@ export default function CheckinForm({ courseId, sessionId }) {
         <p className="text-muted-foreground mb-8">
           Your attendance has been recorded. You can now close this page.
         </p>
-        <Button onClick={() => window.location.reload()}>Check-in Another Student</Button>
       </div>
     );
   }
