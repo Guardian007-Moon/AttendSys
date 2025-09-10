@@ -178,7 +178,7 @@ export default function CheckinForm({ courseId, sessionId }) {
 
   if (isCheckedIn) {
     return (
-      <div className="w-full max-w-4xl mx-auto glass text-white rounded-2xl shadow-2xl overflow-hidden md:flex">
+      <div className="w-full max-w-4xl mx-auto bg-black/30 backdrop-blur-lg text-white rounded-2xl shadow-2xl overflow-hidden md:flex">
           <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center text-center items-center">
             <CheckCircle className="h-20 w-20 text-green-400 mb-6" />
             <h1 className="text-3xl font-bold mb-3">{confirmationMessage}</h1>
@@ -209,7 +209,7 @@ export default function CheckinForm({ courseId, sessionId }) {
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto glass text-white rounded-2xl shadow-2xl overflow-hidden md:flex">
+    <div className="w-full max-w-4xl mx-auto bg-black/30 backdrop-blur-lg text-white rounded-2xl shadow-2xl overflow-hidden md:flex">
         <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
             <div className="mb-8">
                 <h2 className="text-3xl font-bold">Class Check-in</h2>
