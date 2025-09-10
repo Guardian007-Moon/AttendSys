@@ -17,7 +17,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { CheckCircle, Loader2, MapPin, User, Hash, Book } from 'lucide-react';
+import { CheckCircle, Loader2, MapPin, User, Hash } from 'lucide-react';
 import { getDistance } from 'geolib';
 
 const checkinSchema = z.object({
@@ -31,6 +31,7 @@ export default function CheckinForm({ courseId, sessionId }) {
   const [isCheckingIn, setIsCheckingIn] = useState(false);
   const [sessionInfo, setSessionInfo] = useState(null);
   const [isClient, setIsClient] = useState(false);
+  const [confirmationMessage, setConfirmationMessage] = useState('Check-in Complete!');
 
   useEffect(() => {
     setIsClient(true);
@@ -106,6 +107,7 @@ export default function CheckinForm({ courseId, sessionId }) {
                 description: `You have already been marked as ${currentAttendance[sessionId][student.id].status}.`,
                 action: <CheckCircle className="text-blue-500" />,
             });
+            setConfirmationMessage('You have already checked-in!');
             setIsCheckedIn(true);
             setIsCheckingIn(false);
             form.reset();
@@ -138,6 +140,7 @@ export default function CheckinForm({ courseId, sessionId }) {
           description: `Welcome, ${student.name}. You are marked as ${studentStatus}.`,
           action: <CheckCircle className="text-green-500" />,
         });
+        setConfirmationMessage('Check-in Complete!');
         setIsCheckedIn(true);
       } else {
         toast({
@@ -162,7 +165,7 @@ export default function CheckinForm({ courseId, sessionId }) {
     return (
       <div className="bg-card text-card-foreground rounded-2xl shadow-2xl w-full max-w-md p-8 md:p-12 text-center flex flex-col items-center">
         <CheckCircle className="h-20 w-20 text-green-500 mb-6" />
-        <h1 className="text-3xl font-bold mb-3">Check-in Complete!</h1>
+        <h1 className="text-3xl font-bold mb-3">{confirmationMessage}</h1>
         <p className="text-muted-foreground mb-8">
           Your attendance has been recorded. You can now close this page.
         </p>
@@ -171,119 +174,75 @@ export default function CheckinForm({ courseId, sessionId }) {
   }
 
   return (
-    <div className="bg-white/10 backdrop-blur-lg rounded-2xl shadow-xl w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 overflow-hidden">
-      
-      {/* Left side: Check-in Form */}
-      <div className="p-8 md:p-12 flex flex-col justify-center bg-slate-900/80 text-white">
-        <div className="flex items-center gap-3 mb-6">
-          <Book className="h-7 w-7 text-primary" />
-          <h1 className="text-2xl font-bold">Class Check-in</h1>
-        </div>
-        {isClient && sessionInfo ? (
-          <p className="text-sm mb-6 text-gray-300">
+    <div className="bg-card text-card-foreground rounded-2xl shadow-2xl w-full max-w-md p-8 md:p-12">
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold text-foreground">Class Check-in</h1>
+         {isClient && sessionInfo ? (
+          <p className="text-muted-foreground">
             Enter your details for <span className="font-semibold">{sessionInfo.name}</span>
           </p>
         ) : (
-            <div className="space-y-2 mb-6">
-              <div className="h-4 bg-gray-700 rounded w-3/4"></div>
+            <div className="space-y-2 mt-2">
+              <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div>
           </div>
         )}
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="studentId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Student ID</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <Hash className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                      <Input
-                        placeholder="Enter your student ID"
-                        className="pl-10 bg-white/10 border border-gray-500 rounded-lg text-white placeholder-gray-400"
-                        {...field}
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Full Name</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                      <Input
-                        placeholder="Enter your full name"
-                        className="pl-10 bg-white/10 border border-gray-500 rounded-lg text-white placeholder-gray-400"
-                        {...field}
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div className="flex items-center text-gray-300 text-xs pt-2">
-              <MapPin className="h-4 w-4 mr-2" />
-              <span>Your location will be used to verify attendance</span>
-            </div>
-            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={isCheckingIn}>
-              {isCheckingIn ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Checking In...
-                </>
-              ) : (
-                'Check In'
-              )}
-            </Button>
-          </form>
-        </Form>
       </div>
-
-      {/* Right side: Info & Image */}
-      <div className="relative bg-cover bg-center hidden md:flex flex-col justify-center p-10 text-white"
-            style={{ backgroundImage: "url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=1400&auto=format&fit=crop')" }}>
-        <div className="absolute inset-0 bg-black/60" />
-        <div className="relative z-10">
-          <h2 className="text-2xl font-bold mb-4">Check-in Instructions</h2>
-          <p className="text-sm text-gray-200 mb-6">
-            Follow these simple steps to mark your attendance for this session.
-          </p>
-          <ul className="space-y-4">
-            <li className="flex items-start gap-3">
-              <div className="bg-primary/50 text-white rounded-full h-6 w-6 flex items-center justify-center shrink-0">1</div>
-              <span>Enter your official Student ID and Full Name.</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <div className="bg-primary/50 text-white rounded-full h-6 w-6 flex items-center justify-center shrink-0">2</div>
-              <span>Click "Check In" and allow location access when prompted.</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <div className="bg-primary/50 text-white rounded-full h-6 w-6 flex items-center justify-center shrink-0">3</div>
-              <span>Once you see the success message, you're all set!</span>
-            </li>
-          </ul>
-           <div className="mt-8 pt-6 border-t border-white/20">
-              <h3 className="font-semibold mb-3">Please Note:</h3>
-              <ul className="space-y-3 text-sm">
-                 <li className="flex items-center gap-3">
-                    <Hash className="h-4 w-4 text-green-400" /> Ensure your ID matches the class roster.
-                 </li>
-                 <li className="flex items-center gap-3">
-                    <MapPin className="h-4 w-4 text-yellow-400" /> You must be within the allowed distance to check in.
-                 </li>
-              </ul>
-           </div>
-        </div>
-      </div>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <FormField
+            control={form.control}
+            name="studentId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center">
+                  <Hash className="h-4 w-4 mr-2" />
+                  Student ID
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Enter your student ID"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center">
+                   <User className="h-4 w-4 mr-2" />
+                  Full Name
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Enter your full name"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="flex items-center text-muted-foreground text-xs pt-2">
+            <MapPin className="h-4 w-4 mr-2" />
+            <span>Your location will be used to verify your attendance</span>
+          </div>
+          <Button type="submit" className="w-full" disabled={isCheckingIn}>
+            {isCheckingIn ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Checking In...
+              </>
+            ) : (
+              'Check In'
+            )}
+          </Button>
+        </form>
+      </Form>
     </div>
   );
 }
