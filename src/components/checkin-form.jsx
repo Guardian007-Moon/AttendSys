@@ -238,27 +238,38 @@ export default function CheckinForm({ courseId, sessionId }) {
 
       {/* Right side: Info & Image */}
       <div className="relative bg-cover bg-center hidden md:flex flex-col justify-center p-10 text-white"
-            style={{ backgroundImage: "url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1400&auto=format&fit=crop')" }}>
+            style={{ backgroundImage: "url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=1400&auto=format&fit=crop')" }}>
         <div className="absolute inset-0 bg-black/60" />
         <div className="relative z-10">
-          <h2 className="text-2xl font-bold mb-4">Streamline Your Classroom</h2>
+          <h2 className="text-2xl font-bold mb-4">Check-in Instructions</h2>
           <p className="text-sm text-gray-200 mb-6">
-            Manage attendance with our intuitive platform designed for educators.
+            Follow these simple steps to mark your attendance for this session.
           </p>
           <ul className="space-y-4">
-            <li className="flex items-center gap-3">
-              <CheckSquare className="h-5 w-5 text-green-400" /> Track student attendance
+            <li className="flex items-start gap-3">
+              <div className="bg-primary/50 text-white rounded-full h-6 w-6 flex items-center justify-center shrink-0">1</div>
+              <span>Enter your official Student ID and Full Name.</span>
             </li>
-            <li className="flex items-center gap-3">
-              <BarChart3 className="h-5 w-5 text-yellow-400" /> Analyze student behavior
+            <li className="flex items-start gap-3">
+              <div className="bg-primary/50 text-white rounded-full h-6 w-6 flex items-center justify-center shrink-0">2</div>
+              <span>Click "Check In" and allow location access when prompted.</span>
             </li>
-            <li className="flex items-center gap-3">
-              <FileText className="h-5 w-5 text-blue-400" /> Generate reports
-            </li>
-            <li className="flex items-center gap-3">
-              <Smartphone className="h-5 w-5 text-pink-400" /> Mobile access
+            <li className="flex items-start gap-3">
+              <div className="bg-primary/50 text-white rounded-full h-6 w-6 flex items-center justify-center shrink-0">3</div>
+              <span>Once you see the success message, you're all set!</span>
             </li>
           </ul>
+           <div className="mt-8 pt-6 border-t border-white/20">
+              <h3 className="font-semibold mb-3">Please Note:</h3>
+              <ul className="space-y-3 text-sm">
+                 <li className="flex items-center gap-3">
+                    <Hash className="h-4 w-4 text-green-400" /> Ensure your ID matches the class roster.
+                 </li>
+                 <li className="flex items-center gap-3">
+                    <MapPin className="h-4 w-4 text-yellow-400" /> You must be within the allowed distance to check in.
+                 </li>
+              </ul>
+           </div>
         </div>
       </div>
     </div>
