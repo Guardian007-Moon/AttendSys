@@ -54,6 +54,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { ToastAction } from "@/components/ui/toast";
 import * as XLSX from 'xlsx';
 
 // Mock function to simulate generating and downloading a CSV report.
@@ -158,8 +159,8 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
         })).filter(s => s.name && s.sex && s.id);
 
         if (newStudents.length > 0) {
-            const existingStudentIds = new Set(students.map(s => s.id.toLowerCase()));
-            const uniqueNewStudents = newStudents.filter(s => !existingStudentIds.has(s.id.toLowerCase()));
+            const existingStudentIds = new Set(students.map(s => String(s.id).toLowerCase()));
+            const uniqueNewStudents = newStudents.filter(s => !existingStudentIds.has(String(s.id).toLowerCase()));
             
             onStudentUpdate([...students, ...uniqueNewStudents]);
             toast({ title: 'Import Successful', description: `${uniqueNewStudents.length} new students have been added.` });
@@ -213,9 +214,17 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
         s.id === editingStudent.id ? { ...s, name: studentName, id: studentId, sex: studentSex } : s
       );
       onStudentUpdate(updatedStudents);
+       toast({
+        title: "Student Updated",
+        description: `Details for ${studentName} have been updated.`,
+      });
     } else {
       const newStudent = { id: studentId, name: studentName, sex: studentSex, status: 'Absent' };
       onStudentUpdate([...students, newStudent]);
+      toast({
+        title: "Student Added",
+        description: `${studentName} has been added to the roster.`,
+      });
     }
     setStudentDialogOpen(false);
   };
@@ -227,9 +236,34 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
 
   const handleDeleteStudent = () => {
     if (studentToDeleteId) {
-      const updatedStudents = students.filter(s => s.id !== studentToDeleteId);
-      onStudentUpdate(updatedStudents);
-      setStudentToDeleteId(null);
+        const originalStudents = [...students];
+        const studentToDelete = originalStudents.find(s => s.id === studentToDeleteId);
+        if (!studentToDelete) return;
+        
+        const studentName = studentToDelete.name;
+        
+        const updatedStudents = students.filter(s => s.id !== studentToDeleteId);
+        onStudentUpdate(updatedStudents);
+        setStudentToDeleteId(null);
+        
+        const handleUndo = () => {
+            onStudentUpdate(originalStudents);
+            toast({
+                title: "Undo Successful",
+                description: `Student "${studentName}" has been restored.`,
+            });
+        };
+
+        toast({
+            variant: "destructive",
+            title: "Student Deleted",
+            description: `Successfully deleted "${studentName}".`,
+            action: (
+                <ToastAction altText="Undo" onClick={handleUndo}>
+                    Undo
+                </ToastAction>
+            ),
+        });
     }
     setDeleteDialogOpen(false);
   };
@@ -237,180 +271,181 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
 
   return (
     <Card className="shadow-lg h-full">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-            <div className="flex items-center gap-3">
-              <Users className="h-6 w-6 text-primary" />
-              <CardTitle className="font-headline">Student Roster</CardTitle>
+        <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+                <div className="flex items-center gap-3">
+                    <Users className="h-6 w-6 text-primary" />
+                    <CardTitle className="font-headline">Student Roster</CardTitle>
+                </div>
+                <CardDescription>
+                    Manage students in this course and view their attendance summary.
+                </CardDescription>
             </div>
-            <CardDescription>
-                Manage students in this course and view their attendance summary.
-            </CardDescription>
-        </div>
-        <div className="flex gap-2">
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              onChange={handleFileImport}
-              className="hidden" 
-              accept=".xlsx, .xls, .csv"
-            />
-            <Button onClick={handleImportClick} variant="outline">
-              <Upload className="mr-2 h-4 w-4" />
-              Import from File
-            </Button>
-            <Button onClick={openAddStudentDialog}>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Add Student
-            </Button>
-            <Button onClick={handleDownload} disabled={sessions.length === 0} variant="outline">
-                <Download className="mr-2 h-4 w-4" />
-                Download Report
-            </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <ScrollArea className="h-[600px]">
-          <Table>
-            <TableHeader className="sticky top-0 bg-card">
-              <TableRow>
-                <TableHead>Student Name</TableHead>
-                <TableHead>ID</TableHead>
-                <TableHead>Sex</TableHead>
-                <TableHead className="text-center">Present</TableHead>
-                <TableHead className="text-center">Late</TableHead>
-                <TableHead className="text-center">Present (always)</TableHead>
-                <TableHead className="text-center">Absent</TableHead>
-                <TableHead className="text-center">Total Sessions</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {students.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan="9" className="h-24 text-center">
-                    No students in this course yet. Click "Add Student" to get started.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                attendanceData.map(student => (
-                  <TableRow key={student.id}>
-                    <TableCell className="font-medium">{student.name}</TableCell>
-                    <TableCell>{student.id}</TableCell>
-                    <TableCell>{student.sex}</TableCell>
-                    <TableCell className="text-center text-green-600 font-semibold">{student.present}</TableCell>
-                    <TableCell className="text-center text-yellow-500 font-semibold">{student.late}</TableCell>
-                    <TableCell className="text-center font-bold">{student.presentAlways}</TableCell>
-                    <TableCell className="text-center text-red-600 font-semibold">{student.absent}</TableCell>
-                    <TableCell className="text-center">{student.total}</TableCell>
-                    <TableCell className="text-right">
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon">
-                                    <MoreVertical className="h-5 w-5" />
-                                    <span className="sr-only">Student options</span>
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => openEditStudentDialog(student)}>
-                                    <Pencil />
-                                    Edit
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                    onClick={() => openDeleteDialog(student.id)}
-                                    className="text-destructive focus:text-destructive"
-                                >
-                                    <Trash2 />
-                                    Delete
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </ScrollArea>
-      </CardContent>
-
-      <Dialog open={isStudentDialogOpen} onOpenChange={setStudentDialogOpen}>
-          <DialogContent className="sm:max-w-md bg-transparent border-0 shadow-none p-0">
-              <Card className="w-full">
-                  <DialogHeader className="p-6 pb-4">
-                      <DialogTitle className="text-xl flex items-center gap-2">
-                          <User className="h-5 w-5 text-primary" />
-                          {editingStudent ? 'Edit Student' : 'Add New Student'}
-                      </DialogTitle>
-                      <DialogDescription>
-                          {editingStudent ? 'Update the student\'s details below.' : 'Enter the details for the new student.'}
-                      </DialogDescription>
-                  </DialogHeader>
-                  <CardContent className="space-y-5 px-6">
-                      <div className="relative">
-                          <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input 
-                              id="student-id"
-                              value={studentId}
-                              onChange={(e) => setStudentId(e.target.value)}
-                              placeholder="Student ID"
-                              className="pl-10"
-                          />
-                      </div>
-                      <div className="relative">
-                          <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input 
-                              id="student-name"
-                              value={studentName}
-                              onChange={(e) => setStudentName(e.target.value)}
-                              placeholder="Full Name"
-                              className="pl-10"
-                          />
-                      </div>
-                      <div className="relative">
-                           <UserSquare className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                           <Select onValueChange={setStudentSex} value={studentSex}>
-                              <SelectTrigger id="student-sex" className="pl-10">
+            <div className="flex gap-2">
+                <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    onChange={handleFileImport}
+                    className="hidden" 
+                    accept=".xlsx, .xls, .csv"
+                />
+                <Button onClick={handleImportClick} variant="outline">
+                    <Upload className="mr-2 h-4 w-4" />
+                    Import from File
+                </Button>
+                <Button onClick={openAddStudentDialog}>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Add Student
+                </Button>
+                <Button onClick={handleDownload} disabled={sessions.length === 0} variant="outline">
+                    <Download className="mr-2 h-4 w-4" />
+                    Download Report
+                </Button>
+            </div>
+        </CardHeader>
+        <CardContent>
+            <ScrollArea className="h-[600px]">
+                <Table>
+                    <TableHeader className="sticky top-0 bg-card">
+                    <TableRow>
+                        <TableHead>Student Name</TableHead>
+                        <TableHead>ID</TableHead>
+                        <TableHead>Sex</TableHead>
+                        <TableHead className="text-center">Present</TableHead>
+                        <TableHead className="text-center">Late</TableHead>
+                        <TableHead className="text-center">Present (always)</TableHead>
+                        <TableHead className="text-center">Absent</TableHead>
+                        <TableHead className="text-center">Total Sessions</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                    {students.length === 0 ? (
+                        <TableRow>
+                        <TableCell colSpan="9" className="h-24 text-center">
+                            No students in this course yet. Click "Add Student" to get started.
+                        </TableCell>
+                        </TableRow>
+                    ) : (
+                        attendanceData.map(student => (
+                        <TableRow key={student.id}>
+                            <TableCell className="font-medium">{student.name}</TableCell>
+                            <TableCell>{student.id}</TableCell>
+                            <TableCell>{student.sex}</TableCell>
+                            <TableCell className="text-center text-green-600 font-semibold">{student.present}</TableCell>
+                            <TableCell className="text-center text-yellow-500 font-semibold">{student.late}</TableCell>
+                            <TableCell className="text-center font-bold">{student.presentAlways}</TableCell>
+                            <TableCell className="text-center text-red-600 font-semibold">{student.absent}</TableCell>
+                            <TableCell className="text-center">{student.total}</TableCell>
+                            <TableCell className="text-right">
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" size="icon">
+                                            <MoreVertical className="h-5 w-5" />
+                                            <span className="sr-only">Student options</span>
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onClick={() => openEditStudentDialog(student)}>
+                                            <Pencil />
+                                            Edit
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                            onClick={() => openDeleteDialog(student.id)}
+                                            className="text-destructive focus:text-destructive"
+                                        >
+                                            <Trash2 />
+                                            Delete
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </TableCell>
+                        </TableRow>
+                        ))
+                    )}
+                    </TableBody>
+                </Table>
+            </ScrollArea>
+        </CardContent>
+        
+        <Dialog open={isStudentDialogOpen} onOpenChange={setStudentDialogOpen}>
+            <DialogContent className="sm:max-w-md bg-transparent border-0 shadow-none p-0">
+                <Card className="w-full">
+                    <DialogHeader className="p-6 pb-4">
+                        <DialogTitle className="text-xl flex items-center gap-2">
+                            <User className="h-5 w-5 text-primary" />
+                            {editingStudent ? 'Edit Student' : 'Add New Student'}
+                        </DialogTitle>
+                        <DialogDescription>
+                            {editingStudent ? 'Update the student\'s details below.' : 'Enter the details for the new student.'}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <CardContent className="space-y-5 px-6">
+                        <div className="relative">
+                            <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input 
+                                id="student-id"
+                                value={studentId}
+                                onChange={(e) => setStudentId(e.target.value)}
+                                placeholder="Student ID"
+                                className="pl-10"
+                                disabled={!!editingStudent}
+                            />
+                        </div>
+                        <div className="relative">
+                            <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input 
+                                id="student-name"
+                                value={studentName}
+                                onChange={(e) => setStudentName(e.target.value)}
+                                placeholder="Full Name"
+                                className="pl-10"
+                            />
+                        </div>
+                        <div className="relative">
+                            <UserSquare className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Select onValueChange={setStudentSex} value={studentSex}>
+                                <SelectTrigger id="student-sex" className="pl-10">
                                 <SelectValue placeholder="Select sex" />
-                              </SelectTrigger>
+                                </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="Male">Male</SelectItem>
-                              <SelectItem value="Female">Female</SelectItem>
+                                <SelectItem value="Male">Male</SelectItem>
+                                <SelectItem value="Female">Female</SelectItem>
                             </SelectContent>
-                          </Select>
-                      </div>
-                  </CardContent>
-                  <DialogFooter className="px-6 py-4 bg-muted/50 rounded-b-lg">
-                      <Button variant="outline" onClick={() => setStudentDialogOpen(false)}>
-                          Cancel
-                      </Button>
-                      <Button onClick={handleSaveStudent}>
-                          {editingStudent ? 'Save Changes' : 'Add Student'}
-                      </Button>
-                  </DialogFooter>
-              </Card>
-          </DialogContent>
-      </Dialog>
+                            </Select>
+                        </div>
+                    </CardContent>
+                    <DialogFooter className="px-6 py-4 bg-muted/50 rounded-b-lg">
+                        <Button variant="outline" onClick={() => setStudentDialogOpen(false)}>
+                            Cancel
+                        </Button>
+                        <Button onClick={handleSaveStudent}>
+                            {editingStudent ? 'Save Changes' : 'Add Student'}
+                        </Button>
+                    </DialogFooter>
+                </Card>
+            </DialogContent>
+        </Dialog>
 
-      <AlertDialog
-        open={isDeleteDialogOpen}
-        onOpenChange={setDeleteDialogOpen}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete this student and all their attendance data.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteStudent}>
-              Continue
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        <AlertDialog
+            open={isDeleteDialogOpen}
+            onOpenChange={setDeleteDialogOpen}
+        >
+            <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete this student and all their attendance data.
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDeleteStudent}>
+                Continue
+                </AlertDialogAction>
+            </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
     </Card>
   );
 }
