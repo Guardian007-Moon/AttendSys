@@ -17,7 +17,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { CheckCircle, Loader2, MapPin, User, Hash, Book, CheckSquare, BarChart3, FileText, Smartphone } from 'lucide-react';
+import { CheckCircle, Loader2, MapPin, User, Hash, Book } from 'lucide-react';
 import { getDistance } from 'geolib';
 
 const checkinSchema = z.object({
@@ -97,6 +97,19 @@ export default function CheckinForm({ courseId, sessionId }) {
         const currentAttendance = loadAttendance();
         if (!currentAttendance[sessionId]) {
           currentAttendance[sessionId] = {};
+        }
+
+        // Check if student is already checked in
+        if (currentAttendance[sessionId][student.id]) {
+            toast({
+                title: 'Already Checked In',
+                description: `You have already been marked as ${currentAttendance[sessionId][student.id].status}.`,
+                action: <CheckCircle className="text-blue-500" />,
+            });
+            setIsCheckedIn(true);
+            setIsCheckingIn(false);
+            form.reset();
+            return; // Stop execution
         }
 
         let studentStatus = 'Present';
