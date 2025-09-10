@@ -30,6 +30,7 @@ import { getDistance } from 'geolib';
 
 
 const checkinSchema = z.object({
+  studentId: z.string().min(1, 'Please enter your student ID.'),
   name: z.string().min(3, 'Please enter your full name.'),
 });
 
@@ -40,7 +41,7 @@ export default function CheckinForm({ courseId, sessionId }) {
 
   const form = useForm({
     resolver: zodResolver(checkinSchema),
-    defaultValues: { name: '' },
+    defaultValues: { studentId: '', name: '' },
   });
 
   const getStudentLocation = () => {
@@ -92,7 +93,7 @@ export default function CheckinForm({ courseId, sessionId }) {
 
         const studentList = loadStudentsByCourse(courseId);
         const student = studentList.find(
-        s => s.name.toLowerCase() === values.name.toLowerCase()
+          s => s.id.toLowerCase() === values.studentId.toLowerCase() && s.name.toLowerCase() === values.name.toLowerCase()
         );
 
         if (student) {
@@ -133,7 +134,7 @@ export default function CheckinForm({ courseId, sessionId }) {
         toast({
             variant: 'destructive',
             title: 'Check-in Failed',
-            description: 'Your name was not found on the class roster. Please check the name and try again.',
+            description: 'Your ID or name was not found on the class roster. Please check your details and try again.',
         });
         }
     } catch (error) {
@@ -169,24 +170,37 @@ export default function CheckinForm({ courseId, sessionId }) {
         <CardHeader>
             <CardTitle>Class Check-in</CardTitle>
             <CardDescription>
-            Enter your full name to mark your attendance. Your location will be used to verify you are in the classroom.
+            Enter your Student ID and full name to mark your attendance. Your location will be used to verify you are in the classroom.
             </CardDescription>
         </CardHeader>
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
                 <CardContent className="space-y-4">
                     <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                        <FormItem>
-                        <FormLabel>Full Name</FormLabel>
-                        <FormControl>
-                            <Input placeholder="e.g., 'Amelia Harris'" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                        </FormItem>
-                    )}
+                      control={form.control}
+                      name="studentId"
+                      render={({ field }) => (
+                          <FormItem>
+                          <FormLabel>Student ID</FormLabel>
+                          <FormControl>
+                              <Input placeholder="e.g., 'S001'" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                          </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                          <FormItem>
+                          <FormLabel>Full Name</FormLabel>
+                          <FormControl>
+                              <Input placeholder="e.g., 'Amelia Harris'" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                          </FormItem>
+                      )}
                     />
                 </CardContent>
                 <CardFooter>
