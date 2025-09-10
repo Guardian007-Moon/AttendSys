@@ -10,6 +10,9 @@ export default function CheckinPage({ params }) {
             <span>AttendSys</span>
         </div>
       <CheckinForm courseId={params.courseId} sessionId={params.sessionId} />
+       <footer className="absolute bottom-6 text-white/70 text-sm">
+        Easy check-in system • 2025
+      </footer>
     </main>
   );
 }
