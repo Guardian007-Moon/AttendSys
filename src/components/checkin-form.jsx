@@ -115,8 +115,8 @@ export default function CheckinForm({ courseId, sessionId }) {
         }
 
         let studentStatus = 'Present';
+        const now = new Date();
         if (session && session.startTime && session.checkinTimeLimit >= 0) {
-          const now = new Date();
           const sessionDate = new Date(session.date);
           const [hours, minutes] = session.startTime.split(':');
           const deadline = new Date(sessionDate.getTime());
@@ -130,7 +130,7 @@ export default function CheckinForm({ courseId, sessionId }) {
 
         currentAttendance[sessionId][student.id] = {
           status: studentStatus,
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
           distance: distance,
         };
         saveAttendance(currentAttendance);

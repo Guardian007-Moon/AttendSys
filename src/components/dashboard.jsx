@@ -116,22 +116,23 @@ export default function Dashboard({ courseId }) {
 
     for (const studentId in sessionAttendance) {
         const record = sessionAttendance[studentId];
-        // We only re-evaluate for students who have already checked in
+        // We only re-evaluate for students who have already checked in and have a time record
         if (record.time) {
-            const checkinTimeParts = record.time.match(/(\d+):(\d+):(\d+) (AM|PM)/);
+            // The time is stored in 'h:mm:ss AM/PM' format. We need to parse it.
+            const checkinTimeParts = record.time.match(/(\d+):(\d+)(?::\d+)?\s(AM|PM)/);
             if (checkinTimeParts) {
-                let [_, chour, cmin, csec, campm] = checkinTimeParts;
-                let checkinHour = parseInt(chour, 10);
+                let [_, hour, minute, ampm] = checkinTimeParts;
+                let checkinHour = parseInt(hour, 10);
 
-                if (campm === 'PM' && checkinHour < 12) {
+                if (ampm === 'PM' && checkinHour < 12) {
                     checkinHour += 12;
-                } else if (campm === 'AM' && checkinHour === 12) {
+                } else if (ampm === 'AM' && checkinHour === 12) { // Midnight case
                     checkinHour = 0;
                 }
 
                 const checkinDateTime = new Date(sessionDate.getTime());
-                checkinDateTime.setHours(checkinHour, parseInt(cmin, 10), parseInt(csec, 10), 0);
-
+                checkinDateTime.setHours(checkinHour, parseInt(minute, 10), 0, 0);
+                
                 const newStatus = checkinDateTime > deadline ? 'Late' : 'Present';
                 
                 if(record.status !== newStatus) {
@@ -156,7 +157,7 @@ export default function Dashboard({ courseId }) {
     setSelectedSession(null);
      toast({
         title: "Class Session Updated",
-        description: `The session "${updatedSession.name}" has been successfully updated.`,
+        description: `The session "${updatedSession.name}" has been successfully updated. Attendance statuses have been re-evaluated.`,
         action: <CheckCircle className="text-green-500" />,
         className: "border-l-4 border-l-green-500"
     });
