@@ -162,8 +162,18 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
             const existingStudentIds = new Set(students.map(s => String(s.id).toLowerCase()));
             const uniqueNewStudents = newStudents.filter(s => !existingStudentIds.has(String(s.id).toLowerCase()));
             
-            onStudentUpdate([...students, ...uniqueNewStudents]);
-            toast({ title: 'Import Successful', description: `${uniqueNewStudents.length} new students have been added.` });
+            if (uniqueNewStudents.length > 0) {
+                onStudentUpdate([...students, ...uniqueNewStudents]);
+                toast({ 
+                    title: 'Import Successful', 
+                    description: `${uniqueNewStudents.length} new students have been added. ${newStudents.length - uniqueNewStudents.length} duplicates were ignored.` 
+                });
+            } else {
+                 toast({ 
+                    title: 'No New Students Added', 
+                    description: `All ${newStudents.length} students in the file were already in the roster.` 
+                });
+            }
         } else {
             toast({ variant: 'destructive', title: 'Import Failed', description: 'No valid student data found in the file.' });
         }
