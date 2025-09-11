@@ -205,13 +205,13 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
   };
 
   const handleSaveStudent = () => {
-    if (!studentName.trim() || !studentSex || !studentId.trim()) {
+    if (!studentName.trim() || !studentSex || !String(studentId).trim()) {
         toast({ variant: 'destructive', title: 'Validation Error', description: 'Please fill out all fields.' });
         return;
     }
 
     const isIdDuplicate = students.some(
-        (s) => s.id.toLowerCase() === studentId.trim().toLowerCase() && s.id !== editingStudent?.id
+        (s) => String(s.id).toLowerCase() === String(studentId).trim().toLowerCase() && s.id !== editingStudent?.id
     );
 
     if (isIdDuplicate) {
@@ -459,3 +459,5 @@ export default function StudentAttendanceDashboard({ students, sessions, onStude
     </Card>
   );
 }
+
+    
